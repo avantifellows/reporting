@@ -1,0 +1,17 @@
+{
+    "id": "9740769616_mathmajortesti-7",
+    "student_id" : "9740769616",
+    "quiz_id": "mathmajortesti-7",
+    "quiz_name": "Math - Major Test I",
+    "quiz_stats": {
+        "max_score": "50",
+        "average": "26.42",
+        "number_of_students": "18",
+        "highest_marks": "49.0"
+    },
+    "score_details": {
+        "score": 1.0,
+        "rank": 18,
+        "percentile": 5.56
+    }
+}
