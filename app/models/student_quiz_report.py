@@ -5,6 +5,8 @@ from pydantic import BaseModel
 from pydantic.types import UUID4
 from typing import List, Optional
 
+from app.db.student_quiz_reports_db import StudentQuizReportsDB
+
 class QuizStats(BaseModel):
     max_score: float = Field(..., example='Max Score')
     average: float = Field(..., example='Average Score')
@@ -25,7 +27,7 @@ class StudentQuizReportModel(BaseModel):
 
 
 class StudentQuizReportController():
-    def __init__(self, repository: StudentQuizReportRepository) -> None:
+    def __init__(self, repository: StudentQuizReportsDB) -> None:
         self.__repository = repository
 
     def get_all(self):
