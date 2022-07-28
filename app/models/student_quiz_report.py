@@ -23,7 +23,7 @@ class StudentQuizReportModel(BaseModel):
     id: Optional[str]
     quiz_id: str = Field(..., example='QUIZ_ID')
     quiz_name: str = Field(..., example='Quiz Name')
-    student_id: str = Field(..., example='Student ID')
+    student_id: str = Field(..., example='Student_ID')
     student_name: str = Field(..., example='Student Name')
     quiz_stats: QuizStats = Field()
     score_details: ScoreDetails = Field()
