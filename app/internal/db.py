@@ -2,10 +2,11 @@ import boto3
 from dotenv import load_dotenv
 import os
 
-load_dotenv('.env.local')
+load_dotenv('../.env.local')
 
-print(os.getenv('DYNAMODB_URL'))
+
 def initialize_db():
+    print("INITIALIZING DB with", os.getenv('DYNAMODB_URL') )
     ddb = boto3.resource('dynamodb',
                          endpoint_url=os.getenv('DYNAMODB_URL'),
                          region_name=os.getenv('DYNAMODB_REGION'),

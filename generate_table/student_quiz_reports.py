@@ -22,6 +22,10 @@ def generate_student_quiz_reports(ddb):
             {
                 'AttributeName': 'id',
                 'KeyType': 'HASH'
+            },
+            {
+                'AttributeName': 'student_id',
+                'KeyType': 'RANGE'
             }
         ],
         GlobalSecondaryIndexes=[
