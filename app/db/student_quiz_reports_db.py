@@ -13,10 +13,11 @@ class StudentQuizReportsDB:
         response = table.scan()
         return response.get('Items', [])
 
-    def get_student_quiz_report(self, student_id: str, quiz_id: str):
+    def get_student_quiz_report(self, student_id_quiz_id: str):
         try:
+            print("Trying to find", student_id_quiz_id)
             table = self.__db.Table('student_quiz_reports')
-            response = table.get_item(Key={'student_id': student_id, 'quiz_id': quiz_id})
+            response = table.get_item(Key={'id': student_id_quiz_id})
             return response['Item']
         except ClientError as e:
             raise ValueError(e.response['Error']['Message'])

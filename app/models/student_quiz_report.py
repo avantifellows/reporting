@@ -36,12 +36,14 @@ class StudentQuizReportController():
     def get_all(self):
         return self.__repository.get_all()
 
-    def get_student_quiz_report(self, student_id: str, quiz_id: str):
-        return self.__repository.get_student_quiz_report(student_id, quiz_id)
+    def get_student_quiz_report(self, student_id, quiz_id):
+        student_id_quiz_id = student_id + "-" + quiz_id
+        return self.__repository.get_student_quiz_report(student_id_quiz_id=student_id_quiz_id)
 
     def create_student_quiz_report(self, student_quiz_report: StudentQuizReportModel, uid=None):
         if (uid == None):
             uid = student_quiz_report.student_id + "-" + student_quiz_report.quiz_id
+        student_quiz_report.student_id = student_quiz_report.student_id.replace(" ", "_")
         uid = uid.replace(" ", "_")
         student_quiz_report.id = uid
         return self.__repository.create_student_quiz_report(student_quiz_report.dict())
