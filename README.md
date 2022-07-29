@@ -10,7 +10,13 @@ Welcome to the AF Reporting Engine!
 docker-compose up --build
 ```
 
-2. [ONLY FIRST TIME] Go into the shell of t `app` container and run:
+2. [ONLY FIRST TIME] Create an external docker volume to enable DynamoDB data to persist between sessions
+
+```bash
+docker volume create --name=dynamodb_data
+```
+
+3. [ONLY FIRST TIME] Go into the shell of t `app` container and run:
 
 ```
 python generate_table
