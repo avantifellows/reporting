@@ -20,6 +20,11 @@ class ScoreDetails(BaseModel):
     score: float = Field(..., example=65.5)
     rank: int = Field(..., example=7)
     percentile: float = Field(..., example=85.4)
+    num_correct: int = Field(..., example=30)
+    num_incorrect: int = Field(..., example=15)
+    num_skipped: int = Field(..., example=7)
+    max_marks: int = Field(..., example=360)
+    highest_score: int = Field(..., example=325)
 
 
 class StudentQuizReportModel(BaseModel):
