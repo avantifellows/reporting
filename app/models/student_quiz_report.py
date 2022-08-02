@@ -8,6 +8,16 @@ from typing import List, Optional
 
 from db.student_quiz_reports_db import StudentQuizReportsDB
 
+class CustomBaseModel(BaseModel):
+    def dict(self, **kwargs):
+        hidden_fields = set(
+            attribute_name
+            for attribute_name, model_field in self.__fields__.items()
+            if model_field.field_info.extra.get("hidden") is True
+        )
+        kwargs.setdefault("exclude", hidden_fields)
+        return super().dict(**kwargs)
+
 
 class QuizStats(BaseModel):
     max_score: int = Field(..., example=100)
@@ -27,8 +37,7 @@ class ScoreDetails(BaseModel):
     highest_score: int = Field(..., example=325)
 
 
-class StudentQuizReportModel(BaseModel):
-    id: Optional[str]
+class CreateStudentQuizReportModel(BaseModel):
     quiz_id: str = Field(..., example='QUIZ_ID')
     quiz_name: str = Field(..., example='Quiz Name')
     student_id: str = Field(..., example='STUDENT_ID')
@@ -36,27 +45,32 @@ class StudentQuizReportModel(BaseModel):
     quiz_stats: QuizStats = Field()
     score_details: ScoreDetails = Field()
 
-    class Config:
-        # Field id doesn't need to be passed and should be removed
-        schema_extra = {
-            "example": {
-                "quiz_id": "QUIZ_ID",
-                "quiz_name": "Quiz Name",
-                "student_id": "STUDENT_ID",
-                "student_name": "Student Name",
-                "quiz_stats": {
-                    "max_score": 100,
-                    "average": 56.4,
-                    "number_of_students": 72,
-                    "highest_marks": 97.5
-                },
-                "score_details": {
-                    "score": 65.5,
-                    "rank": 7,
-                    "percentile": 85.4
-                }
-            }
-        }
+
+class StudentQuizReportModel(CreateStudentQuizReportModel):
+    id: Optional[str] = Field(..., hidden=True)
+    
+    # class Config:
+    #     # Field id doesn't need to be passed and should be removed
+    #     schema_extra = {
+    #         "example": {
+    #             "quiz_id": "QUIZ_ID",
+    #             "quiz_name": "Quiz Name",
+    #             "student_id": "STUDENT_ID",
+    #             "student_name": "Student Name",
+    #             "quiz_stats": {
+    #                 "max_score": 100,
+    #                 "average": 56.4,
+    #                 "number_of_students": 72,
+    #                 "highest_marks": 97.5,
+    #                 "num_correc"
+    #             },
+    #             "score_details": {
+    #                 "score": 65.5,
+    #                 "rank": 7,
+    #                 "percentile": 85.4
+    #             }
+    #         }
+    #     }
 
 
 class StudentQuizReportController():
@@ -70,13 +84,11 @@ class StudentQuizReportController():
         student_id_quiz_id = student_id + "-" + quiz_id
         return self.__student_quiz_reports_db.get_student_quiz_report(student_id_quiz_id=student_id_quiz_id)
 
-    def create_student_quiz_report(self, student_quiz_report: StudentQuizReportModel, uid=None):
-        if (uid == None):
-            uid = student_quiz_report.student_id + "-" + student_quiz_report.quiz_id
-        student_quiz_report.student_id = student_quiz_report.student_id.replace(
-            " ", "_")
+    def create_student_quiz_report(self, report_data: CreateStudentQuizReportModel, uid=None):
+        uid = report_data.student_id + "-" + report_data.quiz_id
+        
         uid = uid.replace(" ", "_")
-        student_quiz_report.id = uid
+        student_quiz_report = StudentQuizReportModel(**report_data.dict(), id=uid)
         return self.__student_quiz_reports_db.create_student_quiz_report(student_quiz_report.dict())
 
     def update_student_quiz_report(self, student_quiz_report: StudentQuizReportModel):

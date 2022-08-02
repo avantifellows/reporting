@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 from fastapi import HTTPException
 
-from models.student_quiz_report import StudentQuizReportModel, StudentQuizReportController
+from models.student_quiz_report import CreateStudentQuizReportModel, StudentQuizReportModel, StudentQuizReportController
 
 
 class StudentQuizReportsRouter:
@@ -17,7 +17,7 @@ class StudentQuizReportsRouter:
             return 'Hello! Welcome to student_quiz_reports index route'
 
         @api_router.post('/create')
-        def create_student_quiz_report(report_data: StudentQuizReportModel):
+        def create_student_quiz_report(report_data: CreateStudentQuizReportModel):
             return self.__student_quiz_reports_controller.create_student_quiz_report(report_data)
 
         @api_router.get('/get/{student_quiz_report_uid}')
