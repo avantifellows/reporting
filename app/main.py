@@ -18,6 +18,7 @@ student_quiz_reports_controller = StudentQuizReportController(student_quiz_repor
 recipes_router = StudentQuizReportsRouter(student_quiz_reports_controller)
 
 app.include_router(recipes_router.router)
+app.include
 
 
 @app.get('/')
