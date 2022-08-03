@@ -3,38 +3,52 @@
 
 {% block content %}
 
-<h1>Hello How are you?</h1>
-
-Report id is {{report_id}}
-<!-- {% set quizStats = student_details["quiz_stats"] %}
-{% set scoreDetails = student_details["score_details"] %}
-{% set quizName = quizStats["quiz_name"] %}
- 
-<div id="logo_and_title">
-  <center>
-  <a href="/">
-<img src="https://cdn.avanti.in/uploads/2017/04/avantilogo60.png" alt="Avanti Logo" class="logo">
-</a>
-<h1 id="batchreport" style="color:white;"><b><span >Student Report</span></b></h1>
-<h2 class="title-wrap"> <span class="title">{{ student_details["student_name"] }}</span></h2>
-
-<h2 id="perReport"style="color:white;"><b><span > {{ quizName }} </span></b></h2>
-
-  </center>
+<div id="name_card">
+  <p>Name: {{report_data["student_name"]}}
+  <p>Student ID: {{report_data["student_id"]}}
 </div>
 
-Dear {{ student_details["student_name"] }}, 
-<br><br>
-Here is your performance report for {{quizName}}:
+<div id="test_summary_card">
+  <div class="percentage"> {{report_data["score_details"]["percentage"]}}%</div>
+  <div class="test_details">
+    <div>{{report_data["quiz_date"]}}</div>
+    <div>{{report_data["quiz_name"]}}</div>
+  </div>
+</div>
 
-<table class="student_details_table">
-<tr> <td>Total Marks</td> <td>{{ quizStats["max_score"] }} </td> </tr>
-<tr> <td>Highest</td> <td>{{ quizStats["highest_marks"] }} </td> </tr>
-<tr> <td>Average</td>  <td>{{ quizStats["average"] }} </td> </tr>
-<tr> <td>Your Score</td> <td>{{ scoreDetails["score"] }} </td> </tr>
-<tr> <td>Your Percentile</td> <td>{{ scoreDetails["percentile"] }} </td>
-<tr> <td>Your Rank</td>  <td>{{ scoreDetails["rank"] }} </td> </tr>
-</table>
- -->
+<section id="overall_performance">
+  <div id="section_heading">Overall Performance</div>
+  {% set score_details = report_data["score_details"] %}
+
+  <table id="score_details">
+    <tr>
+      <td>Marks</td>
+      <td>{{ score_details["score"]}} / {{score_details["max_marks"]}} </td>
+    </tr>
+    <tr>
+      <td>Correct Answers</td>
+      <td>{{ score_details["num_correct"] }} </td>
+    </tr>
+    <tr>
+      <td>Incorrect Answers</td>
+      <td>{{ score_details["num_incorrect"] }} </td>
+    </tr>
+    <tr>
+      <td>Unattempted</td>
+      <td>{{ score_details["num_skipped"] }} </td>
+    </tr>
+    <tr>
+      <td>Topper Marks</td>
+      <td>{{ score_details["highest_score"] }} </td>
+    <tr>
+      <td>Rank</td>
+      <td>{{ score_details["rank"] }} </td>
+    </tr>
+    <tr>
+      <td>Percentile</td>
+      <td>{{ score_details["percentile"] }} </td>
+    </tr>
+  </table>
+</section>
 
 {% endblock %}
