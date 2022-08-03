@@ -1,0 +1,198 @@
+html {
+  height: 100%;
+}
+body {
+  font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+  margin: 0;
+  margin-left: auto;
+  margin-right: auto;
+  font-size: 16pt;
+  text-align: center;
+  height: 100%;
+  margin-bottom: 25px;
+}
+
+.title-wrap {
+  padding-bottom: 20px;
+}
+
+#logo_and_title {
+  width: 100%;
+  background-color: #0E2A44;
+  margin-top: 0;
+  margin-bottom: 25px;
+}
+
+.logo {
+  margin: 16px;
+}
+
+#graphtitle,
+#perhead {
+  font-size: 16pt;
+}
+
+#batchreport,
+#perReport {
+  font-size: 20pt;
+  margin-top: 10px;
+  margin-bottom: 16px;
+  padding: 16px;
+  color: #ffffff;
+}
+
+caption {
+  font-size: 20pt;
+  margin-top: 50px;
+  padding: 16px;
+  color: #0E2A44;
+}
+
+.statsTitle {
+  color: #0E2A44;
+  font-size: 28px;
+}
+
+.title {
+  padding: 8px;
+  font-family: sans-serif;
+  color: white;
+  font-size: 18pt;
+  border: 2px solid orange;
+}
+
+tr:first-child td {
+  vertical-align: top;
+  background-color: #444444;
+  color: white;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 12pt;
+  margin-left: auto;
+  margin-right: auto;
+  table-layout: fixed;
+  margin-top: 30px;
+  margin-bottom: 30px;
+}
+
+td,
+th {
+  border: 1px solid #ddd;
+  padding: 16px;
+  font-size: 18pt;
+  text-align: center;
+}
+
+tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+tr:hover {
+  background-color: #ddd;
+}
+
+th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+  background-color: #888888;
+  color: white;
+}
+
+.center {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.lead_text {
+  font-size: 25pt;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+  padding: 30px;
+}
+
+/* FOOTER */
+
+#main {
+  min-height: 100%;
+}
+
+#content {
+  overflow: auto;
+  padding-bottom: 60px;
+  margin-bottom: 200px;
+  /* must be same height as the footer */
+}
+
+#footer {
+  position: relative;
+  margin-top: -60px;
+  /* negative value of footer height */
+  height: 60px;
+  clear: both;
+}
+
+/* LOGIN PAGE */
+
+.login-form,
+.search_students {
+  width: 80%;
+  margin: 50px auto;
+}
+
+
+@media only screen and (min-width: 800px) {
+  table {
+    max-width: 70%; 
+  }
+
+
+  .login-form,
+  .search_students {
+    width: 40%;
+    margin: 50px auto;
+  }
+
+  .title {
+    padding: 8px;
+    font-family: sans-serif;
+    font-size: 35px;
+    color: white;
+    border: 2px solid orange;
+  }
+}
+
+@media only screen and (min-width: 1200px) {
+  table {
+    width: 50%;
+  }
+}
+
+
+.login-form form,
+.search_students form {
+  margin-bottom: 15px;
+  background: #f7f7f7;
+  box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+  padding: 30px;
+}
+
+.login-form h2 {
+  margin: 0 0 15px;
+}
+
+.form-control,
+.btn {
+  min-height: 38px;
+  border-radius: 2px;
+}
+
+.btn {
+  background-color: #0E2A44;
+  font-size: 15px;
+  font-weight: bold;
+}

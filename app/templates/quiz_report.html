@@ -1,0 +1,50 @@
+{% extends "layout.html" %}
+{% block title %}Index{% endblock %}
+
+{% block content %}
+
+{% set quiz = quiz_details["quiz"] %}
+
+<div id="logo_and_title">
+  <center>
+  <a href="/">
+<img src="https://cdn.avanti.in/uploads/2017/04/avantilogo60.png" alt="Avanti Logo" class="logo">
+</a>
+<h1 id="batchreport" style="color:white;"><b><span >Batch Report</span></b></h1>
+<h2 id="perReport"style="color:white;"><b><span > {{ quiz["quiz_name"] }} </span></b></h2>
+  </center>
+</div>
+
+<table>
+<tr>
+  <td>Quiz Name</td> <td>{{ quiz["quiz_name"] }} </td></tr>
+  <td>Total Marks</td> <td>{{ quiz["max_score"] }} </td></tr>
+  <td>Highest</td> <td>{{ quiz["highest_marks"] }} </td></tr>
+  <td>Average</td> <td>{{ quiz["average"] }} </td></tr>
+  <td>Number of students</td> <td>{{ quiz["number_of_students"] }} </td></tr>
+</table>
+
+<br><br>
+
+{% set scores = quiz_details["students"] %} 
+<table>
+        <tr>
+            <td> Student ID </td> 
+            <td> Student Name </td>
+            <td> Score </td>
+        </tr>
+
+{% for score  in scores %}
+
+        <tr> 
+            <td><a href="{{ url_for('show_student_report',student_id=score['student_lms_id'], quiz_id=quiz['quiz_cms_id']) }}"> {{ score["student_lms_id"] }} </a> </td> 
+            <td>{{ score["student_name"] }}</td>
+            <td>{{ score["score"] }}</td>
+        </tr>
+
+{% endfor %}
+
+
+</table>
+
+{% endblock %}

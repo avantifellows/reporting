@@ -1,0 +1,91 @@
+{% extends "layout.html" %}
+{% block title %}Quiz Reports{% endblock %}
+
+{% block content %}
+
+<div id="logo_and_title">
+  <center>
+  <a href="/">
+<img src="https://cdn.avanti.in/uploads/2017/04/avantilogo60.png" alt="Avanti Logo" class="logo">
+</a>
+<h1 id="batchreport" style="color:white;"><b><span >Student Dashboard</span></b></h1>
+{% if student_report != {} %}
+    <h2 class="title-wrap"> <span class="title">{{ student_report["name"] }}</span></h2>
+{% endif %}
+</center>
+</div>
+
+<div class="feed_cards">
+  {% if feeds != None and feeds != [] %}
+    <div class="lead_text">Live Class Resources</div>
+    {% for feed in feeds %}
+      <p><a href="{{feed['url']}}" target="_blank"> {{ feed["title"] }} </a></p>
+    {% endfor %}
+  {% endif %}
+</div>
+
+{% if student_report != {} %}
+  {% for field in student_report["fields"] %}
+    <div class="lead_text">
+      {{ field["title"]}}
+    </div>
+      {% if field["type"] == "table" %}
+        <table>
+          {% for key, value in field["data"].items() %}
+            <tr>
+              <td>{{ key }}</td>
+              <td>{{ value }}</td>
+            </tr>
+          {% endfor %}
+        </table>
+        
+      {% endif %}
+  {% endfor %}
+{% else %}
+{% endif %}
+
+<div class="lead_text">
+  Avanti Gurukul App Test Reports
+</div>
+
+{% if app_reports|length > 0 %}
+
+  <table>
+    <tr>
+      <td> Test Name</td>
+    </tr>
+
+    {% for quiz  in app_reports %}
+      <tr>
+          <td> <a href="{{ url_for('show_student_report',quiz_id=quiz['quiz_id'], student_id=student_id) }}">{{ quiz["quiz_name"] }} </a>
+      </tr>
+    {% endfor %}
+  </table>
+
+{% else %}
+  No tests taken on the Gurukul app
+{% endif %}
+
+<div class="lead_text">
+  Subjective Test Reports
+</div>
+
+{% if subj_reports|length > 0 %}
+
+  <table>
+    <tr>
+      <td> Test Name</td>
+    </tr>
+    {% for quiz  in subj_reports %}
+      <tr>
+          <td> <a href="{{ url_for('show_student_report',quiz_id=quiz['quiz_id'], student_id=student_id) }}">{{ quiz["quiz_name"] }} </a>
+      </tr>
+
+    {% endfor %}
+  </table>
+{% else %}
+  No tests taken on the Gurukul app
+
+{% endif %}
+
+{% endblock %}

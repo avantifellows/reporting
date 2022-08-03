@@ -1,0 +1,40 @@
+{% extends "layout.html" %}
+{% block title %}Index{% endblock %}
+
+{% block content %}
+
+<h1>Hello How are you?</h1>
+
+Report id is {{report_id}}
+<!-- {% set quizStats = student_details["quiz_stats"] %}
+{% set scoreDetails = student_details["score_details"] %}
+{% set quizName = quizStats["quiz_name"] %}
+ 
+<div id="logo_and_title">
+  <center>
+  <a href="/">
+<img src="https://cdn.avanti.in/uploads/2017/04/avantilogo60.png" alt="Avanti Logo" class="logo">
+</a>
+<h1 id="batchreport" style="color:white;"><b><span >Student Report</span></b></h1>
+<h2 class="title-wrap"> <span class="title">{{ student_details["student_name"] }}</span></h2>
+
+<h2 id="perReport"style="color:white;"><b><span > {{ quizName }} </span></b></h2>
+
+  </center>
+</div>
+
+Dear {{ student_details["student_name"] }}, 
+<br><br>
+Here is your performance report for {{quizName}}:
+
+<table class="student_details_table">
+<tr> <td>Total Marks</td> <td>{{ quizStats["max_score"] }} </td> </tr>
+<tr> <td>Highest</td> <td>{{ quizStats["highest_marks"] }} </td> </tr>
+<tr> <td>Average</td>  <td>{{ quizStats["average"] }} </td> </tr>
+<tr> <td>Your Score</td> <td>{{ scoreDetails["score"] }} </td> </tr>
+<tr> <td>Your Percentile</td> <td>{{ scoreDetails["percentile"] }} </td>
+<tr> <td>Your Rank</td>  <td>{{ scoreDetails["rank"] }} </td> </tr>
+</table>
+ -->
+
+{% endblock %}
