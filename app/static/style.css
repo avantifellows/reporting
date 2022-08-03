@@ -1,198 +1,252 @@
 html {
-  height: 100%;
-}
-body {
-  font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
-  margin: 0;
-  margin-left: auto;
-  margin-right: auto;
-  font-size: 16pt;
-  text-align: center;
-  height: 100%;
-  margin-bottom: 25px;
+    height: 100%;
 }
 
+body {
+    font-family: "Avenir", Arial, Helvetica, sans-serif;
+    margin-left: auto;
+    margin-right: auto;
+    font-size: 14pt;
+    text-align: center;
+    height: 100%;
+    margin-bottom: 25px;
+}
+
+#name_card {
+    display: table;
+    margin: 30px auto 0 auto;
+    text-align: center;
+    background-color: #EAEDFD;
+    border-radius: 10px;
+    padding: 10px 40px 10px 40px;
+    box-shadow: 1px 1px 5px #535353;
+}
+
+#test_summary_card {
+    display: inline-flex;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 50px;
+    font-weight: bold;
+    justify-content: center;
+    background-color: #EBF5FE;
+    border-radius: 10px;
+    padding: 10px 40px 10px 40px;
+    box-shadow: 1px 1px 5px #535353;
+}
+
+#test_summary_card .percentage {
+    margin-right: 20px;
+    justify-content: center;
+    align-items: center;
+    background: orange;
+    border-radius: 50%;
+    /* -moz-border-radius:50%;
+    -webkit-border-radius:50%; */
+    text-align: center;
+    padding: 5px;
+    aspect-ratio: 1;
+    display: flex;
+    font-size: 12pt;
+}
+
+#test_summary_card .test_details {
+    display: block;
+    margin: auto;
+    font-size: 14pt;
+}
+
+#section_heading {
+    padding: 8px;
+    font-size: 18pt;
+    font-weight: bold;
+    margin-top: 30px;
+    text-transform: uppercase;
+}
+
+#score_details {
+    border-collapse: collapse;
+    font-size: 10pt;
+    padding: 0 30px 0 30px;
+    margin-left: auto;
+    margin-right: auto;
+    table-layout: fixed;
+    margin-top: 30px;
+    margin-bottom: 30px;
+}
+
+#score_details td {
+    border: 1px solid #ddd;
+    padding: 10px 20px 10px 20px;
+    font-size: 14pt;
+    text-align: center;
+}
+
+#score_details tr:first-child td {
+    vertical-align: top;
+    background-color: orange;
+    color: black;
+    font-weight: bold;
+}
+
+#score_detailstr:nth-child(even) {
+    background-color: #FEFBEB;
+}
+
+#score_details tr:nth-child(odd) {
+    background-color: orange;
+}
+
+#score_details tr:hover {
+    background-color: #ddd;
+}
+
+/* OLD STYLES BELOW */
 .title-wrap {
-  padding-bottom: 20px;
+    padding-bottom: 20px;
 }
 
 #logo_and_title {
-  width: 100%;
-  background-color: #0E2A44;
-  margin-top: 0;
-  margin-bottom: 25px;
+    width: 100%;
+    background-color: #0E2A44;
+    margin-top: 0;
+    margin-bottom: 25px;
 }
 
 .logo {
-  margin: 16px;
+    margin: 16px;
 }
 
 #graphtitle,
 #perhead {
-  font-size: 16pt;
+    font-size: 16pt;
 }
 
 #batchreport,
 #perReport {
-  font-size: 20pt;
-  margin-top: 10px;
-  margin-bottom: 16px;
-  padding: 16px;
-  color: #ffffff;
+    font-size: 20pt;
+    margin-top: 10px;
+    margin-bottom: 16px;
+    padding: 16px;
+    color: #ffffff;
 }
 
 caption {
-  font-size: 20pt;
-  margin-top: 50px;
-  padding: 16px;
-  color: #0E2A44;
+    font-size: 20pt;
+    margin-top: 50px;
+    padding: 16px;
+    color: #0E2A44;
 }
 
 .statsTitle {
-  color: #0E2A44;
-  font-size: 28px;
+    color: #0E2A44;
+    font-size: 28px;
 }
 
 .title {
-  padding: 8px;
-  font-family: sans-serif;
-  color: white;
-  font-size: 18pt;
-  border: 2px solid orange;
-}
-
-tr:first-child td {
-  vertical-align: top;
-  background-color: #444444;
-  color: white;
-}
-
-table {
-  border-collapse: collapse;
-  width: 100%;
-  font-size: 12pt;
-  margin-left: auto;
-  margin-right: auto;
-  table-layout: fixed;
-  margin-top: 30px;
-  margin-bottom: 30px;
-}
-
-td,
-th {
-  border: 1px solid #ddd;
-  padding: 16px;
-  font-size: 18pt;
-  text-align: center;
-}
-
-tr:nth-child(even) {
-  background-color: #f2f2f2;
-}
-
-tr:hover {
-  background-color: #ddd;
-}
-
-th {
-  padding-top: 12px;
-  padding-bottom: 12px;
-  text-align: left;
-  background-color: #888888;
-  color: white;
+    padding: 8px;
+    font-family: sans-serif;
+    color: white;
+    font-size: 18pt;
+    border: 2px solid orange;
 }
 
 .center {
-  margin-left: auto;
-  margin-right: auto;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .lead_text {
-  font-size: 25pt;
-  margin-left: auto;
-  margin-right: auto;
-  text-align: center;
-  padding: 30px;
+    font-size: 25pt;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    padding: 30px;
 }
 
 /* FOOTER */
 
 #main {
-  min-height: 100%;
+    min-height: 100%;
+}
+
+p {
+    margin-bottom: 0;
+    padding-bottom: 0;
 }
 
 #content {
-  overflow: auto;
-  padding-bottom: 60px;
-  margin-bottom: 200px;
-  /* must be same height as the footer */
+    overflow: auto;
+    padding-bottom: 60px;
+    margin-bottom: 200px;
+    /* must be same height as the footer */
 }
 
 #footer {
-  position: relative;
-  margin-top: -60px;
-  /* negative value of footer height */
-  height: 60px;
-  clear: both;
+    position: relative;
+    margin-top: -60px;
+    /* negative value of footer height */
+    height: 60px;
+    clear: both;
 }
 
 /* LOGIN PAGE */
 
 .login-form,
 .search_students {
-  width: 80%;
-  margin: 50px auto;
+    width: 80%;
+    margin: 50px auto;
 }
 
 
 @media only screen and (min-width: 800px) {
-  table {
-    max-width: 70%; 
-  }
+    table {
+        max-width: 70%;
+    }
 
 
-  .login-form,
-  .search_students {
-    width: 40%;
-    margin: 50px auto;
-  }
+    .login-form,
+    .search_students {
+        width: 40%;
+        margin: 50px auto;
+    }
 
-  .title {
-    padding: 8px;
-    font-family: sans-serif;
-    font-size: 35px;
-    color: white;
-    border: 2px solid orange;
-  }
+    .title {
+        padding: 8px;
+        font-family: sans-serif;
+        font-size: 35px;
+        color: white;
+        border: 2px solid orange;
+    }
 }
 
 @media only screen and (min-width: 1200px) {
-  table {
-    width: 50%;
-  }
+    table {
+        width: 50%;
+    }
 }
 
 
 .login-form form,
 .search_students form {
-  margin-bottom: 15px;
-  background: #f7f7f7;
-  box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
-  padding: 30px;
+    margin-bottom: 15px;
+    background: #f7f7f7;
+    box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+    padding: 30px;
 }
 
 .login-form h2 {
-  margin: 0 0 15px;
+    margin: 0 0 15px;
 }
 
 .form-control,
 .btn {
-  min-height: 38px;
-  border-radius: 2px;
+    min-height: 38px;
+    border-radius: 2px;
 }
 
 .btn {
-  background-color: #0E2A44;
-  font-size: 15px;
-  font-weight: bold;
+    background-color: #0E2A44;
+    font-size: 15px;
+    font-weight: bold;
 }

@@ -42,35 +42,13 @@ class CreateStudentQuizReportModel(BaseModel):
     quiz_name: str = Field(..., example='Quiz Name')
     student_id: str = Field(..., example='STUDENT_ID')
     student_name: str = Field(..., example='Student Name')
+    quiz_date: str = Field(..., example='2022-08-03')
     quiz_stats: QuizStats = Field()
     score_details: ScoreDetails = Field()
 
 
 class StudentQuizReportModel(CreateStudentQuizReportModel):
     id: Optional[str] = Field(..., hidden=True)
-    
-    # class Config:
-    #     # Field id doesn't need to be passed and should be removed
-    #     schema_extra = {
-    #         "example": {
-    #             "quiz_id": "QUIZ_ID",
-    #             "quiz_name": "Quiz Name",
-    #             "student_id": "STUDENT_ID",
-    #             "student_name": "Student Name",
-    #             "quiz_stats": {
-    #                 "max_score": 100,
-    #                 "average": 56.4,
-    #                 "number_of_students": 72,
-    #                 "highest_marks": 97.5,
-    #                 "num_correc"
-    #             },
-    #             "score_details": {
-    #                 "score": 65.5,
-    #                 "rank": 7,
-    #                 "percentile": 85.4
-    #             }
-    #         }
-    #     }
 
 
 class StudentQuizReportController():
@@ -83,6 +61,9 @@ class StudentQuizReportController():
     def get_student_quiz_report(self, student_id, quiz_id):
         student_id_quiz_id = student_id + "-" + quiz_id
         return self.__student_quiz_reports_db.get_student_quiz_report(student_id_quiz_id=student_id_quiz_id)
+
+    def get_student_quiz_report(self, report_id):
+        return self.__student_quiz_reports_db.get_student_quiz_report(report_id)
 
     def create_student_quiz_report(self, report_data: CreateStudentQuizReportModel, uid=None):
         uid = report_data.student_id + "-" + report_data.quiz_id
