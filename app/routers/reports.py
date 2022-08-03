@@ -24,7 +24,7 @@ class ReportsRouter:
         @api_router.get('/student_quiz_report/{report_id}')
         def student_quiz_report(request: Request, report_id: str):
             if report_id == None:
-                raise HTTPException(status_code=400, detail='Both student_id annd quiz_id have to be specified')
+                raise HTTPException(status_code=400, detail='report_id has to be specified')
             try:
                 report_data = self.__student_quiz_reports_controller.get_student_quiz_report(report_id=report_id)
             except KeyError:
