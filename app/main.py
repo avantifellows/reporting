@@ -15,9 +15,9 @@ db = initialize_db()
 
 student_quiz_reports_db = StudentQuizReportsDB(db)
 student_quiz_reports_controller = StudentQuizReportController(student_quiz_reports_db)
-recipes_router = StudentQuizReportsRouter(student_quiz_reports_controller)
+student_quiz_reports_router = StudentQuizReportsRouter(student_quiz_reports_controller)
 
-app.include_router(recipes_router.router)
+app.include_router(student_quiz_reports_router.router)
 
 
 @app.get('/')
