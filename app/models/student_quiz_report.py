@@ -55,10 +55,6 @@ class StudentQuizReportController():
     def get_all(self):
         return self.__student_quiz_reports_db.get_all()
 
-    def get_student_quiz_report(self, student_id, quiz_id):
-        student_id_quiz_id = student_id + "-" + quiz_id
-        return self.__student_quiz_reports_db.get_student_quiz_report(student_id_quiz_id=student_id_quiz_id)
-
     def get_student_quiz_report(self, report_id):
         return self.__student_quiz_reports_db.get_student_quiz_report(report_id)
 
