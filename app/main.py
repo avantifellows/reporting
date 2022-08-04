@@ -8,8 +8,11 @@ from db.student_quiz_reports_db import StudentQuizReportsDB
 from routers.student_quiz_reports import StudentQuizReportsRouter
 from routers.reports import ReportsRouter
 
+from fastapi.staticfiles import StaticFiles
+
 app = FastAPI()
 
+app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 db = initialize_db()
 
