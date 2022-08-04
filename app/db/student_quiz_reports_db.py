@@ -15,7 +15,6 @@ class StudentQuizReportsDB:
 
     def get_student_quiz_report(self, student_id_quiz_id: str):
         try:
-            print("Trying to find", student_id_quiz_id)
             table = self.__db.Table('student_quiz_reports')
             response = table.get_item(Key={'id': student_id_quiz_id})
             return response['Item']

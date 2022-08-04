@@ -6,8 +6,6 @@ import os
 
 load_dotenv('.env.local')
 def initialize_db():
-    print("INITIALIZING DB")
-    print(os.environ.get('DYNAMODB_REGION'))
     ddb = boto3.resource('dynamodb',
                          endpoint_url=os.environ.get('DYNAMODB_URL'),
                          region_name=os.environ.get('DYNAMODB_REGION'),
