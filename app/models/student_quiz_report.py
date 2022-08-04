@@ -1,10 +1,7 @@
-from doctest import Example
-from uuid import uuid4
 from pydantic import Field
-from decimal import Decimal
 from pydantic import BaseModel
 from pydantic.types import UUID4
-from typing import List, Optional
+from typing import Optional
 
 from db.student_quiz_reports_db import StudentQuizReportsDB
 
@@ -65,15 +62,9 @@ class StudentQuizReportController():
     def get_student_quiz_report(self, report_id):
         return self.__student_quiz_reports_db.get_student_quiz_report(report_id)
 
-    def create_student_quiz_report(self, report_data: CreateStudentQuizReportModel, uid=None):
+    def create_student_quiz_report(self, report_data: CreateStudentQuizReportModel):
         uid = report_data.student_id + "-" + report_data.quiz_id
         
         uid = uid.replace(" ", "_")
         student_quiz_report = StudentQuizReportModel(**report_data.dict(), id=uid)
         return self.__student_quiz_reports_db.create_student_quiz_report(student_quiz_report.dict())
-
-    def update_student_quiz_report(self, student_quiz_report: StudentQuizReportModel):
-        return self.__student_quiz_reports_db.update_student_quiz_report(student_quiz_report.dict())
-
-    def delete_student_quiz_report(self, uid: str):
-        return self.__student_quiz_reports_db.delete_student_quiz_report(uid)
