@@ -1,10 +1,7 @@
-from doctest import Example
-from uuid import uuid4
 from pydantic import Field
-from decimal import Decimal
 from pydantic import BaseModel
 from pydantic.types import UUID4
-from typing import List, Optional
+from typing import Optional
 
 from db.student_quiz_reports_db import StudentQuizReportsDB
 
@@ -49,30 +46,7 @@ class CreateStudentQuizReportModel(BaseModel):
 class StudentQuizReportModel(CreateStudentQuizReportModel):
     id: Optional[str] = Field(..., hidden=True)
     
-    # class Config:
-    #     # Field id doesn't need to be passed and should be removed
-    #     schema_extra = {
-    #         "example": {
-    #             "quiz_id": "QUIZ_ID",
-    #             "quiz_name": "Quiz Name",
-    #             "student_id": "STUDENT_ID",
-    #             "student_name": "Student Name",
-    #             "quiz_stats": {
-    #                 "max_score": 100,
-    #                 "average": 56.4,
-    #                 "number_of_students": 72,
-    #                 "highest_marks": 97.5,
-    #                 "num_correc"
-    #             },
-    #             "score_details": {
-    #                 "score": 65.5,
-    #                 "rank": 7,
-    #                 "percentile": 85.4
-    #             }
-    #         }
-    #     }
-
-
+    
 class StudentQuizReportController():
     def __init__(self, student_quiz_reports_db: StudentQuizReportsDB) -> None:
         self.__student_quiz_reports_db = student_quiz_reports_db
@@ -84,15 +58,9 @@ class StudentQuizReportController():
         student_id_quiz_id = student_id + "-" + quiz_id
         return self.__student_quiz_reports_db.get_student_quiz_report(student_id_quiz_id=student_id_quiz_id)
 
-    def create_student_quiz_report(self, report_data: CreateStudentQuizReportModel, uid=None):
+    def create_student_quiz_report(self, report_data: CreateStudentQuizReportModel):
         uid = report_data.student_id + "-" + report_data.quiz_id
         
         uid = uid.replace(" ", "_")
         student_quiz_report = StudentQuizReportModel(**report_data.dict(), id=uid)
         return self.__student_quiz_reports_db.create_student_quiz_report(student_quiz_report.dict())
-
-    def update_student_quiz_report(self, student_quiz_report: StudentQuizReportModel):
-        return self.__student_quiz_reports_db.update_student_quiz_report(student_quiz_report.dict())
-
-    def delete_student_quiz_report(self, uid: str):
-        return self.__student_quiz_reports_db.delete_student_quiz_report(uid)
