@@ -1,0 +1,172 @@
+{
+    "quiz": {
+        "quiz_cms_id": "5ead282be25b3872b2000001",
+        "quiz_name": "12NEET (NI) - P&C - 3rd May",
+        "max_score": "180",
+        "average": "49.53",
+        "number_of_students": "32",
+        "highest_marks": "172"
+    },
+    "students": [
+        {
+            "student_lms_id": "AGM05216563",
+            "student_name": "Ramesh",
+            "score": "2"
+        },
+        {
+            "student_lms_id": "AGM05216399",
+            "student_name": "Harshit gupta",
+            "score": "2"
+        },
+        {
+            "student_lms_id": "AGM05216571",
+            "student_name": "Ashish Kumar Singh",
+            "score": "2"
+        },
+        {
+            "student_lms_id": "LIV1401059",
+            "student_name": "GOURI GANGADHAR",
+            "score": "0"
+        },
+        {
+            "student_lms_id": "AGM0561771",
+            "student_name": "Silky",
+            "score": "0"
+        },
+        {
+            "student_lms_id": "BGM2100009",
+            "student_name": "Sumita Kadam",
+            "score": "76"
+        },
+        {
+            "student_lms_id": "AGM05207591",
+            "student_name": "Rohit Nandeppanavar",
+            "score": "0"
+        },
+        {
+            "student_lms_id": "AGM05211917",
+            "student_name": "Vaibhav Arya",
+            "score": "77"
+        },
+        {
+            "student_lms_id": "AGM05216843",
+            "student_name": "Shreya singh",
+            "score": "172"
+        },
+        {
+            "student_lms_id": "AGM05216937",
+            "student_name": "Bindu",
+            "score": "1"
+        },
+        {
+            "student_lms_id": "AGM05203253",
+            "student_name": "Mitali Yadav",
+            "score": "70"
+        },
+        {
+            "student_lms_id": "AGM05134671",
+            "student_name": "Lekhika",
+            "score": "140"
+        },
+        {
+            "student_lms_id": "AGM05208935",
+            "student_name": "Deepa",
+            "score": "0"
+        },
+        {
+            "student_lms_id": "VPU0100099",
+            "student_name": "PRATHAM N PRABHU",
+            "score": "70"
+        },
+        {
+            "student_lms_id": "AGM05203199",
+            "student_name": "Rishika Singh",
+            "score": "80"
+        },
+        {
+            "student_lms_id": "LIV8400007",
+            "student_name": "RITESH KANADJE",
+            "score": "74"
+        },
+        {
+            "student_lms_id": "AGM05212075",
+            "student_name": "Shrabani Biswal",
+            "score": "75"
+        },
+        {
+            "student_lms_id": "AGM05202531",
+            "student_name": "Shubhangi Raj",
+            "score": "156"
+        },
+        {
+            "student_lms_id": "AGM05207059",
+            "student_name": "BSB",
+            "score": "0"
+        },
+        {
+            "student_lms_id": "AGM05206619",
+            "student_name": "Kushal A",
+            "score": "89"
+        },
+        {
+            "student_lms_id": "AGM05207331",
+            "student_name": "Divya irkal",
+            "score": "67"
+        },
+        {
+            "student_lms_id": "AGM05212229",
+            "student_name": "Vishnu naik",
+            "score": "108"
+        },
+        {
+            "student_lms_id": "AGM05206995",
+            "student_name": "Siddharth Bhaskar",
+            "score": "0"
+        },
+        {
+            "student_lms_id": "LIV1400545",
+            "student_name": "MANOJ DANDIN",
+            "score": "0"
+        },
+        {
+            "student_lms_id": "AGM05212197",
+            "student_name": "Raynier Machado",
+            "score": "110"
+        },
+        {
+            "student_lms_id": "AGM05212361",
+            "student_name": "Shreyash",
+            "score": "0"
+        },
+        {
+            "student_lms_id": "AGM05220119",
+            "student_name": "Sheetal Rana",
+            "score": "0"
+        },
+        {
+            "student_lms_id": "AGM05206343",
+            "student_name": "Gagan D N",
+            "score": "2"
+        },
+        {
+            "student_lms_id": "AGM05206851",
+            "student_name": "Zeeshan",
+            "score": "22"
+        },
+        {
+            "student_lms_id": "AGM05206895",
+            "student_name": "Suchitra patil G T",
+            "score": "74"
+        },
+        {
+            "student_lms_id": "LIV2900055",
+            "student_name": "Ankita Fatania",
+            "score": "116"
+        },
+        {
+            "student_lms_id": "AGM05235391",
+            "student_name": "Sakshi Malkhede",
+            "score": "0"
+        }
+    ]
+}

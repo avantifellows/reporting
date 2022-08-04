@@ -1,0 +1,14 @@
+{
+    "name": "Sindhu Killi",
+    "email": "0hGIqwhuc0hdl7ijq3v3v5PEE9yPuuGjfktSQsigjdcRrKX6HyR6azJ9.8zk_urgMf52lCkR2@gmail.com",
+    "fields": [
+        {
+            "title": "Attendance Report",
+            "type": "table",
+            "data": {
+                "Last 7 days": 28.57,
+                "Last 15 days": 13.33
+            }
+        }
+    ]
+}
