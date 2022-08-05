@@ -16,7 +16,7 @@ docker-compose up --build
 docker volume create --name=dynamodb_data
 ```
 
-3. [ONLY FIRST TIME] Go into the shell of t `app` container and run:
+3. [ONLY FIRST TIME] Go into the shell of the `app` container and run:
 
 ```
 python generate_table
