@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 from fastapi import HTTPException
 
-from models.student_quiz_report import CreateStudentQuizReportModel, StudentQuizReportModel, StudentQuizReportController
+from models.student_quiz_report import CreateStudentQuizReportModel, StudentQuizReportController
 
 
 class StudentQuizReportsRouter:
