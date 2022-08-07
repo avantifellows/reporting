@@ -5,49 +5,27 @@ def generate_student_quiz_reports(ddb):
         TableName='student_quiz_reports',
         AttributeDefinitions=[
             {
-                'AttributeName': 'id',
+                'AttributeName': 'session_id',
                 'AttributeType': 'S'
             },
             {
-                'AttributeName': 'quiz_id',
-                'AttributeType': 'S'
-            },
-            {
-                'AttributeName': 'student_id',
+                'AttributeName': 'user_id-section',
                 'AttributeType': 'S'
             }
 
         ],
         KeySchema=[
             {
-                'AttributeName': 'id',
+                'AttributeName': 'session_id',
                 'KeyType': 'HASH'
-            }
-        ],
-        GlobalSecondaryIndexes=[
-        {
-            'IndexName': 'quiz_id',
-            'KeySchema': [
-                {
-                    'AttributeName': 'quiz_id',
-                    'KeyType': 'HASH'
-                },
-                {
-                    'AttributeName': 'student_id',
-                    'KeyType': 'RANGE'
-                }
-            ],
-            'Projection': {
-                'ProjectionType': 'ALL',
-            }
             },
+            {
+                'AttributeName': 'user_id-section',
+                'KeyType': 'RANGE'
+            }
         ],
         BillingMode='PAY_PER_REQUEST',
 
-        ProvisionedThroughput={
-            'ReadCapacityUnits': 10,
-            'WriteCapacityUnits': 10
-        }
     )
     print('Successfully created Student Quiz Reports Table')
 

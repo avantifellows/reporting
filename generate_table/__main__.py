@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 
 import os
 
+# Update and use `.env` to write prod dynamodb table
 load_dotenv('.env.local')
 def initialize_db():
     ddb = boto3.resource('dynamodb',
