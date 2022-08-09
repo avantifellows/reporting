@@ -20,9 +20,9 @@ class StudentQuizReportsRouter:
         def create_student_quiz_report(report_data: CreateStudentQuizReportModel):
             return self.__student_quiz_reports_controller.create_student_quiz_report(report_data)
 
-        @api_router.get('/get')
-        def get_student_quiz_report(student_id: str = None, session_id: str = None):
-            if student_id == None or session_id == None:
+        @api_router.get('/get/{student_quiz_report_uid}')
+        def get_student_quiz_report(student_id: str = None, quiz_id: str = None):
+            if student_id == None or quiz_id == None:
                 raise HTTPException(status_code=400, detail='Both student_id annd quiz_id have to be specified')
             try:
                 return self.__student_quiz_reports_controller.get_student_quiz_report(student_id, session_id)

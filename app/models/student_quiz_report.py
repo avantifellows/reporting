@@ -67,8 +67,8 @@ class CreateStudentQuizReportModel(BaseModel):
 
 class StudentQuizReportModel(CreateStudentQuizReportModel):
     user_id_section: str=Field(..., example="", alias="user_id-section")
-
-
+    
+    
 class StudentQuizReportController():
     def __init__(self, student_quiz_reports_db: StudentQuizReportsDB) -> None:
         self.__student_quiz_reports_db = student_quiz_reports_db

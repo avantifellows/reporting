@@ -25,7 +25,6 @@ reports_router = ReportsRouter(student_quiz_reports_controller)
 app.include_router(student_quiz_reports_router.router)
 app.include_router(reports_router.router)
 
-
 @app.get('/')
 def index():
     return 'Hello World!'
