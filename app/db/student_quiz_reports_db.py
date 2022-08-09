@@ -1,7 +1,7 @@
 from botocore.exceptions import ClientError
 from boto3.resources.base import ServiceResource
 from decimal import Decimal
-from boto3.dynamodb.conditions import Key, Attr
+from boto3.dynamodb.conditions import Key
 
 
 import json
