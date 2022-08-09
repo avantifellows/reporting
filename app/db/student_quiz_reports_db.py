@@ -1,6 +1,8 @@
 from botocore.exceptions import ClientError
 from boto3.resources.base import ServiceResource
 from decimal import Decimal
+from boto3.dynamodb.conditions import Key, Attr
+
 
 import json
 
@@ -13,11 +15,13 @@ class StudentQuizReportsDB:
         response = table.scan()
         return response.get('Items', [])
 
-    def get_student_quiz_report(self, student_id_quiz_id: str):
+    def get_student_quiz_report(self, user_id, session_id):
         try:
             table = self.__db.Table('student_quiz_reports')
-            response = table.get_item(Key={'id': student_id_quiz_id})
-            return response['Item']
+            response = table.query(
+                KeyConditionExpression=Key('session_id').eq(session_id) & Key('user_id-section').begins_with(user_id)
+            )
+            return response['Items']
         except ClientError as e:
             raise ValueError(e.response['Error']['Message'])
 

@@ -9,46 +9,41 @@
 </div>
 
 <div id="test_summary_card">
-  <div class="percentage"> {{report_data["score_details"]["percentage"]}}%</div>
+  <div class="percentage"> {{report_data["percentage"]}}%</div>
   <div class="test_details">
-    <div>{{report_data["quiz_date"]}}</div>
-    <div>{{report_data["quiz_name"]}}</div>
+    <div>{{report_data["test_name"]}}</div>
+    <div>{{report_data["test_date"]}}</div>
   </div>
 </div>
 
 <section id="overall_performance">
   <div id="section_heading">Overall Performance</div>
-  {% set score_details = report_data["score_details"] %}
+  {% set score_details = report_data["overall_performance"] %}
 
   <table id="score_details">
-    <tr>
-      <td>Marks</td>
-      <td>{{ score_details["score"]}} / {{score_details["max_marks"]}} </td>
-    </tr>
-    <tr>
-      <td>Correct Answers</td>
-      <td>{{ score_details["num_correct"] }} </td>
-    </tr>
-    <tr>
-      <td>Incorrect Answers</td>
-      <td>{{ score_details["num_incorrect"] }} </td>
-    </tr>
-    <tr>
-      <td>Unattempted</td>
-      <td>{{ score_details["num_skipped"] }} </td>
-    </tr>
-    <tr>
-      <td>Topper Marks</td>
-      <td>{{ score_details["highest_score"] }} </td>
-    <tr>
-      <td>Rank</td>
-      <td>{{ score_details["rank"] }} </td>
-    </tr>
-    <tr>
-      <td>Percentile</td>
-      <td>{{ score_details["percentile"] }} </td>
-    </tr>
+    {% for key, value in score_details["table_data"].items() %}
+      <tr>
+        <td>{{key}}</td>
+        <td>{{value}}</td>
+      </tr>
+    {% endfor %}
   </table>
+</section>
+
+<section id="subject_peformance">
+  {% set section_reports = report_data["section_reports"] %}
+  {% for section_report in section_reports %}
+  <div id="section_heading">{{ section_report["name"] }}</div>
+  <table id="score_details">
+    {% for key, value in section_report["table_data"].items() %}
+      <tr>
+        <td>{{key}}</td>
+        <td>{{value}}</td>
+      </tr>
+    {% endfor %}
+  </table>
+
+  {% endfor %}
 </section>
 
 {% endblock %}
