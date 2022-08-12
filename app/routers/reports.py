@@ -65,7 +65,7 @@ class ReportsRouter:
                     report_data["test_name"] = section["test_name"]
                     report_data["test_date"] = section["start_date"]
                 else:
-                    section_reports.append(_parse_section_data(section))
+                    section_reports.append(parsed_section_data)
             report_data["overall_performance"] = overall_performance
             report_data["section_reports"] = section_reports
             return self._templates.TemplateResponse("student_quiz_report.html", {"request": request, "report_data": report_data})
