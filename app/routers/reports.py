@@ -39,10 +39,6 @@ class ReportsRouter:
             section_report["table_data"] = table_data
             return section_report
         
-        @api_router.get('/')
-        def index_route():
-            return 'Welcome to all reports Index'
-
         @api_router.get('/student_quiz_report/{session_id}/{user_id}')
         def student_quiz_report(request: Request, session_id: str, user_id: str):
             if session_id == None or user_id == None:

@@ -20,6 +20,7 @@ db = initialize_db()
 student_quiz_reports_db = StudentQuizReportsDB(db)
 student_quiz_reports_controller = StudentQuizReportController(student_quiz_reports_db)
 student_quiz_reports_router = StudentQuizReportsRouter(student_quiz_reports_controller)
+reports_router = ReportsRouter(student_quiz_reports_controller)
 
 reports_router = ReportsRouter(student_quiz_reports_controller)
 app.include_router(student_quiz_reports_router.router)
