@@ -4,6 +4,12 @@ Welcome to the AF Reporting Engine!
 
 ## Installation and First Run
 
+0. Install pre-commit hooks in the repo
+```
+pip install pre-commit
+pre-commit install
+```
+
 1. Get everything running with:
 
 ```bash
@@ -31,4 +37,3 @@ DynamoDB Admin: localhost:8001
 Reporting FastAPI Server: localhost:5050 (docs and API tryout at localhost:5050/docs)
 
 DynamoDB server: localhost:8000 (we won't access this directly)
-

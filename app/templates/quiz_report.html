@@ -26,18 +26,18 @@
 
 <br><br>
 
-{% set scores = quiz_details["students"] %} 
+{% set scores = quiz_details["students"] %}
 <table>
         <tr>
-            <td> Student ID </td> 
+            <td> Student ID </td>
             <td> Student Name </td>
             <td> Score </td>
         </tr>
 
 {% for score  in scores %}
 
-        <tr> 
-            <td><a href="{{ url_for('show_student_report',student_id=score['student_lms_id'], quiz_id=quiz['quiz_cms_id']) }}"> {{ score["student_lms_id"] }} </a> </td> 
+        <tr>
+            <td><a href="{{ url_for('show_student_report',student_id=score['student_lms_id'], quiz_id=quiz['quiz_cms_id']) }}"> {{ score["student_lms_id"] }} </a> </td>
             <td>{{ score["student_name"] }}</td>
             <td>{{ score["score"] }}</td>
         </tr>

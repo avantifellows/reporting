@@ -35,13 +35,13 @@ services:
       - "./:/app"
     ports:
       - "5050:5050"
-    depends_on: 
+    depends_on:
       - dynamodb-local
     environment:
       - DYNAMODB_URL=http://dynamodb-local:8000
       - DYNAMODB_REGION=ap-south-1
       - DYNAMODB_ACCESS_KEY=local
       - DYNAMODB_SECRET_KEY=local
-volumes:  
+volumes:
   dynamodb_data:
     external: true
