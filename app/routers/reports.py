@@ -14,7 +14,7 @@ ROW_NAMES = {
     "num_correct": "Correct Answers",
     "percentage": "Percentage",
     "highest_test_score": "Topper Marks",
-    # "percentile": "Percentile",
+    "percentile": "Percentile",
     "rank": "Rank"
 }
 
@@ -32,7 +32,6 @@ class ReportsRouter:
             section["name"] = section["user_id-section"].split("#")[1].capitalize()
             section_report = {}
             section_report["name"] = "Performance - " + section["name"].capitalize()
-            section["percentage"] = '%0.2f' %( 100 * section["marks_scored"] / section["max_marks_possible"])
             table_data = {}
             for row in ROW_NAMES:
                 table_data[ROW_NAMES[row]] = section[row]
