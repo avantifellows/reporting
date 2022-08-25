@@ -21,3 +21,4 @@ toml==0.10.2
 typing_extensions==4.3.0
 urllib3==1.26.10
 uvicorn==0.18.2
+mangum==0.14.1
