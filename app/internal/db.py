@@ -2,7 +2,12 @@ import boto3
 from dotenv import load_dotenv
 import os
 
-load_dotenv(".env")
+# when running app locally -- use load_dotenv
+# when running app via gh actions -- variables already exist via secrets
+# so no need to load_dotenv
+# checking only for secret key as of now
+if "DYNAMODB_SECRET_KEY" not in os.environ:
+    load_dotenv("../.env.local")
 
 
 def initialize_db():
