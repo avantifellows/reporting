@@ -1,0 +1,46 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: Reporting Engine - Staging - FastAPI on Lambda
+
+Parameters:
+  DynamodbUrl:
+    Type: String
+    Description: Url of Dynamodb instance
+  DynamodbRegion:
+    Type: String
+    Description: Region of Dynamodb instance
+  DynamodbAccessKey:
+    Type: String
+    Description: Access key credentials of Dynamodb instance
+  DynamodbSecretKey:
+    Type: String
+    Description: Secret key credentials of Dynamodb instance
+
+Resources:
+  Function:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: "ReportingStaging"
+      CodeUri: ../app
+      Handler: main.handler
+      Runtime: python3.9
+      Environment:
+        Variables:
+          DYNAMODB_URL: !Ref DynamodbUrl
+          DYNAMODB_REGION: !Ref DynamodbRegion
+          DYNAMODB_ACCESS_KEY: !Ref DynamodbAccessKey
+          DYNAMODB_SECRET_KEY: !Ref DynamodbSecretKey
+      Events:
+        Api:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref Api
+
+  Api:
+    Type: AWS::Serverless::HttpApi
+
+Outputs:
+  ApiUrl:
+    Description: URL of your API
+    Value:
+      Fn::Sub: "https://${Api}.execute-api.${AWS::Region}.${AWS::URLSuffix}/"
