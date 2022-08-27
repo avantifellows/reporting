@@ -2,6 +2,7 @@ from fastapi import APIRouter, Request
 from fastapi.templating import Jinja2Templates
 from fastapi import HTTPException
 from collections import OrderedDict
+from models.quiz_report import QuizReportController
 
 from models.student_quiz_report import StudentQuizReportController
 
@@ -20,9 +21,12 @@ ROW_NAMES = {
 
 class ReportsRouter:
     def __init__(
-        self, student_quiz_reports_controller: StudentQuizReportController
+        self,
+        student_quiz_reports_controller: StudentQuizReportController,
+        quiz_reports_controller: QuizReportController,
     ) -> None:
         self.__student_quiz_reports_controller = student_quiz_reports_controller
+        self.__quiz_reports_controller = quiz_reports_controller
         self._templates = Jinja2Templates(directory="app/templates")
 
     @property
@@ -39,6 +43,22 @@ class ReportsRouter:
             section_report["table_data"] = table_data
             return section_report
 
+        @api_router.get("/quiz_report/{quiz_id}")
+        def quiz_report(request: Request, quiz_id: str):
+            if quiz_id is None or quiz_id == "":
+                raise HTTPException(
+                    status_code=400,
+                    detail="Quiz ID has to be specified",
+                )
+            try:
+                self.__quiz_reports_controller.get_quiz_report(quiz_id=quiz_id)
+            except KeyError:
+                raise HTTPException(
+                    status_code=400, detail="No student_quiz_report found"
+                )
+            quiz_report = {}
+            quiz_report[""]
+
         @api_router.get("/student_quiz_report/{session_id}/{user_id}")
         def student_quiz_report(request: Request, session_id: str, user_id: str):
             if session_id is None or user_id is None:
@@ -50,6 +70,8 @@ class ReportsRouter:
                 data = self.__student_quiz_reports_controller.get_student_quiz_report(
                     session_id=session_id, user_id=user_id
                 )
+                if data is None or len(data) == 0:
+                    raise KeyError
             except KeyError:
                 raise HTTPException(
                     status_code=400, detail="No student_quiz_report found"
