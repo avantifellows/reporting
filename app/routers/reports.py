@@ -26,8 +26,7 @@ class ReportsRouter:
         quiz_reports_controller: QuizReportController,
     ) -> None:
         self.__student_quiz_reports_controller = student_quiz_reports_controller
-        self.__quiz_reports_controller = quiz_reports_controller
-        self._templates = Jinja2Templates(directory="app/templates")
+        self._templates = Jinja2Templates(directory="templates")
 
     @property
     def router(self):
