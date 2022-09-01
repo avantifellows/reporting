@@ -1,5 +1,4 @@
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
 from mangum import Mangum
 
 from internal.db import initialize_db
@@ -12,19 +11,6 @@ from routers.reports import ReportsRouter
 from fastapi.staticfiles import StaticFiles
 
 app = FastAPI()
-
-origins = [
-    "http://localhost:5050",
-    "https://report-staging.avantifellows.org",
-    "https://reporting.avantifellows.org",
-]
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
