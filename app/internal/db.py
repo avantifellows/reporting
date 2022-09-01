@@ -5,7 +5,6 @@ import os
 # when running app locally -- use load_dotenv
 # when running app via gh actions -- variables already exist via secrets
 # so no need to load_dotenv
-# checking only for secret key as of now
 if not all(key in os.environ for key in 
     ["DYNAMODB_URL", "DYNAMODB_REGION", 
     "DYNAMODB_ACCESS_KEY", "DYNAMODB_SECRET_KEY"]):
