@@ -1,5 +1,5 @@
-import uvicorn
 from fastapi import FastAPI
+from mangum import Mangum
 
 from internal.db import initialize_db
 
@@ -12,7 +12,7 @@ from fastapi.staticfiles import StaticFiles
 
 app = FastAPI()
 
-app.mount("/static", StaticFiles(directory="app/static"), name="static")
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 db = initialize_db()
 
@@ -29,8 +29,7 @@ app.include_router(reports_router.router)
 
 @app.get("/")
 def index():
-    return "Hello World!"
+    return "Hello World! Welcome to Reporting Engine!"
 
 
-if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=5050, log_level="info", reload=True)
+handler = Mangum(app)
