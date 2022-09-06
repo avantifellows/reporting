@@ -39,16 +39,16 @@ jobs:
           DYNAMODB_REGION: ${{ secrets.DYNAMODB_REGION }}
           DYNAMODB_ACCESS_KEY: ${{ secrets.DYNAMODB_ACCESS_KEY }}
           DYNAMODB_SECRET_KEY: ${{ secrets.DYNAMODB_SECRET_KEY }}
-run: >
-   sam deploy 
-   --stack-name ReportingProduction 
-   --s3-bucket reporting-engine-production 
-   --no-confirm-changeset 
-   --no-fail-on-empty-changeset 
-   --region ap-south-1 
-   --capabilities CAPABILITY_IAM 
-   --parameter-overrides 
-   DynamodbUrl=$DYNAMODB_URL 
-   DynamodbRegion=$DYNAMODB_REGION 
-   DynamodbAccessKey=$DYNAMODB_ACCESS_KEY 
-   DynamodbSecretKey=$DYNAMODB_SECRET_KEY
+        run: >
+          sam deploy 
+          --stack-name ReportingProduction 
+          --s3-bucket reporting-engine-production 
+          --no-confirm-changeset 
+          --no-fail-on-empty-changeset 
+          --region ap-south-1 
+          --capabilities CAPABILITY_IAM 
+          --parameter-overrides 
+          DynamodbUrl=$DYNAMODB_URL 
+          DynamodbRegion=$DYNAMODB_REGION 
+          DynamodbAccessKey=$DYNAMODB_ACCESS_KEY 
+          DynamodbSecretKey=$DYNAMODB_SECRET_KEY
