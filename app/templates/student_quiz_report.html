@@ -4,7 +4,9 @@
 {% block content %}
 
 <div id="name_card">
-  <p>Name: {{report_data["student_name"]}}
+  {% if report_data["student_name"] != "" %}
+    <p>Name: {{report_data["student_name"]}}
+  {% endif %}
   <p>Student ID: {{report_data["student_id"]}}
 </div>
 
