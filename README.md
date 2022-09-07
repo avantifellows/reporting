@@ -54,6 +54,6 @@ cd app; uvicorn main:app --port 5050 --reload
 ### Deployment
 We deploy our FastAPI instance on AWS Lambda which is triggered via an API Gateway. In order to automate the process, we use AWS SAM, which creates the stack required for deployment and updates it as needed with just a couple of commands and without having to do anything manually on the AWS GUI. Refer to this [blog](https://www.eliasbrange.dev/posts/deploy-fastapi-on-aws-part-1-lambda-api-gateway/) post for more details.
 
-The actual deployment happens through Github Actions. Look at `.github/workflows/deploy_to_staging.yml` to understand the deployment to Staging and `.github/workflows/deploy_to_prod.yml` for Production. 
+The actual deployment happens through Github Actions. Look at `.github/workflows/deploy_to_staging.yml` to understand the deployment to Staging and `.github/workflows/deploy_to_prod.yml` for Production.
 
-The details of the AWS Lambda instances are described in `templates/prod.yaml` and `templates/staging.yaml`. 
+The details of the AWS Lambda instances are described in `templates/prod.yaml` and `templates/staging.yaml`.
