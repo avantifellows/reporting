@@ -1,6 +1,6 @@
 # Reporting Engine
 
-Welcome to the AF Reporting Engine!
+Welcome to the Avanti Fellows Reporting Engine!
 
 ## Setting up the Reporting Engine locally
 
