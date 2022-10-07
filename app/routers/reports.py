@@ -42,17 +42,17 @@ class ReportsRouter:
 
         @api_router.get("/student_quiz_report/{session_id}/{user_id}")
         def student_quiz_report(request: Request, session_id: str, user_id: str):
+            if session_id is None or user_id is None:
+                raise HTTPException(
+                    status_code=400,
+                    detail="Session ID and User ID have to be specified",
+                )
             # decoding URL encoded values. As this information is coming through a URL,
             # it's possible that the strings are URL encoded.
             session_id = unquote(session_id)
             user_id = unquote(user_id)
             print(session_id)
             print(user_id)
-            if session_id is None or user_id is None:
-                raise HTTPException(
-                    status_code=400,
-                    detail="Session ID and User ID have to be specified",
-                )
             try:
                 data = self.__student_quiz_reports_controller.get_student_quiz_report(
                     session_id=session_id, user_id=user_id

@@ -29,6 +29,7 @@ app.include_router(reports_router.router)
 
 @app.get("/")
 def index():
+    print("HAHAHAHA")
     return "Hello World! Welcome to Reporting Engine!"
 
 
