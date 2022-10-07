@@ -2,6 +2,7 @@ from fastapi import APIRouter, Request
 from fastapi.templating import Jinja2Templates
 from fastapi import HTTPException
 from collections import OrderedDict
+from urllib.parse import unquote
 
 from models.student_quiz_report import StudentQuizReportController
 
@@ -41,6 +42,10 @@ class ReportsRouter:
 
         @api_router.get("/student_quiz_report/{session_id}/{user_id}")
         def student_quiz_report(request: Request, session_id: str, user_id: str):
+            # decoding URL encoded values. As this information is coming through a URL,
+            # it's possible that the strings are URL encoded.
+            session_id = unquote(session_id)
+            user_id = unquote(user_id)
             if session_id is None or user_id is None:
                 raise HTTPException(
                     status_code=400,
