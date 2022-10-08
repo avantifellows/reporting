@@ -51,8 +51,6 @@ class ReportsRouter:
             # it's possible that the strings are URL encoded.
             session_id = unquote(session_id)
             user_id = unquote(user_id)
-            print(session_id)
-            print(user_id)
             try:
                 data = self.__student_quiz_reports_controller.get_student_quiz_report(
                     session_id=session_id, user_id=user_id
