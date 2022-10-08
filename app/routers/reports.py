@@ -2,6 +2,7 @@ from fastapi import APIRouter, Request
 from fastapi.templating import Jinja2Templates
 from fastapi import HTTPException
 from collections import OrderedDict
+from urllib.parse import unquote
 
 from models.student_quiz_report import StudentQuizReportController
 
@@ -46,6 +47,10 @@ class ReportsRouter:
                     status_code=400,
                     detail="Session ID and User ID have to be specified",
                 )
+            # decoding URL encoded values. As this information is coming through a URL,
+            # it's possible that the strings are URL encoded.
+            session_id = unquote(session_id)
+            user_id = unquote(user_id)
             try:
                 data = self.__student_quiz_reports_controller.get_student_quiz_report(
                     session_id=session_id, user_id=user_id
