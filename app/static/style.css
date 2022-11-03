@@ -23,12 +23,25 @@ body {
     box-shadow: 1px 1px 5px #535353;
 }
 
+
+#answer_sheet_button {
+    display: table;
+    margin: 30px auto 0 auto;
+    text-align: center;
+    font-size: 14pt;
+    background-color: #29973E;
+    border-radius: 10px;
+    text-decoration: none;
+    color: white;
+    padding: 10px 40px 10px 40px;
+    box-shadow: 1px 1px 5px #535353;
+}
+
 #test_summary_card {
     display: inline-flex;
     margin-left: auto;
     margin-right: auto;
     margin-top: 50px;
-    font-size: 28pt;
     font-weight: bold;
     justify-content: center;
     background-color: #EBF5FE;
@@ -49,13 +62,13 @@ body {
     padding: 5px;
     aspect-ratio: 1;
     display: flex;
-    font-size: 12pt;
+    font-size: 20pt;
 }
 
 #test_summary_card .test_details {
     display: block;
     margin: auto;
-    font-size: 14pt;
+    font-size: 22pt;
 }
 
 #section_heading {
