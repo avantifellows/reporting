@@ -15,5 +15,4 @@ COPY ./app /code
 EXPOSE 80
 
 # RUN python generate_table
-# CMD ["python", "app/main.py"]
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "5050", "--reload"]
