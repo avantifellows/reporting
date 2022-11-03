@@ -62,6 +62,7 @@ class ReportsRouter:
             report_data = {}
             report_data["student_name"] = ""
             report_data["student_id"] = data[0]["user_id"]
+            report_data["test_id"] = data[0]["test_id"]
 
             section_reports = []
             overall_performance = {}
