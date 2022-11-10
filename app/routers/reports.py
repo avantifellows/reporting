@@ -45,7 +45,7 @@ class ReportsRouter:
 
             # TODO: When accuracy is added to the BQ table, use that instead
             if (section["num_wrong"] + section["num_correct"]) == 0:
-                table_data["Accuracy"] = 0
+                table_data["Accuracy"] = "0%"
             else:
                 table_data["Accuracy"] = "{:.2f}%".format(
                     100
