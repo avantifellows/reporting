@@ -42,6 +42,16 @@ class ReportsRouter:
             table_data = {}
             for row in ROW_NAMES:
                 table_data[ROW_NAMES[row]] = section[row]
+
+            # TODO: When accuracy is added to the BQ table, use that instead
+            if (section["num_wrong"] + section["num_correct"]) == 0:
+                table_data["Accuracy"] = "0%"
+            else:
+                table_data["Accuracy"] = "{:.2f}%".format(
+                    100
+                    * section["num_correct"]
+                    / ((section["num_wrong"] + section["num_correct"]))
+                )
             section_report["table_data"] = table_data
             return section_report
 
