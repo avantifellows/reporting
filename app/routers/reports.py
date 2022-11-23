@@ -80,9 +80,10 @@ class ReportsRouter:
             user_id = data[0]["user_id"]
 
             report_data["student_id"] = user_id
-            report_data["test_link"] = QUIZ_URL.format(
-                quiz_id=test_id, user_id=user_id, api_key=AF_API_KEY
-            )
+            if "platform" in report_data and report_data["platform"] == "quizengine":
+                report_data["test_link"] = QUIZ_URL.format(
+                    quiz_id=test_id, user_id=user_id, api_key=AF_API_KEY
+                )
 
             section_reports = []
             overall_performance = {}
