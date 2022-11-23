@@ -18,9 +18,11 @@
   </div>
 </div>
 
-<a id="answer_sheet_button" target="_blank" href={{report_data["test_link"]}}>
-  Click here to review your answers
-</a>
+{% if "test_link" in report_data %}
+  <a id="answer_sheet_button" target="_blank" href={{report_data["test_link"]}}>
+    Click here to review your answers
+  </a>
+{% endif %}
 
 <section id="overall_performance">
   <div id="section_heading">Overall Performance</div>
