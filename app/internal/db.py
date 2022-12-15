@@ -14,6 +14,9 @@ if not all(
         "DYNAMODB_SECRET_KEY",
     ]
 ):
+    # Update and use `.env.prod` to access the prod dynamodb table
+    # or use `.env.staging` to access the staging dynamodb table
+    # TODO: Staging table doesn't exist as of now :p - so maybe we should create it in the future
     load_dotenv("../.env.local")
 
 

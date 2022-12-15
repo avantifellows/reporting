@@ -45,9 +45,13 @@ DynamoDB server: localhost:8000 (we won't access this directly)
 pip install pre-commit
 pre-commit install
 ```
-1. Obtain credentials to replace local keys in `.env.local` file from repository owners.
+1. Create a `.env.local` file using `.env.example`.
+```sh
+cp .env.example .env.local
+```
+2. Obtain credentials to replace local keys in the newly created `.env.local` file from repository owners.
 
-2. Run the following to get app at `localhost:5050/docs`
+3. Run the following to get app at `localhost:5050/docs`
 ```
 cd app; uvicorn main:app --port 5050 --reload
 ```

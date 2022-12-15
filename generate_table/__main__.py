@@ -7,7 +7,9 @@ from dotenv import load_dotenv
 
 import os
 
-# Update and use `.env` to write prod dynamodb table
+# Update and use `.env.prod` to write to prod dynamodb table
+# or use `.env.staging` to write to staging dynamodb table
+# TODO: Staging table doesn't exist as of now :p - so maybe we should create it in the future
 load_dotenv(".env.local")
 
 
