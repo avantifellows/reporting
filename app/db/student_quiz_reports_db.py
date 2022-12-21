@@ -19,10 +19,16 @@ class StudentQuizReportsDB:
     def get_student_quiz_report(self, user_id, session_id):
         try:
             table = self.__db.Table("student_quiz_reports")
-            response = table.query(
-                KeyConditionExpression=Key("session_id").eq(session_id)
-                & Key("user_id-section").begins_with(user_id)
-            )
+            if user_id is not None:
+                response = table.query(
+                    KeyConditionExpression=Key("session_id").eq(session_id)
+                    & Key("user_id-section").begins_with(user_id)
+                )
+            else:
+                response = table.query(
+                    KeyConditionExpression=Key("session_id").eq(session_id)
+                )
+
             return response["Items"]
         except ClientError as e:
             raise ValueError(e.response["Error"]["Message"])

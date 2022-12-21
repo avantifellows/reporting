@@ -55,6 +55,18 @@ class ReportsRouter:
             section_report["table_data"] = table_data
             return section_report
 
+        @api_router.get("/student_quiz_report/{session_id}")
+        def student_quiz_report_by_session_id(request: Request, session_id: str):
+            try:
+                data = self.__student_quiz_reports_controller.get_student_quiz_report(
+                    None, session_id
+                )
+            except KeyError:
+                raise HTTPException(
+                    status_code=400, detail="No student_quiz_report found"
+                )
+            return data
+
         @api_router.get("/student_quiz_report/{session_id}/{user_id}")
         def student_quiz_report(request: Request, session_id: str, user_id: str):
             if session_id is None or user_id is None:
