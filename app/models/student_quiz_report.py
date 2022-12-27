@@ -84,9 +84,11 @@ class StudentQuizReportController:
             user_id, session_id
         )
 
+    def get_quiz_report(self, session_id):
+        return self.__student_quiz_reports_db.get_quiz_report(session_id)
+
     def create_student_quiz_report(self, report_data: CreateStudentQuizReportModel):
         uid = report_data.student_id + "-" + report_data.quiz_id
-
         uid = uid.replace(" ", "_")
         student_quiz_report = StudentQuizReportModel(**report_data.dict(), id=uid)
         return self.__student_quiz_reports_db.create_student_quiz_report(
@@ -96,7 +98,7 @@ class StudentQuizReportController:
     def get_student_quiz_report_by_session_id(self, session_id: str) -> List[dict]:
         try:
             report_data = self.__student_quiz_reports_db.get_student_quiz_report(
-                session_id=session_id, user_id=""
+                session_id=session_id, user_id=None
             )
         except KeyError:
             raise ValueError("No student_quiz_report found")

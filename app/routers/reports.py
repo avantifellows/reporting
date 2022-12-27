@@ -55,11 +55,11 @@ class ReportsRouter:
             section_report["table_data"] = table_data
             return section_report
 
-        @api_router.get("/student_quiz_report/{session_id}")
-        def student_quiz_report_by_session_id(request: Request, session_id: str):
+        @api_router.get("/quiz_report_by_session_id/{session_id}")
+        def quiz_report_by_session_id(request: Request, session_id: str):
             try:
-                data = self.__student_quiz_reports_controller.get_student_quiz_report(
-                    None, session_id
+                data = self.__student_quiz_reports_controller.get_quiz_report(
+                    session_id
                 )
             except KeyError:
                 raise HTTPException(
