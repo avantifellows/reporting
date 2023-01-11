@@ -1,5 +1,7 @@
 from pydantic import Field
 from pydantic import BaseModel
+from typing import List
+
 
 from db.student_quiz_reports_db import StudentQuizReportsDB
 
@@ -82,9 +84,11 @@ class StudentQuizReportController:
             user_id, session_id
         )
 
+    def get_quiz_report(self, session_id):
+        return self.__student_quiz_reports_db.get_quiz_report(session_id)
+
     def create_student_quiz_report(self, report_data: CreateStudentQuizReportModel):
         uid = report_data.student_id + "-" + report_data.quiz_id
-
         uid = uid.replace(" ", "_")
         student_quiz_report = StudentQuizReportModel(**report_data.dict(), id=uid)
         return self.__student_quiz_reports_db.create_student_quiz_report(
