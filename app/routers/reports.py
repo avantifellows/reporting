@@ -3,6 +3,10 @@ from fastapi.templating import Jinja2Templates
 from fastapi import HTTPException
 from collections import OrderedDict
 from urllib.parse import unquote
+from fastapi.responses import HTMLResponse
+
+templates = Jinja2Templates(directory="templates")
+
 
 from models.student_quiz_report import StudentQuizReportController
 
@@ -55,7 +59,7 @@ class ReportsRouter:
             section_report["table_data"] = table_data
             return section_report
 
-        @api_router.get("/quiz_report_by_session_id/{session_id}")
+        @api_router.get("/quiz_report/{session_id}")
         def quiz_report_by_session_id(request: Request, session_id: str):
             try:
                 data = self.__student_quiz_reports_controller.get_quiz_report(
@@ -65,7 +69,22 @@ class ReportsRouter:
                 raise HTTPException(
                     status_code=400, detail="No student_quiz_report found"
                 )
-            return data
+            num_students = len(data)
+            marks = [student["marks_scored"] for student in data]
+            avg_result = sum(marks) / num_students
+
+            context = {
+                "request": request,
+                "session_id": session_id,
+                "num_students": num_students,
+                "avg_result": avg_result,
+                "data": data,
+            }
+            template = "quiz_report_by_session_id.html"
+            html = self._templates.TemplateResponse(
+                "quiz_report_by_session_id.html", context=context
+            )
+            return HTMLResponse(content=html.body.decode())
 
         @api_router.get("/student_quiz_report/{session_id}/{user_id}")
         def student_quiz_report(request: Request, session_id: str, user_id: str):

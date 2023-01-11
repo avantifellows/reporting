@@ -94,12 +94,3 @@ class StudentQuizReportController:
         return self.__student_quiz_reports_db.create_student_quiz_report(
             student_quiz_report.dict()
         )
-
-    def get_student_quiz_report_by_session_id(self, session_id: str) -> List[dict]:
-        try:
-            report_data = self.__student_quiz_reports_db.get_student_quiz_report(
-                session_id=session_id, user_id=None
-            )
-        except KeyError:
-            raise ValueError("No student_quiz_report found")
-        return report_data
