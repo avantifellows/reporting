@@ -1,22 +1,27 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Test Summary</title>
-</head>
-<body>
-  <div id="header" style="background-color: #f2f2f2; padding: 20px;">
-    <h1 style="text-align: center; font-size: 36px;">Test Summary</h1>
+{% extends "layout.html" %}
+{% block title %}Index{% endblock %}
+
+{% block content %}
+
+<div id="test_summary_card">
+  <div class="test_details">
+    <div>{{session_id}}</div>
   </div>
-  <div id="main" style="background-color: #ffffff; padding: 20px;">
-    <div id="test-summary-card" style="background-color: #f2f2f2; padding: 20px;">
-      <h2 style="text-align: center; font-size: 24px;">Number of Students: {{ num_students }}</h2>
-      <h2 style="text-align: center; font-size: 24px;">Average Result: {{ avg_result }}</h2>
-    </div>
-  </div>
-  <div id="footer" style="background-color: #f2f2f2; padding: 20px;">
-    <center>
-    &copy; Copyright 2022 by <a href="https://avantifellows.org" style="text-decoration: none; color: #000000;">Avanti Fellows</a>.
-    </center>
-  </div>
-</body>
-</html>
+</div>
+
+<section id="overall_performance">
+  <div id="section_heading">Test Summary</div>
+
+  <table id="score_details">
+      <tr>
+        <td>Number of Students:</td>
+        <td>{{num_students}}</td>
+      </tr>
+      <tr>
+        <td>Average Result:</td>
+        <td>{{avg_result}}</td>
+      </tr>
+  </table>
+</section>
+
+{% endblock %}

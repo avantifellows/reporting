@@ -11,11 +11,6 @@ class StudentQuizReportsDB:
     def __init__(self, db: ServiceResource) -> None:
         self.__db = db
 
-    def get_report_by_session_id(self, session_id):
-        table = self.__db.Table("student_quiz_reports")
-        response = table.query(KeyConditionExpression=Key("session_id").eq(session_id))
-        return response.get("Items", [])
-
     def get_all(self):
         table = self.__db.Table("student_quiz_reports")
         response = table.scan()
