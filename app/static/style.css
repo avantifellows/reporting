@@ -143,24 +143,59 @@ p {
 }
 
 
-.title {
-    font-size: 36pt;
-    padding: 10px;
+second-template #header {
+    background-color: #4CAF50;
+    color: white;
+    text-align: center;
+    padding: 15px;
 }
 
-.subtitle {
+second-template #main {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    padding: 50px;
+    text-align: center;
+}
+
+second-template #main h1 {
+    font-size: 36pt;
+    margin: 0;
+    padding: 0;
+}
+
+second-template  #main h2 {
     font-size: 24pt;
-    padding: 10px;
+    margin: 0;
+    padding: 0;
+}
+
+second-template #main h2 span {
+    font-size: 18pt;
+    color: #828282;
+    font-weight: normal;
+}
+
+second-template #test-summary-card {
+    background-color: #e1f5fe;
+    padding: 20px;
+    border-radius: 10px;
+    margin-top: 50px;
+    width: 70%;
+}
+
+second-template #test-summary-card h2 {
+    font-size: 24pt;
     margin-bottom: 20px;
 }
 
-#name_card {
-    display: table;
-    margin: 30px auto 0 auto;
+second-template #footer {
+    background-color: #4CAF50;
+    color: white;
     text-align: center;
-    font-size: 22pt;
-    background-color: #EAEDFD;
-    border-radius: 10px;
-    padding: 10px 40px 10px 40px;
-    box-shadow: 1px 1px 5px #535353;
+    padding: 15px;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
 }

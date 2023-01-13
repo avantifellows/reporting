@@ -80,7 +80,7 @@ class ReportsRouter:
                 "avg_result": avg_result,
                 "data": data,
             }
-            template = "quiz_report_by_session_id.html"
+
             html = self._templates.TemplateResponse(
                 "quiz_report_by_session_id.html", context=context
             )

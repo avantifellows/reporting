@@ -1,89 +1,22 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <style>
-    html {
-    height: 100%;
-    }
-
-    body {
-    font-family: "Avenir", Arial, Helvetica, sans-serif;
-    margin: 0;
-    padding: 0;
-    font-size: 14pt;
-    text-align: center;
-    background-color: #f2f2f2;
-    }
-
-    #header {
-    background-color: #4CAF50;
-    color: white;
-    text-align: center;
-    padding: 15px;
-    }
-
-    #main {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-    padding: 50px;
-    text-align: center;
-    }
-
-    #main h1 {
-    font-size: 36pt;
-    margin: 0;
-    padding: 0;
-    }
-
-    #main h2 {
-    font-size: 24pt;
-    margin: 0;
-    padding: 0;
-    }
-
-    #main h2 span {
-    font-size: 18pt;
-    color: #828282;
-    font-weight: normal;
-    }
-
-    #test-summary-card {
-    background-color: #e1f5fe;
-    padding: 20px;
-    border-radius: 10px;
-    margin-top: 50px;
-    width: 70%;
-    }
-
-    #test-summary-card h2 {
-    font-size: 24pt;
-    margin-bottom: 20px;
-    }
-
-    #footer {
-    background-color: #4CAF50;
-    color: white;
-    text-align: center;
-    padding: 15px;
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    }
-  </style>
-  <title>Test Summary</title>
+    <title>Test Summary</title>
 </head>
 <body>
-  <div id="header">
-    <h1>Test Summary</h1>
+  <div id="header" style="background-color: #f2f2f2; padding: 20px;">
+    <h1 style="text-align: center; font-size: 36px;">Test Summary</h1>
   </div>
-  <div id="main">
-    <div id="test-summary-card">
-      <h2>Number of Students: {{ num_students }}</h2>
-      <h2>Average Result: {{ avg_result }}</h2>
+  <div id="main" style="background-color: #ffffff; padding: 20px;">
+    <div id="test-summary-card" style="background-color: #f2f2f2; padding: 20px;">
+      <h2 style="text-align: center; font-size: 24px;">Number of Students: {{ num_students }}</h2>
+      <h2 style="text-align: center; font-size: 24px;">Average Result: {{ avg_result }}</h2>
     </div>
   </div>
-  <div id="footer">
+  <div id="footer" style="background-color: #f2f2f2; padding: 20px;">
     <center>
-    &copy; Copyright 2022 by <a href="https://avantifellows.org">Avanti Fellows</a>.
+    &copy; Copyright 2022 by <a href="https://avantifellows.org" style="text-decoration: none; color: #000000;">Avanti Fellows</a>.
+    </center>
+  </div>
+</body>
+</html>
