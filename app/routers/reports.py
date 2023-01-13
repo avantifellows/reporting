@@ -60,15 +60,13 @@ class ReportsRouter:
             return section_report
 
         @api_router.get("/quiz_report/{session_id}")
-        def quiz_report_by_session_id(request: Request, session_id: str):
+        def quiz_report(request: Request, session_id: str):
             try:
                 data = self.__student_quiz_reports_controller.get_quiz_report(
                     session_id
                 )
             except KeyError:
-                raise HTTPException(
-                    status_code=400, detail="No student_quiz_report found"
-                )
+                raise HTTPException(status_code=400, detail="No quiz_report found")
             num_students = len(data)
             marks = [student["marks_scored"] for student in data]
             avg_result = sum(marks) / num_students

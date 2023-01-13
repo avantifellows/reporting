@@ -1,8 +1,5 @@
 from pydantic import Field
 from pydantic import BaseModel
-from typing import List
-
-
 from db.student_quiz_reports_db import StudentQuizReportsDB
 
 
