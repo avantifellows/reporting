@@ -14,6 +14,39 @@ def generate_student_quiz_reports(ddb):
     print("Successfully created Student Quiz Reports Table")
 
 
+def add_secondary_index(ddb):
+    table = ddb.Table("student_quiz_reports")
+    response = table.update(
+        AttributeDefinitions=[
+            {"AttributeName": "session_id", "AttributeType": "S"},
+            {"AttributeName": "user_id-section", "AttributeType": "S"},
+            {"AttributeName": "user_id", "AttributeType": "S"},
+        ],
+        GlobalSecondaryIndexUpdates=[
+            {
+                "Create": {
+                    "IndexName": "gsi_user_id",
+                    "KeySchema": [{"AttributeName": "user_id", "KeyType": "HASH"}],
+                    "Projection": {"ProjectionType": "ALL"},
+                    "ProvisionedThroughput": {
+                        "ReadCapacityUnits": 5,
+                        "WriteCapacityUnits": 5,
+                    },
+                }
+            }
+        ],
+    )
+    print(response)
+
+
+def drop_secondary_index(ddb, index_name):
+    table = ddb.Table("student_quiz_reports")
+    response = table.update(
+        GlobalSecondaryIndexUpdates=[{"Delete": {"IndexName": index_name}}]
+    )
+    print(response)
+
+
 def drop_student_quiz_reports(ddb):
     table = ddb.Table("student_quiz_reports")
     table.delete()

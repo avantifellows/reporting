@@ -1,16 +1,21 @@
 from student_quiz_reports import (
     generate_student_quiz_reports,
     drop_student_quiz_reports,
+    add_secondary_index,
+    drop_secondary_index,
 )
-import boto3
 from dotenv import load_dotenv
-
+import boto3
 import os
 
 # Update and use `.env.prod` to write to prod dynamodb table
 # or use `.env.staging` to write to staging dynamodb table
 # TODO: Staging table doesn't exist as of now :p - so maybe we should create it in the future
 load_dotenv(".env.local")
+
+print("HELLO")
+print(os.environ.get("DYNAMODB_URL"))
+print(os.environ.get("DYNAMODB_ACCESS_KEY"))
 
 
 def initialize_db():
@@ -35,5 +40,15 @@ def drop_tables():
     drop_student_quiz_reports(ddb)
 
 
+def add_secondary_ind():
+    # DON'T RUN THIS for the key user_id key as it's already been run
+    ddb = initialize_db()
+    add_secondary_index(ddb)
+
+
+def drop_secondary_ind():
+    drop_secondary_index("gsi_user_id-section")
+
+
 if __name__ == "__main__":
-    generate_tables()
+    add_secondary_ind()
