@@ -51,7 +51,8 @@ def drop_secondary_ind(index_name: str):
     """
     Drops a secondary index
     """
-    drop_secondary_index(index_name)
+    ddb = initialize_db()
+    drop_secondary_index(ddb, index_name)
 
 
 if __name__ == "__main__":
