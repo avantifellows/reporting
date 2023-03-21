@@ -82,6 +82,9 @@ class StudentQuizReportController:
             user_id, session_id
         )
 
+    def get_student_reports(self, user_id):
+        return self.__student_quiz_reports_db.get_student_reports(user_id)
+
     def create_student_quiz_report(self, report_data: CreateStudentQuizReportModel):
         uid = report_data.student_id + "-" + report_data.quiz_id
 

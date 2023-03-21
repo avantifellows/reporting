@@ -3,6 +3,7 @@ from fastapi.templating import Jinja2Templates
 from fastapi import HTTPException
 from collections import OrderedDict
 from urllib.parse import unquote
+from typing import Union
 
 from models.student_quiz_report import StudentQuizReportController
 
@@ -21,6 +22,9 @@ ROW_NAMES = {
 QUIZ_URL = (
     "https://quiz.avantifellows.org/quiz/{quiz_id}?userId={user_id}&apiKey={api_key}"
 )
+# https://reports.avantifellows.org/reports/student_quiz_report/Homework_Quiz_2022-08-03_62ea813210de4e9677c8ce2d/1403899102
+STUDENT_QUIZ_REPORT_URL = "https://reports.avantifellows.org/reports/student_quiz_report/{session_id}/{user_id}"
+
 AF_API_KEY = "6qOO8UdF1EGxLgzwIbQN"
 
 
@@ -54,6 +58,40 @@ class ReportsRouter:
                 )
             section_report["table_data"] = table_data
             return section_report
+
+        @api_router.get("/student_reports/{user_id}")
+        def get_student_reports(
+            request: Request, user_id: str = None, format: Union[str, None] = None
+        ):
+            if user_id is None:
+                raise HTTPException(
+                    status_code=400,
+                    detail="User ID has to be specified",
+                )
+            elif format is not None and format == "json":
+                data = self.__student_quiz_reports_controller.get_student_reports(
+                    user_id=user_id
+                )
+                response = {"student_id": user_id}
+                student_reports = []
+                for doc in data:
+                    result = {
+                        "test_name": doc["test_name"],
+                        "test_session_id": doc["session_id"],
+                        "rank": doc["rank"],
+                        "percentile": doc["percentile"],
+                        "report_link": STUDENT_QUIZ_REPORT_URL.format(
+                            session_id=doc["session_id"], user_id=user_id
+                        ),
+                    }
+                    student_reports.append(result)
+                response["reports"] = student_reports
+                return response
+            else:
+                return HTTPException(
+                    status_code=501,
+                    detail="Not implemented",
+                )
 
         @api_router.get("/student_quiz_report/{session_id}/{user_id}")
         def student_quiz_report(request: Request, session_id: str, user_id: str):
