@@ -13,10 +13,6 @@ import os
 # TODO: Staging table doesn't exist as of now :p - so maybe we should create it in the future
 load_dotenv(".env.local")
 
-print("HELLO")
-print(os.environ.get("DYNAMODB_URL"))
-print(os.environ.get("DYNAMODB_ACCESS_KEY"))
-
 
 def initialize_db():
     ddb = boto3.resource(
@@ -31,24 +27,36 @@ def initialize_db():
 
 
 def generate_tables():
+    """
+    Generates all required dynamodb table (for now only student_quiz_reports)
+    """
     ddb = initialize_db()
     generate_student_quiz_reports(ddb)
 
 
 def drop_tables():
+    """
+    Empty the database of all the tables
+    """
     ddb = initialize_db()
     drop_student_quiz_reports(ddb)
 
 
 def add_secondary_ind():
-    # DON'T RUN THIS for the key user_id key as it's already been run
     ddb = initialize_db()
     add_secondary_index(ddb)
 
 
-def drop_secondary_ind():
-    drop_secondary_index("gsi_user_id-section")
+def drop_secondary_ind(index_name: str):
+    """
+    Drops a secondary index
+    """
+    drop_secondary_index(index_name)
 
 
 if __name__ == "__main__":
+    """
+    Creates empty dynamodb table with correct schema for local usage.
+    """
+    generate_tables()
     add_secondary_ind()
