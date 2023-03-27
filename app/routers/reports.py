@@ -1,11 +1,13 @@
 from fastapi import APIRouter, Request
 from fastapi.templating import Jinja2Templates
-from fastapi import HTTPException
+from fastapi import HTTPException, Depends
 from collections import OrderedDict
 from urllib.parse import unquote
-from typing import Union
-
+from typing import Union, Optional
+from auth import verify_token
 from models.student_quiz_report import StudentQuizReportController
+from fastapi.security.api_key import APIKeyHeader
+
 
 ROW_NAMES = OrderedDict()
 ROW_NAMES = {
@@ -26,6 +28,8 @@ QUIZ_URL = (
 STUDENT_QUIZ_REPORT_URL = "https://reports.avantifellows.org/reports/student_quiz_report/{session_id}/{user_id}"
 
 AF_API_KEY = "6qOO8UdF1EGxLgzwIbQN"
+
+api_key_header = APIKeyHeader(name="Authorization", auto_error=False)
 
 
 class ReportsRouter:
@@ -61,8 +65,15 @@ class ReportsRouter:
 
         @api_router.get("/student_reports/{user_id}")
         def get_student_reports(
-            request: Request, user_id: str = None, format: Union[str, None] = None
+            request: Request,
+            user_id: str = None,
+            format: Union[str, None] = None,
+            verified: bool = Depends(verify_token),
+            auth_header: Optional[str] = Depends(api_key_header),
         ):
+            if not verified:
+                raise HTTPException(status_code=401, detail="Unauthorized")
+
             if user_id is None:
                 raise HTTPException(
                     status_code=400,
