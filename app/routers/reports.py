@@ -94,7 +94,6 @@ class ReportsRouter:
                 for doc in data:
                     if "overall" not in doc["user_id-section"]:
                         continue
-                    print(doc)
                     result = {
                         "test_name": doc["test_name"],
                         "test_session_id": doc["session_id"],
