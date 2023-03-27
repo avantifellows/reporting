@@ -71,6 +71,12 @@ class ReportsRouter:
             verified: bool = Depends(verify_token),
             auth_header: Optional[str] = Depends(api_key_header),
         ):
+            """
+            Returns all student reports for a given user ID
+            params: user_id: str
+            params: format: str
+            params: verified: bool
+            """
             if not verified:
                 raise HTTPException(status_code=401, detail="Unauthorized")
 
@@ -86,11 +92,14 @@ class ReportsRouter:
                 response = {"student_id": user_id}
                 student_reports = []
                 for doc in data:
+                    if "overall" not in doc["user_id-section"]:
+                        continue
+                    print(doc)
                     result = {
                         "test_name": doc["test_name"],
                         "test_session_id": doc["session_id"],
-                        "rank": doc["rank"],
-                        "percentile": doc["percentile"],
+                        "percentile": doc["percentile"] if "percentile" in doc else "",
+                        "rank": doc["rank"] if "rank" in doc else "",
                         "report_link": STUDENT_QUIZ_REPORT_URL.format(
                             session_id=doc["session_id"], user_id=user_id
                         ),
@@ -106,6 +115,11 @@ class ReportsRouter:
 
         @api_router.get("/student_quiz_report/{session_id}/{user_id}")
         def student_quiz_report(request: Request, session_id: str, user_id: str):
+            """
+            Returns a student quiz report for a given session ID and user ID
+            params: session_id: str
+            params: user_id: str
+            """
             if session_id is None or user_id is None:
                 raise HTTPException(
                     status_code=400,
