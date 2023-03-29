@@ -49,7 +49,8 @@ class ReportsRouter:
             section_report["name"] = "Performance - " + section["name"].capitalize()
             table_data = {}
             for row in ROW_NAMES:
-                table_data[ROW_NAMES[row]] = section[row]
+                if row in section:
+                    table_data[ROW_NAMES[row]] = section[row]
 
             # TODO: When accuracy is added to the BQ table, use that instead
             if (section["num_wrong"] + section["num_correct"]) == 0:
