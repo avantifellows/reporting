@@ -15,6 +15,7 @@ ROW_NAMES = {
     "num_skipped": "Unattempted",
     "num_wrong": "Wrong Answers",
     "num_correct": "Correct Answers",
+    "num_partially_correct": "Partially Correct",
     "percentage": "Percentage",
     "highest_test_score": "Topper Marks",
     "percentile": "Percentile",
@@ -53,13 +54,13 @@ class ReportsRouter:
                     table_data[ROW_NAMES[row]] = section[row]
 
             # TODO: When accuracy is added to the BQ table, use that instead
-            if (section["num_wrong"] + section["num_correct"]) == 0:
+            if (section["num_wrong"] + section["num_correct"] + section["num_partially_correct"]) == 0:
                 table_data["Accuracy"] = "0%"
             else:
                 table_data["Accuracy"] = "{:.2f}%".format(
                     100
-                    * section["num_correct"]
-                    / ((section["num_wrong"] + section["num_correct"]))
+                    * (section["num_correct"] + section["num_partially_correct"]) # not sure what metric to use here
+                    / ((section["num_wrong"] + section["num_correct"] + section["num_partially_correct"]))
                 )
             section_report["table_data"] = table_data
             return section_report
