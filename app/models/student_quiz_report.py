@@ -27,7 +27,7 @@ class ScoreDetails(BaseModel):
     rank: int = Field(..., example=7)
     percentile: float = Field(..., example=85.4)
     num_correct: int = Field(..., example=30)
-    num_partially_correct: int = Field(..., example = 10)
+    num_partially_correct: int = Field(..., example=10)
     num_incorrect: int = Field(..., example=15)
     num_skipped: int = Field(..., example=7)
     max_marks: int = Field(..., example=360)
@@ -55,6 +55,7 @@ class CreateStudentQuizReportModel(BaseModel):
     highest_test_score: float = Field(..., example=50.3)
     percentile: float = Field(..., example=40.3)
     percentage: float = Field(..., example=20.2)
+    accuracy: float = Field(..., example=30.5)
 
     max_marks_possible: int = Field(..., example=100)
     avg_test_score: float = Field(..., example=25.30)
