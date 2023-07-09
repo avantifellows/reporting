@@ -122,14 +122,19 @@ class ReportsRouter:
             # it's possible that the strings are URL encoded.
             session_id = unquote(session_id)
             user_id = unquote(user_id)
-            try:
-                data = self.__student_quiz_reports_controller.get_student_quiz_report(
+            data = self.__student_quiz_reports_controller.get_student_quiz_report(
                     session_id=session_id, user_id=user_id
                 )
-            except KeyError:
-                raise HTTPException(
-                    status_code=400, detail="No student_quiz_report found"
-                )
+            if isinstance(data, ValueError):
+                raise HTTPException(status_code=400, detail="Invalid user_id or session_id")
+            # try:
+            #     data = self.__student_quiz_reports_controller.get_student_quiz_report(
+            #         session_id=session_id, user_id=user_id
+            #     )
+            # except KeyError:
+            #     raise HTTPException(
+            #         status_code=400, detail="No student_quiz_report found"
+            #     )
             report_data = {}
             report_data["student_name"] = ""
             test_id = data[0]["test_id"]
