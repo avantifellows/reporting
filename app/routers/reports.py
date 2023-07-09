@@ -139,7 +139,7 @@ class ReportsRouter:
                 error_data = {
                     "session_id": session_id,
                     "user_id": user_id,
-                    "error_message": "No report found. Please enter valid session_id and user_id",
+                    "error_message": "No report found. Please contact admin.",
                     "status_code": 400
                 }
                 return self._templates.TemplateResponse(
