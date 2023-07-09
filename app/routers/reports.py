@@ -125,16 +125,28 @@ class ReportsRouter:
             data = self.__student_quiz_reports_controller.get_student_quiz_report(
                     session_id=session_id, user_id=user_id
                 )
-            if isinstance(data, ValueError):
-                raise HTTPException(status_code=400, detail="Invalid user_id or session_id")
-            # try:
-            #     data = self.__student_quiz_reports_controller.get_student_quiz_report(
-            #         session_id=session_id, user_id=user_id
-            #     )
-            # except KeyError:
-            #     raise HTTPException(
-            #         status_code=400, detail="No student_quiz_report found"
-            #     )
+            try:
+                data = self.__student_quiz_reports_controller.get_student_quiz_report(
+                    session_id=session_id, user_id=user_id
+                )
+            except KeyError:
+                raise HTTPException(
+                    status_code=400, detail="No student_quiz_report found"
+                )
+            
+            if len(data) == 0:
+                # no data
+                error_data = {
+                    "session_id": session_id,
+                    "user_id": user_id,
+                    "error_message": "No report found. Please enter valid session_id and user_id",
+                    "status_code": 400
+                }
+                return self._templates.TemplateResponse(
+                    "error.html",
+                    {"request": request, "error_data": error_data}
+                )
+            
             report_data = {}
             report_data["student_name"] = ""
             test_id = data[0]["test_id"]

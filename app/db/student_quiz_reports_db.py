@@ -25,7 +25,7 @@ class StudentQuizReportsDB:
             )
             return response["Items"]
         except ClientError as e:
-            return ValueError(e.response["Error"]["Message"]) 
+            raise ValueError(e.response["Error"]["Message"])
 
     def get_student_reports(self, user_id):
         try:
