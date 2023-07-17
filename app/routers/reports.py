@@ -128,8 +128,22 @@ class ReportsRouter:
                 )
             except KeyError:
                 raise HTTPException(
-                    status_code=400, detail="No student_quiz_report found"
+                    status_code=400, detail="No student_quiz_report found. Unknown error occurred."
                 )
+            
+            if len(data) == 0:
+                # no data
+                error_data = {
+                    "session_id": session_id,
+                    "user_id": user_id,
+                    "error_message": "No report found. Please contact admin.",
+                    "status_code": 404
+                }
+                return self._templates.TemplateResponse(
+                    "error.html",
+                    {"request": request, "error_data": error_data}
+                )
+            
             report_data = {}
             report_data["student_name"] = ""
             test_id = data[0]["test_id"]
