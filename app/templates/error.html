@@ -1,0 +1,13 @@
+{% extends "layout.html" %}
+{% block title %}Error{% endblock %}
+
+{% block content %}
+
+<section id="error_page">
+    <div id="section_heading">{{ error_data["error_message"] }}</div>
+    <div id="name_card">
+        <p>Student ID: {{error_data["user_id"]}}
+    </div>
+</section>
+
+{% endblock %}
