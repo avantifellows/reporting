@@ -128,7 +128,7 @@ class ReportsRouter:
                 )
             except KeyError:
                 raise HTTPException(
-                    status_code=400, detail="No student_quiz_report found"
+                    status_code=400, detail="No student_quiz_report found. Unknown error occurred."
                 )
             
             if len(data) == 0:
