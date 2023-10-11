@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from mangum import Mangum
 
 from internal.db import initialize_db
@@ -14,6 +15,20 @@ app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 db = initialize_db()
+
+origins = [
+    "http://localhost:3000", # gurukul localhost
+    "https://reports.avantifellows.org",
+    "https://reports-staging.avantifellows.org",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 
 student_quiz_reports_db = StudentQuizReportsDB(db)
