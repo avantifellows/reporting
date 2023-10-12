@@ -49,7 +49,6 @@
       <td>{{value}}</td>
     </tr>
     {% endfor %}
-    <div id="chapter_wise_heading">Chapterwise Performance</div>
     <table id="chapter_details">
       <tr>
         <td>Chapter</td>
@@ -57,6 +56,7 @@
         <td>Accuracy</td>
         <td>Attempt Rate</td>
       </tr>
+      <div id="chapter_wise_heading">Chapterwise Performance</div>
       {% for row in section_report["table_data"]["chapter_level_data"] %}
       <tr>
         <td>{{ row["chapter_name"] }}</td>

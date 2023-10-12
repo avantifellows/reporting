@@ -79,9 +79,9 @@ body {
     text-transform: uppercase;
 }
 
-#chapterwise_heading {
+#chapter_wise_heading {
     padding: 8px;
-    font-size: 18pt;
+    font-size: 20pt;
     font-weight: bold;
     margin-top: 30px;
     text-transform: uppercase;
