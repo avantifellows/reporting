@@ -49,23 +49,25 @@
       <td>{{value}}</td>
     </tr>
     {% endfor %}
-    <table id="chapter_details">
-      <tr>
-        <td>Chapter</td>
-        <td>Score</td>
-        <td>Accuracy</td>
-        <td>Attempt Rate</td>
-      </tr>
-      <div id="chapter_wise_heading">Chapterwise Performance</div>
-      {% for row in section_report["table_data"]["chapter_level_data"] %}
-      <tr>
-        <td>{{ row["chapter_name"] }}</td>
-        <td>{{ row["marks_scored"] }}</td>
-        <td>{{ row["accuracy"] }} </td>
-        <td>{{ row["attempt_percentage"] }}</td>
-      </tr>
-      {% endfor %}
-    </table>
+    {% if "chapter_level_data" in section_report["table_data"] %}
+      <table id="chapter_details">
+        <tr>
+          <td>Chapter</td>
+          <td>Score</td>
+          <td>Accuracy</td>
+          <td>Attempt Rate</td>
+        </tr>
+        <div id="chapter_wise_heading">Chapterwise Performance</div>
+        {% for row in section_report["table_data"]["chapter_level_data"] %}
+        <tr>
+          <td>{{ row["chapter_name"] }}</td>
+          <td>{{ row["marks_scored"] }}</td>
+          <td>{{ row["accuracy"] }} </td>
+          <td>{{ row["attempt_percentage"] }}</td>
+        </tr>
+        {% endfor %}
+      </table>
+    {% endif %}
 
 
   </table>
