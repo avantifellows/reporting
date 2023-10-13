@@ -8,7 +8,6 @@ from auth import verify_token
 from models.student_quiz_report import StudentQuizReportController
 from fastapi.security.api_key import APIKeyHeader
 
-
 ROW_NAMES = OrderedDict()
 ROW_NAMES = {
     "marks_scored": "Marks",
@@ -21,6 +20,17 @@ ROW_NAMES = {
     "highest_test_score": "Topper Marks",
     "percentile": "Percentile",
     "rank": "Rank",
+    "weightage": "Weightage",
+}
+
+CHAPTER_WISE_ROW_NAMES = {
+    "marks_scored": "Marks",
+    "max_score": "Max Marks",
+    "total_questions": "Number of Questions",
+    "accuracy": "Accuracy",
+    "chapter_name": "Chapter Name",
+    "attempt_percentage": "Attempt Rate",
+    "chapter_code": "Chapter Code",
 }
 
 QUIZ_URL = (
@@ -50,10 +60,17 @@ class ReportsRouter:
             section_report = {}
             section_report["name"] = "Performance - " + section["name"].capitalize()
             table_data = {}
+
+            # For main table
             for row in ROW_NAMES:
                 if row in section:
                     table_data[ROW_NAMES[row]] = section[row]
 
+            # For chapter level tables where the data exists.
+            # Ignore if it doesn't exist like the "Overall section", but also
+            # reports that don't have chapterwise data
+            if "chapter_wise_data" in section:
+                table_data["chapter_level_data"] = section["chapter_wise_data"]
             section_report["table_data"] = table_data
             return section_report
 
@@ -128,22 +145,22 @@ class ReportsRouter:
                 )
             except KeyError:
                 raise HTTPException(
-                    status_code=400, detail="No student_quiz_report found. Unknown error occurred."
+                    status_code=400,
+                    detail="No student_quiz_report found. Unknown error occurred.",
                 )
-            
+
             if len(data) == 0:
                 # no data
                 error_data = {
                     "session_id": session_id,
                     "user_id": user_id,
                     "error_message": "No report found. Please contact admin.",
-                    "status_code": 404
+                    "status_code": 404,
                 }
                 return self._templates.TemplateResponse(
-                    "error.html",
-                    {"request": request, "error_data": error_data}
+                    "error.html", {"request": request, "error_data": error_data}
                 )
-            
+
             report_data = {}
             report_data["student_name"] = ""
             test_id = data[0]["test_id"]
