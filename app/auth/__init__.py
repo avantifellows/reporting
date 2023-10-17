@@ -2,7 +2,7 @@ import httpx
 from fastapi import Request, HTTPException, status
 
 # Portal Backend URL
-VERIFICATION_URL = "https://9nqmv8p8k2.execute-api.ap-south-1.amazonaws.com/auth/verify"
+VERIFICATION_URL = "https://uza9ixusuh.execute-api.ap-south-1.amazonaws.com/auth/verify"
 
 
 async def verify_token(request: Request) -> bool:
