@@ -19,7 +19,7 @@ db = initialize_db()
 origins = [
     "https://reports.avantifellows.org",
     "https://reports-staging.avantifellows.org",
-    "https://main.d2gowi7rh3vzhn.amplifyapp.com" # amplify testing
+    "https://main.d2gowi7rh3vzhn.amplifyapp.com" # amplify url
 ]
 
 app.add_middleware(
