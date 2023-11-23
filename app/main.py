@@ -17,10 +17,9 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 db = initialize_db()
 
 origins = [
-    "http://localhost:3000", # gurukul localhost
     "https://reports.avantifellows.org",
     "https://reports-staging.avantifellows.org",
-    "https://main.d2gowi7rh3vzhn.amplifyapp.com/" # amplify testing
+    "https://main.d2gowi7rh3vzhn.amplifyapp.com" # amplify testing
 ]
 
 app.add_middleware(
