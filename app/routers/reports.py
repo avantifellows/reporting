@@ -5,7 +5,7 @@ from collections import OrderedDict
 from urllib.parse import unquote
 from typing import Union, Optional
 from auth import verify_token
-from models.student_quiz_report import StudentQuizReportController
+from app.models.student_quiz_reports import StudentQuizReportController
 from fastapi.security.api_key import APIKeyHeader
 
 ROW_NAMES = OrderedDict()
@@ -44,7 +44,11 @@ AF_API_KEY = "6qOO8UdF1EGxLgzwIbQN"
 api_key_header = APIKeyHeader(name="Authorization", auto_error=False)
 
 
-class ReportsRouter:
+class StudentQuizReportsRouter:
+    """
+    Router class for handling reports related endpoints.
+    """
+
     def __init__(
         self, student_quiz_reports_controller: StudentQuizReportController
     ) -> None:
@@ -56,6 +60,15 @@ class ReportsRouter:
         api_router = APIRouter(prefix="/reports", tags=["reports"])
 
         def _parse_section_data(section=None):
+            """
+            Parse the section data and return a formatted section report.
+
+            Args:
+                section (dict): The section data.
+
+            Returns:
+                dict: The formatted section report.
+            """
             section["name"] = section["user_id-section"].split("#")[1].capitalize()
             section_report = {}
             section_report["name"] = "Performance - " + section["name"].capitalize()
@@ -83,10 +96,20 @@ class ReportsRouter:
             auth_header: Optional[str] = Depends(api_key_header),
         ):
             """
-            Returns all student reports for a given user ID
-            params: user_id: str
-            params: format: str
-            params: verified: bool
+            Returns all student reports for a given user ID.
+
+            Args:
+                request (Request): The request object.
+                user_id (str): The user ID.
+                format (str, optional): The format of the reports. Defaults to None.
+                verified (bool): The verification status of the token.
+                auth_header (str, optional): The API key header. Defaults to None.
+
+            Raises:
+                HTTPException: If the user is not verified or user ID is not specified.
+
+            Returns:
+                dict: The student reports.
             """
             if not verified:
                 raise HTTPException(status_code=401, detail="Unauthorized")
@@ -126,9 +149,18 @@ class ReportsRouter:
         @api_router.get("/student_quiz_report/{session_id}/{user_id}")
         def student_quiz_report(request: Request, session_id: str, user_id: str):
             """
-            Returns a student quiz report for a given session ID and user ID
-            params: session_id: str
-            params: user_id: str
+            Returns a student quiz report for a given session ID and user ID.
+
+            Args:
+                request (Request): The request object.
+                session_id (str): The session ID.
+                user_id (str): The user ID.
+
+            Raises:
+                HTTPException: If session ID or user ID is not specified.
+
+            Returns:
+                TemplateResponse: The student quiz report template response.
             """
             if session_id is None or user_id is None:
                 raise HTTPException(

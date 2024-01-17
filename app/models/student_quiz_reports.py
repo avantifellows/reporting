@@ -4,34 +4,11 @@ from pydantic import BaseModel
 from db.student_quiz_reports_db import StudentQuizReportsDB
 
 
-class CustomBaseModel(BaseModel):
-    def dict(self, **kwargs):
-        hidden_fields = set(
-            attribute_name
-            for attribute_name, model_field in self.__fields__.items()
-            if model_field.field_info.extra.get("hidden") is True
-        )
-        kwargs.setdefault("exclude", hidden_fields)
-        return super().dict(**kwargs)
-
-
 class QuizStats(BaseModel):
     max_score: int = Field(..., example=100)
     average: float = Field(..., example=56.4)
     number_of_students: int = Field(..., example=72)
     highest_marks: float = Field(..., example=97.5)
-
-
-class ScoreDetails(BaseModel):
-    score: float = Field(..., example=65.5)
-    rank: int = Field(..., example=7)
-    percentile: float = Field(..., example=85.4)
-    num_correct: int = Field(..., example=30)
-    num_partially_correct: int = Field(..., example=10)
-    num_incorrect: int = Field(..., example=15)
-    num_skipped: int = Field(..., example=7)
-    max_marks: int = Field(..., example=360)
-    highest_score: int = Field(..., example=325)
 
 
 class CreateStudentQuizReportModel(BaseModel):

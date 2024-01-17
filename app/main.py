@@ -4,9 +4,9 @@ from mangum import Mangum
 
 from internal.db import initialize_db
 
-from models.student_quiz_report import StudentQuizReportController
+from app.models.student_quiz_reports import StudentQuizReportController
 from db.student_quiz_reports_db import StudentQuizReportsDB
-from routers.reports import ReportsRouter
+from routers.reports import StudentQuizReportsRouter
 
 from fastapi.staticfiles import StaticFiles
 
@@ -34,9 +34,9 @@ app.add_middleware(
 
 student_quiz_reports_db = StudentQuizReportsDB(db)
 student_quiz_reports_controller = StudentQuizReportController(student_quiz_reports_db)
-reports_router = ReportsRouter(student_quiz_reports_controller)
+student_level_reports_router = StudentQuizReportsRouter(student_quiz_reports_controller)
 
-reports_router = ReportsRouter(student_quiz_reports_controller)
+reports_router = StudentQuizReportsRouter(student_quiz_reports_controller)
 app.include_router(reports_router.router)
 
 
