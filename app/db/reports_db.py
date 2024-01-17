@@ -1,13 +1,9 @@
 from botocore.exceptions import ClientError
 from boto3.resources.base import ServiceResource
-from decimal import Decimal
 from boto3.dynamodb.conditions import Key
 
 
-import json
-
-
-class StudentQuizReportsDB:
+class ReportsDB:
     def __init__(self, db: ServiceResource) -> None:
         self.__db = db
 
@@ -37,14 +33,3 @@ class StudentQuizReportsDB:
             return response["Items"]
         except ClientError as e:
             raise ValueError(e.response["Error"]["Message"])
-
-    def create_student_quiz_report(self, student_quiz_report: dict):
-        table = self.__db.Table("student_quiz_reports")
-
-        # Need to do this because otherwise dynamodb throws error about float not being supported
-        # https://stackoverflow.com/questions/70343666/python-boto3-float-types-are-not-supported-use-decimal-types-instead
-        student_quiz_report = json.loads(
-            json.dumps(student_quiz_report), parse_float=Decimal
-        )
-        response = table.put_item(Item=student_quiz_report)
-        return response

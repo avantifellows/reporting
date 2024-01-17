@@ -1,12 +1,13 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from mangum import Mangum
+from db.quiz_db import QuizDB
+from routers.quiz_reports import QuizReportsRouter
 
-from internal.db import initialize_db
+from internal.db import initialize_quiz_db, initialize_reports_db
 
-from app.models.student_quiz_reports import StudentQuizReportController
-from db.student_quiz_reports_db import StudentQuizReportsDB
-from routers.reports import StudentQuizReportsRouter
+from db.reports_db import ReportsDB
+from routers.student_quiz_reports import StudentQuizReportsRouter
 
 from fastapi.staticfiles import StaticFiles
 
@@ -14,7 +15,8 @@ app = FastAPI()
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-db = initialize_db()
+reports_db = initialize_reports_db()
+quiz_db = initialize_quiz_db()
 
 origins = [
     "http://localhost:3000",  # gurukul localhost
@@ -32,12 +34,15 @@ app.add_middleware(
 )
 
 
-student_quiz_reports_db = StudentQuizReportsDB(db)
-student_quiz_reports_controller = StudentQuizReportController(student_quiz_reports_db)
-student_level_reports_router = StudentQuizReportsRouter(student_quiz_reports_controller)
+student_quiz_reports_db = ReportsDB(reports_db)
+quiz_db = QuizDB(quiz_db)
+student_quiz_reports_router = StudentQuizReportsRouter(
+    reports_db=student_quiz_reports_db
+)
+quiz_reports_router = QuizReportsRouter(quiz_db=quiz_db)
 
-reports_router = StudentQuizReportsRouter(student_quiz_reports_controller)
-app.include_router(reports_router.router)
+app.include_router(student_quiz_reports_router.router)
+app.include_router(quiz_reports_router.router)
 
 
 @app.get("/")

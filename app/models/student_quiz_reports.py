@@ -1,7 +1,7 @@
 from pydantic import Field
 from pydantic import BaseModel
 
-from db.student_quiz_reports_db import StudentQuizReportsDB
+# NOTE: THESE models are not used in the code, but keeping them here to inform the dynamoDB schema till we find a better way to do it.
 
 
 class QuizStats(BaseModel):
@@ -11,7 +11,7 @@ class QuizStats(BaseModel):
     highest_marks: float = Field(..., example=97.5)
 
 
-class CreateStudentQuizReportModel(BaseModel):
+class StudentQuizReportModel(BaseModel):
     id: str = Field(..., example="SESSION_ID_TEST_ID")
     session_id: str = Field(..., example="SESSION_ID")
     test_id: str = Field(..., example="TEST_ID")
@@ -44,32 +44,4 @@ class CreateStudentQuizReportModel(BaseModel):
     user_id: str = Field(..., example="USER_ID")
     student_name: str = Field(..., example="Student Name")
     start_date: str = Field(..., example="2022-08-03")
-
-
-class StudentQuizReportModel(CreateStudentQuizReportModel):
     user_id_section: str = Field(..., example="", alias="user_id-section")
-
-
-class StudentQuizReportController:
-    def __init__(self, student_quiz_reports_db: StudentQuizReportsDB) -> None:
-        self.__student_quiz_reports_db = student_quiz_reports_db
-
-    def get_all(self):
-        return self.__student_quiz_reports_db.get_all()
-
-    def get_student_quiz_report(self, user_id, session_id):
-        return self.__student_quiz_reports_db.get_student_quiz_report(
-            user_id, session_id
-        )
-
-    def get_student_reports(self, user_id):
-        return self.__student_quiz_reports_db.get_student_reports(user_id)
-
-    def create_student_quiz_report(self, report_data: CreateStudentQuizReportModel):
-        uid = report_data.student_id + "-" + report_data.quiz_id
-
-        uid = uid.replace(" ", "_")
-        student_quiz_report = StudentQuizReportModel(**report_data.dict(), id=uid)
-        return self.__student_quiz_reports_db.create_student_quiz_report(
-            student_quiz_report.dict()
-        )

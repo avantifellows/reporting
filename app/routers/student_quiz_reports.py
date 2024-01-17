@@ -4,8 +4,8 @@ from fastapi import HTTPException, Depends
 from collections import OrderedDict
 from urllib.parse import unquote
 from typing import Union, Optional
+from db.reports_db import ReportsDB
 from auth import verify_token
-from app.models.student_quiz_reports import StudentQuizReportController
 from fastapi.security.api_key import APIKeyHeader
 
 ROW_NAMES = OrderedDict()
@@ -46,13 +46,11 @@ api_key_header = APIKeyHeader(name="Authorization", auto_error=False)
 
 class StudentQuizReportsRouter:
     """
-    Router class for handling reports related endpoints.
+    Router class for handling Student Reports related endpoints.
     """
 
-    def __init__(
-        self, student_quiz_reports_controller: StudentQuizReportController
-    ) -> None:
-        self.__student_quiz_reports_controller = student_quiz_reports_controller
+    def __init__(self, reports_db: ReportsDB) -> None:
+        self.__reports_db = reports_db
         self._templates = Jinja2Templates(directory="templates")
 
     @property
@@ -120,9 +118,8 @@ class StudentQuizReportsRouter:
                     detail="User ID has to be specified",
                 )
             elif format is not None and format == "json":
-                data = self.__student_quiz_reports_controller.get_student_reports(
-                    user_id=user_id
-                )
+                data = self.__reports_db.get_student_reports(user_id)
+
                 response = {"student_id": user_id}
                 student_reports = []
                 for doc in data:
@@ -172,9 +169,7 @@ class StudentQuizReportsRouter:
             session_id = unquote(session_id)
             user_id = unquote(user_id)
             try:
-                data = self.__student_quiz_reports_controller.get_student_quiz_report(
-                    session_id=session_id, user_id=user_id
-                )
+                data = self.__reports_db.get_student_quiz_report(user_id, session_id)
             except KeyError:
                 raise HTTPException(
                     status_code=400,
