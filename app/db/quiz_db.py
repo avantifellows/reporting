@@ -23,6 +23,7 @@ class QuizDB:
         # Get quiz details
         quiz = self.__db.quiz.quizzes.find_one({"_id": quiz_id})
         quiz_title = quiz.get("title", "") if quiz else ""
+        print(quiz_title)
 
         pipeline = []
         pipeline.append({"$match": {"quiz_id": quiz_id}})
@@ -71,7 +72,7 @@ class QuizDB:
                 },
                 {
                     # Sort the results by date
-                    "$sort": {"_id.date": 1}
+                    "$sort": {"_id": -1}
                 },
                 {
                     # Format the output if needed
