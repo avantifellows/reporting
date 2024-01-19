@@ -1,8 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from mangum import Mangum
+from db.sessions_db import SessionsDB
 from db.quiz_db import QuizDB
-from routers.quiz_reports import QuizReportsRouter
+from routers.session_quiz_reports import SessionQuizReportsRouter
 
 from internal.db import initialize_quiz_db, initialize_reports_db
 
@@ -36,10 +37,11 @@ app.add_middleware(
 
 student_quiz_reports_db = ReportsDB(reports_db)
 quiz_db = QuizDB(quiz_db)
+sessions_db = SessionsDB()
 student_quiz_reports_router = StudentQuizReportsRouter(
     reports_db=student_quiz_reports_db
 )
-quiz_reports_router = QuizReportsRouter(quiz_db=quiz_db)
+quiz_reports_router = SessionQuizReportsRouter(quiz_db=quiz_db, sessions_db=sessions_db)
 
 app.include_router(student_quiz_reports_router.router)
 app.include_router(quiz_reports_router.router)

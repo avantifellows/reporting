@@ -87,7 +87,8 @@ body {
     text-transform: uppercase;
 }
 
-#score_details {
+#score_details,
+#daywise_stats {
     border-collapse: collapse;
     padding: 0 30px 0 30px;
     margin-left: auto;
@@ -98,7 +99,8 @@ body {
     width: 70%;
 }
 
-#score_details td {
+#score_details,
+#daywise_stats td {
     border: 1px solid #ddd;
     padding: 10px 20px 10px 20px;
     font-size: 22pt;
@@ -106,7 +108,8 @@ body {
 }
 
 #score_details tr:first-child td,
-#chapter_details tr:first-child td {
+#chapter_details tr:first-child td,
+#daywise_stats tr:first-child td{
     vertical-align: top;
     background-color: orange;
     color: black;
@@ -114,17 +117,20 @@ body {
 }
 
 #score_detailstr:nth-child(even),
-#chapter_details tr:nth-child(even) {
+#chapter_details tr:nth-child(even),
+#daywise_stats tr:nth-child(even) {
     background-color: #FEFBEB;
 }
 
 #score_details tr:nth-child(odd),
-#chapter_details tr:nth-child(odd) {
+#chapter_details tr:nth-child(odd),
+#daywise_stats tr:nth-child(even) {
     background-color: orange;
 }
 
 #score_details tr:hover,
-#chapter_details tr:hover {
+#chapter_details tr:hover,
+#daywise_stats tr:hover {
     background-color: #ddd;
 }
 
