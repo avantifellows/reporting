@@ -4,16 +4,24 @@ from pymongo import MongoClient
 
 
 class QuizDB:
+    """
+    Class to handle all the database operations related to quizzes (currently stored on Mongo Atlas)
+    """
+
     def __init__(self, db: MongoClient) -> None:
         self.__db = db
 
     def __generate_objectid_for_time(self, time):
+        """
+        Generates a Mongo object ID for a given time
+        """
         timeId = str(ObjectId.from_datetime(time))
         return timeId
 
     def get_live_quiz_stats(self, quiz_id, start_date=None, end_date=None):
         """
-        Returns daywise report for a given quiz ID
+        Returns daywise report for a given quiz ID by using an aggregation pipeline
+
         params:
             quiz_id: The quiz ID
             start_date (optional): The start date for the report
@@ -26,8 +34,11 @@ class QuizDB:
         print(quiz_title)
 
         pipeline = []
+        # Narrow down documents by quiz ID
         pipeline.append({"$match": {"quiz_id": quiz_id}})
 
+        # Narrow down documents by start and end date
+        # (if start and end dates are not specified (for live quiz report), then no filters are applied)
         if start_date is not None:
             start_datetime = datetime.strptime(
                 start_date + ":00:00:00", "%Y-%m-%d:%H:%M:%S"
@@ -44,7 +55,6 @@ class QuizDB:
         else:
             end_datetime = datetime.now()
 
-        # Aggregation pipeline
         pipeline.extend(
             [
                 {
@@ -75,13 +85,13 @@ class QuizDB:
                     "$sort": {"_id": -1}
                 },
                 {
-                    # Format the output if needed
+                    # Format the output
                     "$project": {"_id": 0, "date": "$_id", "uniqueSessions": 1}
                 },
             ]
         )
 
-        # Get the total sessions
+        # Get the total sessions as sum of unique sessions per day
         pipeline.append(
             {
                 "$group": {
@@ -92,7 +102,7 @@ class QuizDB:
             }
         )
 
-        # Reshape the final output
+        # Reshape the final output to get a nice dictionary
         pipeline.append(
             {
                 "$project": {
@@ -106,7 +116,6 @@ class QuizDB:
 
         # Run the pipeline
         daywise_results = list(self.__db.quiz.sessions.aggregate(pipeline))
-        print(daywise_results)
 
         # Format the final output including the quiz title
         final_result = {

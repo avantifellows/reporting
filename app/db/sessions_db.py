@@ -7,6 +7,11 @@ from google.cloud.firestore_v1.base_query import FieldFilter
 
 
 class SessionsDB:
+    """
+    This class is used to interact with the Sessions Firestore collection
+    As of 22/1/2024, the Sessions colletion is on Firestore till we migrate it to Postgres
+    """
+
     def __init__(self) -> None:
         # Import the environment variables (not needed for prod as it will be in GH secrets)
         if "FIRESTORE_CREDENTIALS" not in os.environ:
@@ -18,6 +23,9 @@ class SessionsDB:
         self.__collection_name = "Sessions"
 
     def get_quiz_session(self, session_id):
+        """
+        Returns a quiz session for a given session ID.
+        """
         # Create a query against the collection
         sessions_ref = self.__db.collection(self.__collection_name)
         query = sessions_ref.where(
@@ -31,5 +39,4 @@ class SessionsDB:
         for doc in docs:
             return doc.to_dict()
 
-        # Return None if no documents are found
         return None
