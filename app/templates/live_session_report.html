@@ -3,23 +3,23 @@
 
 {% block content %}
 
-<div id="report_header">
-  <h1>Quiz Title: {{ data["quizTitle"] }}</h1>
+<div id="report_header_card">
+  <h1>{{ data["quizTitle"] }}</h1>
   {% if session_id %}
     <h2>Session ID: {{ session_id }}</h2>
   {% endif %}
 </div>
 
-<div id="total_stats">
-  <h3>Total Sessions: {{ data["totalSessions"] }}</h3>
+<div id="total_stats_card">
+  <h3>Total Unique Users: {{ data["totalSessions"] }}</h3>
 </div>
 
 <section id="daywise_performance">
-  <h3>Daywise Stats</h3>
+  <div id="section_heading">Daywise Statistics</div>
   <table id="daywise_stats">
     <tr>
-      <th>Date</th>
-      <th>Unique Sessions</th>
+      <td>Date</td>
+      <td>Unique Sessions</td>
     </tr>
     {% for stat in data["daywiseStats"] %}
     <tr>

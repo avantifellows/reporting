@@ -12,7 +12,8 @@ body {
     margin-bottom: 25px;
 }
 
-#name_card {
+#name_card,
+#total_stats_card {
     display: table;
     margin: 30px auto 0 auto;
     text-align: center;
@@ -37,7 +38,8 @@ body {
     box-shadow: 1px 1px 5px #535353;
 }
 
-#test_summary_card {
+#test_summary_card,
+#report_header_card {
     display: inline-flex;
     margin-left: auto;
     margin-right: auto;
@@ -109,7 +111,7 @@ body {
 
 #score_details tr:first-child td,
 #chapter_details tr:first-child td,
-#daywise_stats tr:first-child td{
+#daywise_stats tr:first-child td {
     vertical-align: top;
     background-color: orange;
     color: black;
@@ -145,7 +147,8 @@ body {
     width: 70%;
 }
 
-#chapter_details td {
+#chapter_details td,
+#daywise_stats td {
     border: 1px solid #ddd;
     padding: 10px 20px 10px 20px;
     font-size: 16pt;
