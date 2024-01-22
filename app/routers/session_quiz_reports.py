@@ -6,7 +6,7 @@ from db.quiz_db import QuizDB
 
 class SessionQuizReportsRouter:
     """
-    Router class for handling Student Reports related endpoints.
+    Router class for handling Session and Quiz Reports related endpoints.
     """
 
     def __init__(self, quiz_db: QuizDB, sessions_db: SessionsDB) -> None:
@@ -23,6 +23,8 @@ class SessionQuizReportsRouter:
         def get_live_session_report(request: Request, session_id: str = None):
             """
             Returns live report for a given session ID (only quizzes supported for now)
+            params:
+                session_id: The session ID
             """
             if not session_id:
                 raise HTTPException(status_code=400, detail="Session ID is required.")
@@ -44,7 +46,9 @@ class SessionQuizReportsRouter:
         @api_router.get("/live_quiz_report/{quiz_id}")
         def get_live_quiz_report(request: Request, quiz_id: str = None):
             """
-            Returns live report for a given quiz ID (only quizzes supported for now)
+            Returns live report for a given quiz ID
+            params:
+                quiz_id: The quiz ID
             """
             if not quiz_id:
                 raise HTTPException(status_code=400, detail="Session ID is required.")
