@@ -51,7 +51,7 @@ class SessionQuizReportsRouter:
                 quiz_id: The quiz ID
             """
             if not quiz_id:
-                raise HTTPException(status_code=400, detail="Session ID is required.")
+                raise HTTPException(status_code=400, detail="Quiz ID is required.")
 
             data = self.__quiz_db.get_live_quiz_stats(quiz_id=quiz_id)
             return self._templates.TemplateResponse(

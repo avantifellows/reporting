@@ -31,8 +31,6 @@ class QuizDB:
         # Get quiz details
         quiz = self.__db.quiz.quizzes.find_one({"_id": quiz_id})
         quiz_title = quiz.get("title", "") if quiz else ""
-        print(quiz_title)
-
         pipeline = []
         # Narrow down documents by quiz ID
         pipeline.append({"$match": {"quiz_id": quiz_id}})
@@ -50,10 +48,10 @@ class QuizDB:
             end_datetime = datetime.strptime(
                 end_date + ":23:59:59", "%Y-%m-%d:%H:%M:%S"
             )
-            oid_end = self.__generate_objectid_for_time(end_datetime)
-            pipeline.append({"$match": {"_id": {"$lte": oid_end}}})
         else:
             end_datetime = datetime.now()
+        oid_end = self.__generate_objectid_for_time(end_datetime)
+        pipeline.append({"$match": {"_id": {"$lte": oid_end}}})
 
         pipeline.extend(
             [
