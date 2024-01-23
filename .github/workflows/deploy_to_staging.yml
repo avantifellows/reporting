@@ -41,6 +41,8 @@ jobs:
           DYNAMODB_REGION: ${{ secrets.DYNAMODB_REGION }}
           DYNAMODB_ACCESS_KEY: ${{ secrets.DYNAMODB_ACCESS_KEY }}
           DYNAMODB_SECRET_KEY: ${{ secrets.DYNAMODB_SECRET_KEY }}
+          FIRESTORE_CREDENTIALS: ${{ secrets.FIRESTORE_CREDENTIALS }}
+          MONGO_AUTH_CREDENTIALS: ${{ secrets.MONGO_AUTH_CREDENTIALS }}
         run: >
            sam deploy
            --stack-name ReportingStaging
@@ -54,3 +56,5 @@ jobs:
            DynamodbRegion=$DYNAMODB_REGION
            DynamodbAccessKey=$DYNAMODB_ACCESS_KEY
            DynamodbSecretKey=$DYNAMODB_SECRET_KEY
+           FirestoreCredentials=$FIRESTORE_CREDENTIALS
+           MongoAuthCredentials=$MONGO_AUTH_CREDENTIALS

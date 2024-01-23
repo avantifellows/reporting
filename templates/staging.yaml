@@ -15,6 +15,12 @@ Parameters:
   DynamodbSecretKey:
     Type: String
     Description: Secret key credentials of Dynamodb instance
+  FirestoreCredentials:
+    Type: String
+    Description: Credentials of Firestore
+  MongoAuthCredentials:
+    Type: String
+    Description: Credentials of Mongo DB
 
 Resources:
   Function:
@@ -30,6 +36,8 @@ Resources:
           DYNAMODB_REGION: !Ref DynamodbRegion
           DYNAMODB_ACCESS_KEY: !Ref DynamodbAccessKey
           DYNAMODB_SECRET_KEY: !Ref DynamodbSecretKey
+          MONGO_AUTH_CREDENTIALS: !Ref MongoAuthCredentials
+          FIRESTORE_CREDENTIALS: !Ref FirestoreCredentials
       Events:
         Api:
           Type: HttpApi
