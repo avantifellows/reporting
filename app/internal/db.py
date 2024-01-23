@@ -1,6 +1,7 @@
 import boto3
 from dotenv import load_dotenv
 import os
+from pymongo import MongoClient
 
 # when running app locally -- use load_dotenv
 # when running app via gh actions -- variables already exist via secrets
@@ -12,6 +13,7 @@ if not all(
         "DYNAMODB_REGION",
         "DYNAMODB_ACCESS_KEY",
         "DYNAMODB_SECRET_KEY",
+        "MONGO_AUTH_CREDENTIALS",
     ]
 ):
     # Update and use `.env.prod` to access the prod dynamodb table
@@ -20,7 +22,7 @@ if not all(
     load_dotenv("../.env.local")
 
 
-def initialize_db():
+def initialize_reports_db():
     ddb = boto3.resource(
         "dynamodb",
         endpoint_url=os.getenv("DYNAMODB_URL"),
@@ -30,3 +32,8 @@ def initialize_db():
     )
 
     return ddb
+
+
+def initialize_quiz_db():
+    quiz_db = MongoClient(os.getenv("MONGO_AUTH_CREDENTIALS"))
+    return quiz_db
