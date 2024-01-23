@@ -54,6 +54,10 @@ class SessionQuizReportsRouter:
                 raise HTTPException(status_code=400, detail="Quiz ID is required.")
 
             data = self.__quiz_db.get_live_quiz_stats(quiz_id=quiz_id)
+            if not data:
+                raise HTTPException(
+                    status_code=400, detail="Quiz not found with provided Quiz ID."
+                )
             return self._templates.TemplateResponse(
                 "live_session_report.html",
                 {"request": request, "session_id": "", "data": data},

@@ -30,6 +30,9 @@ class QuizDB:
 
         # Get quiz details
         quiz = self.__db.quiz.quizzes.find_one({"_id": quiz_id})
+        if quiz is None:
+            return None
+
         quiz_title = quiz.get("title", "") if quiz else ""
         pipeline = []
         # Narrow down documents by quiz ID
