@@ -15,7 +15,7 @@
 
 <div id="total_stats_card">
     <h3>Unique users: {{ data["totalSessions"] }}</h3>
-    <h3>Unique users who finished: {{ data["totalFinishedSessions"] }} </h3>
+    <h3>Users who finished: {{ data["totalFinishedSessions"] }} </h3>
 </div>
 
 <section id="daywise_performance">
@@ -23,8 +23,8 @@
     <table id="daywise_stats">
         <tr>
             <td>Date</td>
-            <td>Unique Sessions</td>
-            <td>Finished Sessions</td>
+            <td>Unique users</td>
+            <td>Users who finished</td>
         </tr>
         {% for stat in data["daywiseStats"] %}
         <tr>
