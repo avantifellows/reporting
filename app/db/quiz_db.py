@@ -71,20 +71,17 @@ class QuizDB:
                                 }
                             },
                         },
-                        "uniqueSessions": {"$sum": 1},
-                        "count_has_quiz_ended_true": {
-                            "$sum": {
-                                "$cond": [{"$eq": ["$has_quiz_ended", True]}, 1, 0]
-                            }
-                        },
+                        "hasQuizEnded": {"$max": "$has_quiz_ended"},
                     }
                 },
                 {
                     # Group by date to count unique sessions per day
                     "$group": {
                         "_id": "$_id.date",
-                        "uniqueSessions": {"$sum": "$uniqueSessions"},
-                        "finishedSessions": {"$sum": "$count_has_quiz_ended_true"},
+                        "uniqueSessions": {"$sum": 1},
+                        "finishedSessions": {
+                            "$sum": {"$cond": [{"$eq": ["$hasQuizEnded", True]}, 1, 0]}
+                        },
                     }
                 },
                 {

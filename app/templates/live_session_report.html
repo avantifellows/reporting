@@ -7,11 +7,11 @@
     <h2>{{ data["quizTitle"] }}</h2>
 </div>
 
+{% if session_id %}
 <div id="report_header_card">
-    {% if session_id %}
     <h2>Session ID: {{ session_id }}</h2>
-    {% endif %}
 </div>
+{% endif %}
 
 <div id="total_stats_card">
     <h3>Unique users: {{ data["totalSessions"] }}</h3>
