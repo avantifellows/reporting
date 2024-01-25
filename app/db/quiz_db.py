@@ -71,7 +71,7 @@ class QuizDB:
                                 }
                             },
                         },
-                        "count": {"$sum": 1},
+                        "hasQuizEnded": {"$max": "$has_quiz_ended"},
                     }
                 },
                 {
@@ -79,6 +79,9 @@ class QuizDB:
                     "$group": {
                         "_id": "$_id.date",
                         "uniqueSessions": {"$sum": 1},
+                        "finishedSessions": {
+                            "$sum": {"$cond": [{"$eq": ["$hasQuizEnded", True]}, 1, 0]}
+                        },
                     }
                 },
                 {
@@ -87,7 +90,12 @@ class QuizDB:
                 },
                 {
                     # Format the output
-                    "$project": {"_id": 0, "date": "$_id", "uniqueSessions": 1}
+                    "$project": {
+                        "_id": 0,
+                        "date": "$_id",
+                        "uniqueSessions": 1,
+                        "finishedSessions": 1,
+                    }
                 },
             ]
         )
@@ -98,6 +106,7 @@ class QuizDB:
                 "$group": {
                     "_id": None,
                     "totalSessions": {"$sum": "$uniqueSessions"},
+                    "totalFinishedSessions": {"$sum": "$finishedSessions"},
                     "data": {"$push": "$$ROOT"},
                 }
             }
@@ -109,6 +118,7 @@ class QuizDB:
                 "$project": {
                     "_id": 0,
                     "totalSessions": 1,
+                    "totalFinishedSessions": 1,
                     "quizTitle": 1,
                     "daywise_results": "$data",
                 }
@@ -117,11 +127,11 @@ class QuizDB:
 
         # Run the pipeline
         daywise_results = list(self.__db.quiz.sessions.aggregate(pipeline))
-
         # Format the final output including the quiz title
         final_result = {
             "quizTitle": quiz_title,
             "totalSessions": daywise_results[0]["totalSessions"],
+            "totalFinishedSessions": daywise_results[0]["totalFinishedSessions"],
             "daywiseStats": daywise_results[0]["daywise_results"],
         }
         return final_result
