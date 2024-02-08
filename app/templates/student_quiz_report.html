@@ -1,78 +1,71 @@
 {% extends "layout.html" %}
-{% block title %}Index{% endblock %}
+{% block title %}Student Report{% endblock %}
 
 {% block content %}
 
-<div id="name_card">
-  {% if report_data["student_name"] != "" %}
-  <p>Name: {{report_data["student_name"]}}
-    {% endif %}
-  <p>Student ID: {{report_data["student_id"]}}
-</div>
-
-<div id="test_summary_card">
-  <div class="percentage"> {{report_data["percentage"]}}%</div>
-  <div class="test_details">
-    <div>{{report_data["test_name"]}}</div>
-    <div>{{report_data["test_date"]}}</div>
+<div class="report-header">
+  <h1>Report</h1>
+  <div class="test-info">
+    <h2>{{ report_data["test_name"] }}</h2>
+    <p>Sub - {{ report_data["test_type"] }}</p>
   </div>
 </div>
 
-{% if "test_link" in report_data %}
-<a id="answer_sheet_button" target="_blank" href={{report_data["test_link"]}}>
-  Click here to review your answers
-</a>
-{% endif %}
+{% set score_details = report_data["overall_performance"]["table_data"] %}
 
-<section id="overall_performance">
-  <div id="section_heading">Overall Performance</div>
-  {% set score_details = report_data["overall_performance"] %}
+{{ score_details}}
+<div class="score-summary">
+  <div class="score-block">
+    <div class="score-title">Your Score</div>
+    <div class="score-value">{{ score_details["Marks"] }}</div>
+  </div>
+  <div class="score-block">
+    <div class="score-title">Target Score</div>
+    <div class="score-value">{{ report_data["Max Marks"] }}</div>
+  </div>
+  <div class="score-block">
+    <div class="score-title">Your Rank</div>
+    <div class="score-value">{{ report_data["rank"] }}</div>
+  </div>
+  <div class="score-block">
+    <div class="score-title">Batch Percentile</div>
+    <div class="score-value">{{ report_data["percentile"] }}%</div>
+  </div>
+</div>
 
-  <table id="score_details">
-    {% for key, value in score_details["table_data"].items() %}
-    <tr>
-      <td>{{key}}</td>
-      <td>{{value}}</td>
-    </tr>
-    {% endfor %}
-  </table>
-</section>
+<div class="time-summary">
+  <div class="time-block">
+    <div class="time-title">Total Time Taken</div>
+    <div class="time-value">{{ report_data["total_time"] }}</div>
+  </div>
+</div>
 
-<section id="subject_peformance">
-  {% set section_reports = report_data["section_reports"] %}
-  {% for section_report in section_reports %}
-  <div id="section_heading">{{ section_report["name"] }}</div>
-  <table id="score_details">
-    {% for key, value in section_report["table_data"].items() if key != "chapter_level_data" %}
-    <tr>
-      <td>{{key}}</td>
-      <td>{{value}}</td>
-    </tr>
-    {% endfor %}
-    {% if "chapter_level_data" in section_report["table_data"] %}
-      <table id="chapter_details">
-        <tr>
-          <td>Chapter</td>
-          <td>Score</td>
-          <td>Accuracy</td>
-          <td>Attempt Rate</td>
-        </tr>
-        <div id="chapter_wise_heading">Chapterwise Performance</div>
-        {% for row in section_report["table_data"]["chapter_level_data"] %}
-        <tr>
-          <td>{{ row["chapter_name"] }}</td>
-          <td>{{ row["marks_scored"] }}</td>
-          <td>{{ row["accuracy"] }} </td>
-          <td>{{ row["attempt_percentage"] }}</td>
-        </tr>
-        {% endfor %}
-      </table>
-    {% endif %}
+<a class="review-button" target="_blank" href="{{ report_data["test_link"] }}">Review Test</a>
 
-
-  </table>
-
+<div class="subject-performance">
+  {% for subject in report_data["subjects"] %}
+  <div class="subject-block">
+    <div class="subject-title">{{ subject["name"] }}</div>
+    <div class="subject-details">
+      <div>Your Score: {{ subject["score"] }}</div>
+      <div>Attempt %: {{ subject["attempt_percentage"] }}</div>
+      <div>Accuracy %: {{ subject["accuracy"] }}</div>
+    </div>
+  </div>
   {% endfor %}
-</section>
+</div>
+
+<div class="chapter-performance">
+  <h3>Chapter Name</h3>
+  {% for chapter in report_data["chapters"] %}
+  <div class="chapter-block">
+    <div>Score: {{ chapter["score"] }}</div>
+    <div>% Weightage: {{ chapter["weightage"] }}</div>
+    <div># Questions: {{ chapter["question_count"] }}</div>
+    <div>Attempt %: {{ chapter["attempt_percentage"] }}</div>
+    <div>Accuracy %: {{ chapter["accuracy"] }}</div>
+  </div>
+  {% endfor %}
+</div>
 
 {% endblock %}

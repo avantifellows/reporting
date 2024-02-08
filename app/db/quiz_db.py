@@ -127,11 +127,27 @@ class QuizDB:
 
         # Run the pipeline
         daywise_results = list(self.__db.quiz.sessions.aggregate(pipeline))
+
+        if len(daywise_results) > 0:
+            daywise_results = daywise_results[0]
+        else:
+            daywise_results = {
+                "totalSessions": 0,
+                "totalFinishedSessions": 0,
+                "daywise_results": [],
+            }
+
         # Format the final output including the quiz title
         final_result = {
             "quizTitle": quiz_title,
-            "totalSessions": daywise_results[0]["totalSessions"],
-            "totalFinishedSessions": daywise_results[0]["totalFinishedSessions"],
-            "daywiseStats": daywise_results[0]["daywise_results"],
+            "totalSessions": daywise_results["totalSessions"]
+            if len(daywise_results) > 0
+            else [],
+            "totalFinishedSessions": daywise_results["totalFinishedSessions"]
+            if len(daywise_results) > 0
+            else [],
+            "daywiseStats": daywise_results["daywise_results"]
+            if len(daywise_results) > 0
+            else [],
         }
         return final_result
