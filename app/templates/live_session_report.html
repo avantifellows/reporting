@@ -3,15 +3,17 @@
 
 {% block content %}
 
-<div id="report_header_card">
-    <h2>{{ data["quizTitle"] }}</h2>
-</div>
+<div class="container">
+    <div id="report_header_card">
+        <h2>{{ data["quizTitle"] }}</h2>
+    </div>
 
-{% if session_id %}
-<div id="report_header_card">
-    <h2>Session ID: {{ session_id }}</h2>
+    {% if session_id %}
+    <div id="report_header_card">
+        <h2>Session ID: {{ session_id }}</h2>
+    </div>
+    {% endif %}
 </div>
-{% endif %}
 
 <div id="total_stats_card">
     <h3>Unique users: {{ data["totalSessions"] }}</h3>
