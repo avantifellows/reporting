@@ -140,14 +140,8 @@ class QuizDB:
         # Format the final output including the quiz title
         final_result = {
             "quizTitle": quiz_title,
-            "totalSessions": daywise_results["totalSessions"]
-            if len(daywise_results) > 0
-            else [],
-            "totalFinishedSessions": daywise_results["totalFinishedSessions"]
-            if len(daywise_results) > 0
-            else [],
-            "daywiseStats": daywise_results["daywise_results"]
-            if len(daywise_results) > 0
-            else [],
+            "totalSessions": daywise_results["totalSessions"],
+            "totalFinishedSessions": daywise_results["totalFinishedSessions"],
+            "daywiseStats": daywise_results["daywise_results"],
         }
         return final_result
