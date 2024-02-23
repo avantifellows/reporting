@@ -121,7 +121,6 @@ class QuizDB:
             {
                 "$group": {
                     "_id": None,
-                    "totalUniqueUsers": {"$push": "$_id.user_id"},
                     "totalFinishedSessions": {"$sum": "$finishedSessions"},
                     "data": {"$push": "$$ROOT"},
                 }
