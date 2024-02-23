@@ -34,7 +34,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
 student_quiz_reports_db = ReportsDB(reports_db)
 quiz_db = QuizDB(quiz_db)
 sessions_db = SessionsDB()
