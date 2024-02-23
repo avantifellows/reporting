@@ -54,16 +54,20 @@ class QuizDB:
         else:
             end_datetime = datetime.now()
         oid_end = self.__generate_objectid_for_time(end_datetime)
+
+        # Get documents only matching quiz ID
         pipeline.append({"$match": {"_id": {"$lte": oid_end}}})
 
+        # Group by user_id,and date to get unique sessions per user per day
+        # Note that we don't need to group by quiz because the documents already
+        # are matched to this quiz.
+        # Also include data of how many of these users finished the quiz
         pipeline.extend(
             [
                 {
-                    # Group by user_id, quiz_id, and date to get unique sessions per user per day
                     "$group": {
                         "_id": {
                             "user_id": "$user_id",
-                            "quiz_id": "$quiz_id",
                             "date": {
                                 "$dateToString": {
                                     "format": "%Y-%m-%d",
@@ -73,25 +77,36 @@ class QuizDB:
                         },
                         "hasQuizEnded": {"$max": "$has_quiz_ended"},
                     }
-                },
+                }
+            ]
+        )
+
+        # Group by date again to count how many users attempted/finished the quiz each day
+        pipeline.extend(
+            [
                 {
-                    # Group by date to count unique sessions per day
                     "$group": {
                         "_id": "$_id.date",
+                        "totalUniqueUsers": {"$addToSet": "$_id.user_id"},
                         "uniqueSessions": {"$sum": 1},
                         "finishedSessions": {
                             "$sum": {"$cond": [{"$eq": ["$hasQuizEnded", True]}, 1, 0]}
                         },
                     }
-                },
+                }
+            ]
+        )
+
+        # Sort by date and format.
+        # TODO: Projecting may not be necessary at this stage. But it doesn't affect
+        # efficiency and makes the following steps cleaner
+        pipeline.extend(
+            [
+                {"$sort": {"_id": -1}},
                 {
-                    # Sort the results by date
-                    "$sort": {"_id": -1}
-                },
-                {
-                    # Format the output
                     "$project": {
                         "_id": 0,
+                        "totalUniqueUsers": 1,
                         "date": "$_id",
                         "uniqueSessions": 1,
                         "finishedSessions": 1,
@@ -100,12 +115,12 @@ class QuizDB:
             ]
         )
 
-        # Get the total sessions as sum of unique sessions per day
+        # After this stage totalUniqueUsers will be an array of arrays
+        # each array containing the user_ids for that particular day
         pipeline.append(
             {
                 "$group": {
                     "_id": None,
-                    "totalSessions": {"$sum": "$uniqueSessions"},
                     "totalFinishedSessions": {"$sum": "$finishedSessions"},
                     "data": {"$push": "$$ROOT"},
                 }
@@ -113,21 +128,34 @@ class QuizDB:
         )
 
         # Reshape the final output to get a nice dictionary
+        # To find the totalUniqueUsersCount --
+        # 1. Concatenate arrays to get array of arrays
+        # 2. Reduce to make it a big array
+        # 3. Use setUnion to get only unique values
         pipeline.append(
             {
                 "$project": {
                     "_id": 0,
-                    "totalSessions": 1,
                     "totalFinishedSessions": 1,
                     "quizTitle": 1,
                     "daywise_results": "$data",
+                    "totalSessions": {
+                        "$size": {
+                            "$setUnion": {
+                                "$reduce": {
+                                    "input": "$data.totalUniqueUsers",
+                                    "initialValue": [],
+                                    "in": {"$concatArrays": ["$$value", "$$this"]},
+                                }
+                            }
+                        }
+                    },
                 }
             }
         )
 
         # Run the pipeline
         daywise_results = list(self.__db.quiz.sessions.aggregate(pipeline))
-
         if len(daywise_results) > 0:
             daywise_results = daywise_results[0]
         else:
