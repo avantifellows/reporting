@@ -157,7 +157,6 @@ class QuizDB:
 
         # Run the pipeline
         daywise_results = list(self.__db.quiz.sessions.aggregate(pipeline))
-        print(daywise_results)
         if len(daywise_results) > 0:
             daywise_results = daywise_results[0]
         else:
