@@ -133,6 +133,7 @@ class StudentQuizReportsRouter:
                         "report_link": STUDENT_QUIZ_REPORT_URL.format(
                             session_id=doc["session_id"], user_id=user_id
                         ),
+                        "start_date": doc["start_date"],
                     }
                     student_reports.append(result)
                 response["reports"] = student_reports
