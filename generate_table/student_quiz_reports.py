@@ -1,4 +1,7 @@
 def generate_student_quiz_reports(ddb):
+    """
+    Adds student quiz report table (v1)
+    """
     ddb.create_table(
         TableName="student_quiz_reports",
         AttributeDefinitions=[
@@ -8,6 +11,25 @@ def generate_student_quiz_reports(ddb):
         KeySchema=[
             {"AttributeName": "session_id", "KeyType": "HASH"},
             {"AttributeName": "user_id-section", "KeyType": "RANGE"},
+        ],
+        BillingMode="PAY_PER_REQUEST",
+    )
+    print("Successfully created Student Quiz Reports Table")
+
+
+def generate_student_quiz_reports_v2(ddb):
+    """
+    Adds student quiz report table (v1)
+    """
+    ddb.create_table(
+        TableName="student_quiz_reports_v2",
+        AttributeDefinitions=[
+            {"AttributeName": "user_id", "AttributeType": "S"},
+            {"AttributeName": "session_id", "AttributeType": "S"},
+        ],
+        KeySchema=[
+            {"AttributeName": "session_id", "KeyType": "HASH"},
+            {"AttributeName": "user_id", "KeyType": "RANGE"},
         ],
         BillingMode="PAY_PER_REQUEST",
     )

@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 services:
   dynamodb-local:
     # command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ./data"
@@ -12,16 +12,17 @@ services:
     restart: unless-stopped
     command: -jar DynamoDBLocal.jar -sharedDb -dbPath /opt/dynamodblocal
     volumes:
-     - dynamodb_data:/opt/dynamodblocal
+      - dynamodb_data:/opt/dynamodblocal
     ports:
-     - "8000:8000"
+      - "8000:8000"
     user: root
   admin:
+    env_file: .env.local
     build:
       context: .
       dockerfile: ddbadmin.Dockerfile
     ports:
-    - 8001:8001
+      - 8001:8001
     environment:
       - DYNAMO_ENDPOINT=http://dynamodb-local:8000
       - AWS_REGION=ap-south-1
@@ -30,6 +31,7 @@ services:
     depends_on:
       - dynamodb-local
   app:
+    env_file: .env.local
     build: .
     volumes:
       - "./app:/code"
@@ -38,10 +40,7 @@ services:
     depends_on:
       - dynamodb-local
     environment:
-      - DYNAMODB_URL=http://dynamodb-local:8000
-      - DYNAMODB_REGION=ap-south-1
-      - DYNAMODB_ACCESS_KEY=local
-      - DYNAMODB_SECRET_KEY=local
+      - env_file = ./.env.local
 volumes:
   dynamodb_data:
     external: true
