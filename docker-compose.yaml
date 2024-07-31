@@ -24,10 +24,6 @@ services:
     ports:
       - 8001:8001
     environment:
-      - DYNAMO_ENDPOINT=http://dynamodb-local:8000
-      - AWS_REGION=ap-south-1
-      - AWS_ACCESS_KEY_ID=local
-      - AWS_SECRET_ACCESS_KEY=local
     depends_on:
       - dynamodb-local
   app:
@@ -39,8 +35,6 @@ services:
       - "5050:5050"
     depends_on:
       - dynamodb-local
-    environment:
-      - env_file = ./.env.local
 volumes:
   dynamodb_data:
     external: true

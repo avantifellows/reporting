@@ -1,12 +1,12 @@
-from fastapi import APIRouter, Request
-from fastapi.templating import Jinja2Templates
-from fastapi import HTTPException, Depends
 from collections import OrderedDict
+from typing import Optional, Union
 from urllib.parse import unquote
-from typing import Union, Optional
-from db.reports_db import ReportsDB
+
 from auth import verify_token
+from db.reports_db import ReportsDB
+from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.security.api_key import APIKeyHeader
+from fastapi.templating import Jinja2Templates
 
 ROW_NAMES = OrderedDict()
 ROW_NAMES = {
@@ -219,5 +219,87 @@ class StudentQuizReportsRouter:
                 "student_quiz_report.html",
                 {"request": request, "report_data": report_data},
             )
+
+        @api_router.get("/student_quiz_report/v2/{session_id}/{user_id}")
+        def student_quiz_report_v2(request: Request, session_id: str, user_id: str):
+            """
+            Returns a student quiz report (V2) for a given session ID and user ID.
+
+            Args:
+                request (Request): The request object.
+                session_id (str): The session ID.
+                user_id (str): The user ID.
+
+            Raises:
+                HTTPException: If session ID or user ID is not specified.
+
+            Returns:
+                TemplateResponse: The student quiz report template response.
+            """
+            if session_id is None or user_id is None:
+                raise HTTPException(
+                    status_code=400,
+                    detail="Session ID and User ID have to be specified",
+                )
+            # decoding URL encoded values. As this information is coming through a URL,
+            # it's possible that the strings are URL encoded.
+            session_id = unquote(session_id)
+            user_id = unquote(user_id)
+            try:
+                data = self.__reports_db.get_student_quiz_report_v2(user_id, session_id)
+            except KeyError:
+                raise HTTPException(
+                    status_code=400,
+                    detail="No student_quiz_report found. Unknown error occurred.",
+                )
+
+            if len(data) == 0:
+                # no data
+                error_data = {
+                    "session_id": session_id,
+                    "user_id": user_id,
+                    "error_message": "No report found. Please contact admin.",
+                    "status_code": 404,
+                }
+                return self._templates.TemplateResponse(
+                    "error.html", {"request": request, "error_data": error_data}
+                )
+
+            return self._templates.TemplateResponse(
+                "student_quiz_report_v2.html",
+                {"request": request, "report_data": data[0]},
+            )
+
+            # return data
+            # report_data = {}
+            # report_data["student_name"] = ""
+            # test_id = data[0]["test_id"]
+            # user_id = data[0]["user_id"]
+
+            # report_data["student_id"] = user_id
+            # if "platform" in data[0] and data[0]["platform"] == "quizengine":
+            #     report_data["test_link"] = QUIZ_URL.format(
+            #         quiz_id=test_id, user_id=user_id, api_key=AF_API_KEY
+            #     )
+
+            # section_reports = []
+            # overall_performance = {}
+            # for section in data:
+            #     parsed_section_data = _parse_section_data(section)
+            #     if section["section"] == "overall":
+            #         overall_performance = parsed_section_data
+            #         report_data["percentage"] = parsed_section_data["table_data"][
+            #             "Percentage"
+            #         ]
+            #         report_data["test_name"] = section["test_name"]
+            #         report_data["test_date"] = section["start_date"]
+            #     else:
+            #         section_reports.append(parsed_section_data)
+            # report_data["overall_performance"] = overall_performance
+            # report_data["section_reports"] = section_reports
+            # return self._templates.TemplateResponse(
+            #     "student_quiz_report.html",
+            #     {"request": request, "report_data": report_data},
+            # )
 
         return api_router

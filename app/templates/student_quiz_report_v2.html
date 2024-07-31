@@ -1,0 +1,80 @@
+{% extends "layout.html" %}
+{% block title %}Index{% endblock %}
+
+{% block content %}
+
+<div id="name_card">
+  {% if report_data["name"] != "" %}
+  <p>Name: {{report_data["name"]}}
+    {% endif %}
+  <p>Student ID: {{report_data["user_id"]}}
+</div>
+
+<section id="overall_performance">
+  <div id="section_heading">Overall Performance</div>
+  {% set score_details = report_data["sections"] %}
+
+  <table id="score_details">
+    <table border="1" id="score_details">
+  <tr>
+    <th></th>
+    {% for subject in score_details %}
+      <th>{{ 'Total' if subject == 'overall' else subject }}</th>
+    {% endfor %}
+  </tr>
+  <tr>
+    <td>Score</td>
+    {% for subject in score_details %}
+      <td>{{ score_details[subject]['marks_scored']|round(0, 'floor')|int }}</td>
+    {% endfor %}
+  </tr>
+  <tr>
+    <td>Attempt Rate</td>
+    {% for subject in score_details %}
+      <td>{{ "%.2f%%"|format(score_details[subject]['attempt_rate']) }}</td>
+    {% endfor %}
+  </tr>
+  <tr>
+    <td>Accuracy</td>
+    {% for subject in score_details %}
+      {% set accuracy = score_details[subject]['accuracy']|float %}
+      {% set green = 255 * (accuracy / 100.0) %}
+      {% set red = 255 * (1 - accuracy  / 100.0) %}
+      {% set color = "rgb({},{},0)".format(red|int, green|int) %}
+      <td style="background-color: {{ color }};">
+        {{ "%.2f%%"|format(accuracy) }}
+      </td>
+      </td>
+    {% endfor %}
+  </tr>
+</table>
+  </table>
+</section>
+
+<section id="milestones">
+  {% set milestones = report_data["milestones"] %}
+
+  {% for milestone in milestones %}
+        <h2>{{ milestone.title }}</h2>
+        {% for subject, details in milestone.items() if subject not in ['milestone', 'title'] %}
+            <h3>{{ subject }}</h3>
+            <table id="score_details">
+                    <tr>
+                        <th>Chapter</th>
+                        <th>Question No.</th>
+                        <th>Your Response</th>
+                    </tr>
+                    {% for detail in details %}
+                        <tr>
+                            <td>{{ detail.chapter }}</td>
+                            <td>{{ detail.question_number }}</td>
+                            <td class="{% if detail.response == 'Correct' %}correct{% elif detail.response == 'Incorrect' %}incorrect{% else %}skipped{% endif %}">{{ detail.response }}</td>
+                        </tr>
+                    {% endfor %}
+            </table>
+        {% endfor %}
+    {% endfor %}
+
+</section>
+
+{% endblock %}
