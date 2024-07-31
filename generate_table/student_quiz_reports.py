@@ -33,7 +33,7 @@ def generate_student_quiz_reports_v2(ddb):
         ],
         BillingMode="PAY_PER_REQUEST",
     )
-    print("Successfully created Student Quiz Reports Table")
+    print("Successfully created Student Quiz Reports V2 Table")
 
 
 def add_secondary_index(ddb):
