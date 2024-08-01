@@ -21,6 +21,9 @@ Parameters:
   MongoAuthCredentials:
     Type: String
     Description: Credentials of Mongo DB
+  HtmltoPdfServerURL:
+    Type: String
+    Description: HTML to PDF Server
 
 Resources:
   Function:
