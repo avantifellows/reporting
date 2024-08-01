@@ -38,6 +38,7 @@ Resources:
           DYNAMODB_SECRET_KEY: !Ref DynamodbSecretKey
           MONGO_AUTH_CREDENTIALS: !Ref MongoAuthCredentials
           FIRESTORE_CREDENTIALS: !Ref FirestoreCredentials
+          HTML_TO_PDF_SERVER_URL: !Ref HtmltoPdfServerURL
       Events:
         Api:
           Type: HttpApi
