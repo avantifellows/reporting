@@ -66,6 +66,47 @@ body {
   font-size: 20pt;
 }
 
+.milestone_heading {
+  font-size: 22pt;
+  font-weight: bold;
+  border: 1px solid #000;
+  margin-top: 80px;
+  text-transform: uppercase;
+}
+
+.milestone_subject {
+  font-size: 22pt;
+  font-weight: bold;
+  margin-top: 60px;
+}
+
+#milestone_details {
+  margin-top: 30px;
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#milestone_details th,
+#milestone_details td {
+  border: 1px solid #ddd;
+  font-size: 18pt;
+  padding: 0px 20px 0px 20px;
+  text-align: center;
+}
+
+#milestone_details .correct {
+  background-color: #d4edda;
+}
+
+#milestone_details .incorrect {
+  background-color: #f8d7da;
+}
+
+#milestone_details .skipped {
+  background-color: #fff3cd;
+}
+
 #test_summary_card .test_details {
   display: block;
   margin: auto;
@@ -89,6 +130,7 @@ body {
 }
 
 #score_details,
+#score_details_v2,
 #daywise_stats {
   border-collapse: collapse;
   padding: 0 30px 0 30px;
@@ -106,10 +148,11 @@ table {
 }
 
 #score_details,
+#score_details_v2,
 #daywise_stats td {
   border: 1px solid #ddd;
   padding: 10px 20px 10px 20px;
-  font-size: 22pt;
+  font-size: 18pt;
   text-align: center;
 }
 

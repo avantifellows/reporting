@@ -11,11 +11,10 @@
 </div>
 
 <section id="overall_performance">
-  <div id="section_heading">Overall Performance</div>
+  <div id="section_heading">Performance Summary</div>
   {% set score_details = report_data["sections"] %}
 
-  <table id="score_details">
-    <table border="1" id="score_details">
+    <table border="1" id="score_details_v2">
   <tr>
     <th></th>
     {% for subject in score_details %}
@@ -23,23 +22,31 @@
     {% endfor %}
   </tr>
   <tr>
-    <td>Score</td>
+    <td><b>Score</b></td>
     {% for subject in score_details %}
       <td>{{ score_details[subject]['marks_scored']|round(0, 'floor')|int }}</td>
     {% endfor %}
   </tr>
   <tr>
-    <td>Attempt Rate</td>
+    <td><b>Attempt Rate</b></td>
     {% for subject in score_details %}
-      <td>{{ "%.2f%%"|format(score_details[subject]['attempt_rate']) }}</td>
+      {% set attempt_rate = score_details[subject]['attempt_rate']|float %}
+      <td>
+       {{ "%.2f%%"|format(attempt_rate)}}
+      </td>
     {% endfor %}
   </tr>
   <tr>
-    <td>Accuracy</td>
+    <td><b>Accuracy</b></td>
     {% for subject in score_details %}
       {% set accuracy = score_details[subject]['accuracy']|float %}
-      {% set green = 255 * (accuracy / 100.0) %}
-      {% set red = 255 * (1 - accuracy  / 100.0) %}
+        {% if accuracy <= 50 %}
+          {% set green = 255 * (accuracy / 50.0) %}
+          {% set red = 255 %}
+        {% else %}
+          {% set green = 255 %}
+          {% set red = 255 * (1 - (accuracy - 50) / 50.0) %}
+        {% endif %}
       {% set color = "rgb({},{},0)".format(red|int, green|int) %}
       <td style="background-color: {{ color }};">
         {{ "%.2f%%"|format(accuracy) }}
@@ -48,17 +55,59 @@
     {% endfor %}
   </tr>
 </table>
-  </table>
+
+<div id="section_heading">
+Attempt Summary
+</div>
+<table border=1 id="score_details_v2">
+  <tr>
+    <th></th>
+    {% for subject in score_details %}
+      <th>{{ 'Total' if subject == 'overall' else subject }}</th>
+    {% endfor %}
+  </tr>
+  <tr>
+    <td><b>Total Questions</b></td>
+    {% for subject in score_details %}
+      <td>{{ score_details[subject]['num_questions'] }}</td>
+    {% endfor %}
+  </tr>
+  <tr>
+    <td><b># Attempted</b></td>
+    {% for subject in score_details %}
+      <td>{{ score_details[subject]['attempted'] }}</td>
+    {% endfor %}
+  </tr>
+  <tr>
+    <td><b># Correct</b></td>
+    {% for subject in score_details %}
+      <td>{{ score_details[subject]['correct'] }}</td>
+    {% endfor %}
+  </tr>
+  <tr>
+    <td><b># Incorrect</b></td>
+    {% for subject in score_details %}
+      <td>{{ score_details[subject]['wrong'] }}</td>
+    {% endfor %}
+  </tr>
+  <tr>
+    <td><b># Skipped</b></td>
+    {% for subject in score_details %}
+      <td>{{ score_details[subject]['skipped'] }}</td>
+    {% endfor %}
+  </tr>
+</table>
+
 </section>
 
 <section id="milestones">
   {% set milestones = report_data["milestones"] %}
 
   {% for milestone in milestones %}
-        <h2>{{ milestone.title }}</h2>
+        <div class="milestone_heading">{{ milestone.title }}</div>
         {% for subject, details in milestone.items() if subject not in ['milestone', 'title'] %}
-            <h3>{{ subject }}</h3>
-            <table id="score_details">
+              <div class="milestone_subject">{{ subject }}</div>
+            <table id="milestone_details">
                     <tr>
                         <th>Chapter</th>
                         <th>Question No.</th>

@@ -23,7 +23,6 @@ services:
       dockerfile: ddbadmin.Dockerfile
     ports:
       - 8001:8001
-    environment:
     depends_on:
       - dynamodb-local
   app:
