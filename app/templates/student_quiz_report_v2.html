@@ -5,11 +5,13 @@
 
 <div id="name_card">
   {% if report_data["name"] != "" %}
-  <p>Name: {{report_data["name"]}}
+  <p><b>Name</b>: {{report_data["name"]}}
     {% endif %}
-  <p>Student ID: {{report_data["user_id"]}}
+  {% if report_data["test_name"] != "" %}
+  <p><b>Test Name</b>: {{report_data["test_name"]}}
+  {% endif %}
   {% if report_data["school"] != "" %}
-  <p> School: {{report_data["school"]}}
+  <p> <b>School</b>: {{report_data["school"]}}
   {% endif %}
 </div>
 

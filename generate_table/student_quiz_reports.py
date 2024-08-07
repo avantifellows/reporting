@@ -36,7 +36,36 @@ def generate_student_quiz_reports_v2(ddb):
     print("Successfully created Student Quiz Reports V2 Table")
 
 
+def add_secondary_index_v2(ddb):
+    """
+    Adds a secondary index to the student
+    quiz reports table
+    """
+    table = ddb.Table("student_quiz_reports_v2")
+    response = table.update(
+        AttributeDefinitions=[
+            {"AttributeName": "session_id", "AttributeType": "S"},
+            {"AttributeName": "user_id", "AttributeType": "S"},
+            {"AttributeName": "school_code", "AttributeType": "S"},
+        ],
+        GlobalSecondaryIndexUpdates=[
+            {
+                "Create": {
+                    "IndexName": "gsi_school_code",
+                    "KeySchema": [{"AttributeName": "school_code", "KeyType": "HASH"}],
+                    "Projection": {"ProjectionType": "ALL"},
+                }
+            }
+        ],
+    )
+    print(response)
+
+
 def add_secondary_index(ddb):
+    """
+    Adds a secondary index (school code) to the student
+    quiz reports v2 table
+    """
     table = ddb.Table("student_quiz_reports")
     response = table.update(
         AttributeDefinitions=[
