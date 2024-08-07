@@ -69,15 +69,23 @@ body {
 .milestone_heading {
   font-size: 22pt;
   font-weight: bold;
+  padding: 8px;
   border: 1px solid #000;
-  margin-top: 80px;
+  margin-top: 10px;
   text-transform: uppercase;
 }
 
 .milestone_subject {
   font-size: 22pt;
   font-weight: bold;
-  margin-top: 60px;
+  margin-top: 30px;
+}
+
+.milestone {
+  display: block;
+  margin-top 30px;
+  margin-bottom: 60px;
+  font-size: 22pt;
 }
 
 #milestone_details {
@@ -138,7 +146,7 @@ body {
   margin-right: auto;
   table-layout: fixed;
   margin-top: 30px;
-  margin-bottom: 30px;
+  margin-bottom: 60px;
   width: 70%;
 }
 

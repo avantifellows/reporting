@@ -8,6 +8,9 @@
   <p>Name: {{report_data["name"]}}
     {% endif %}
   <p>Student ID: {{report_data["user_id"]}}
+  {% if report_data["school"] != "" %}
+  <p> School: {{report_data["school"]}}
+  {% endif %}
 </div>
 
 <section id="overall_performance">
@@ -104,7 +107,8 @@ Attempt Summary
   {% set milestones = report_data["milestones"] %}
 
   {% for milestone in milestones %}
-        <div class="milestone_heading">{{ milestone.title }}</div>
+        <div class="milestone">
+          <span class="milestone_heading">{{ milestone.title }}</span>
         {% for subject, details in milestone.items() if subject not in ['milestone', 'title'] %}
               <div class="milestone_subject">{{ subject }}</div>
             <table id="milestone_details">
@@ -122,6 +126,7 @@ Attempt Summary
                     {% endfor %}
             </table>
         {% endfor %}
+        </div>
     {% endfor %}
 
 </section>
