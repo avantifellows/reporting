@@ -26,7 +26,6 @@ def initialize_db():
         aws_secret_access_key=os.environ.get("DYNAMODB_SECRET_KEY"),
     )
 
-    print(os.environ.get("DYNAMODB_URL"))
     return ddb
 
 

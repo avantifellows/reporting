@@ -272,7 +272,6 @@ class StudentQuizReportsRouter:
                 return self._templates.TemplateResponse(
                     "error.html", {"request": request, "error_data": error_data}
                 )
-            print(data[0])
 
             templateResponse = self._templates.TemplateResponse(
                 "student_quiz_report_v2.html",

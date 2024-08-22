@@ -42,7 +42,7 @@ def add_secondary_index_v2(ddb):
     quiz reports table
     """
     table = ddb.Table("student_quiz_reports_v2")
-    response = table.update(
+    table.update(
         AttributeDefinitions=[
             {"AttributeName": "session_id", "AttributeType": "S"},
             {"AttributeName": "user_id", "AttributeType": "S"},
@@ -58,7 +58,6 @@ def add_secondary_index_v2(ddb):
             }
         ],
     )
-    print(response)
 
 
 def add_secondary_index(ddb):
@@ -67,7 +66,7 @@ def add_secondary_index(ddb):
     quiz reports v2 table
     """
     table = ddb.Table("student_quiz_reports")
-    response = table.update(
+    table.update(
         AttributeDefinitions=[
             {"AttributeName": "session_id", "AttributeType": "S"},
             {"AttributeName": "user_id-section", "AttributeType": "S"},
@@ -87,15 +86,11 @@ def add_secondary_index(ddb):
             }
         ],
     )
-    print(response)
 
 
 def drop_secondary_index(ddb, index_name):
     table = ddb.Table("student_quiz_reports")
-    response = table.update(
-        GlobalSecondaryIndexUpdates=[{"Delete": {"IndexName": index_name}}]
-    )
-    print(response)
+    table.update(GlobalSecondaryIndexUpdates=[{"Delete": {"IndexName": index_name}}])
 
 
 def drop_student_quiz_reports(ddb):
