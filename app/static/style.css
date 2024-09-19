@@ -70,9 +70,11 @@ body {
   font-size: 22pt;
   font-weight: bold;
   padding: 8px;
+  display: inline-block;
   border: 1px solid #000;
   margin-top: 10px;
   text-transform: uppercase;
+  break-before: page;
 }
 
 .milestone_subject {
@@ -86,6 +88,7 @@ body {
   margin-top 30px;
   margin-bottom: 60px;
   font-size: 22pt;
+  break-before: page;
 }
 
 #milestone_details {
@@ -93,6 +96,7 @@ body {
   border-collapse: collapse;
   margin-left: auto;
   margin-right: auto;
+  break-before: always;
 }
 
 #milestone_details th,
