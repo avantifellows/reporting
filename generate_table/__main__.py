@@ -1,12 +1,15 @@
+import os
+
+import boto3
+from dotenv import load_dotenv
 from student_quiz_reports import (
-    generate_student_quiz_reports,
-    drop_student_quiz_reports,
     add_secondary_index,
     drop_secondary_index,
+    drop_student_quiz_reports,
+    generate_student_quiz_reports,
+    generate_student_quiz_reports_v2,
+    add_secondary_index_v2,
 )
-from dotenv import load_dotenv
-import boto3
-import os
 
 # Update and use `.env.prod` to write to prod dynamodb table
 # or use `.env.staging` to write to staging dynamodb table
@@ -32,6 +35,7 @@ def generate_tables():
     """
     ddb = initialize_db()
     generate_student_quiz_reports(ddb)
+    generate_student_quiz_reports_v2(ddb)
 
 
 def drop_tables():
@@ -47,6 +51,11 @@ def add_secondary_ind():
     add_secondary_index(ddb)
 
 
+def add_secondary_ind_v2():
+    ddb = initialize_db()
+    add_secondary_index_v2(ddb)
+
+
 def drop_secondary_ind(index_name: str):
     """
     Drops a secondary index
@@ -59,5 +68,5 @@ if __name__ == "__main__":
     """
     Creates empty dynamodb table with correct schema for local usage.
     """
-    generate_tables()
-    add_secondary_ind()
+    # generate_tables()
+    add_secondary_ind_v2()

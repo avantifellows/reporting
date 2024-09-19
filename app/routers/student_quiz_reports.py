@@ -1,12 +1,15 @@
-from fastapi import APIRouter, Request
-from fastapi.templating import Jinja2Templates
-from fastapi import HTTPException, Depends
+import os
 from collections import OrderedDict
+from typing import Optional, Union
 from urllib.parse import unquote
-from typing import Union, Optional
-from db.reports_db import ReportsDB
+
+import requests
 from auth import verify_token
+from db.reports_db import ReportsDB
+from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi.responses import HTMLResponse, StreamingResponse
 from fastapi.security.api_key import APIKeyHeader
+from fastapi.templating import Jinja2Templates
 
 ROW_NAMES = OrderedDict()
 ROW_NAMES = {
@@ -219,5 +222,83 @@ class StudentQuizReportsRouter:
                 "student_quiz_report.html",
                 {"request": request, "report_data": report_data},
             )
+
+        @api_router.get("/student_quiz_report/v2/{session_id}/{user_id}")
+        def student_quiz_report_v2(
+            request: Request,
+            session_id: str,
+            user_id: str,
+            format: Union[str, None] = None,
+        ):
+            """
+            Returns a student quiz report (V2) for a given session ID and user ID.
+
+            Args:
+                request (Request): The request object.
+                session_id (str): The session ID.
+                user_id (str): The user ID.
+
+            Raises:
+                HTTPException: If session ID or user ID is not specified.
+
+            Returns:
+                TemplateResponse: The student quiz report template response.
+            """
+            if session_id is None or user_id is None:
+                raise HTTPException(
+                    status_code=400,
+                    detail="Session ID and User ID have to be specified",
+                )
+            # decoding URL encoded values. As this information is coming through a URL,
+            # it's possible that the strings are URL encoded.
+            session_id = unquote(session_id)
+            user_id = unquote(user_id)
+            try:
+                data = self.__reports_db.get_student_quiz_report_v2(user_id, session_id)
+            except KeyError:
+                raise HTTPException(
+                    status_code=400,
+                    detail="No student_quiz_report found. Unknown error occurred.",
+                )
+
+            if len(data) == 0:
+                # no data
+                error_data = {
+                    "session_id": session_id,
+                    "user_id": user_id,
+                    "error_message": "No report found. Please contact admin.",
+                    "status_code": 404,
+                }
+                return self._templates.TemplateResponse(
+                    "error.html", {"request": request, "error_data": error_data}
+                )
+
+            templateResponse = self._templates.TemplateResponse(
+                "student_quiz_report_v2.html",
+                {"request": request, "report_data": data[0]},
+            )
+            if format != "pdf":
+                return templateResponse
+            else:
+                html_content = templateResponse.body
+                html_content = html_content.decode("utf-8")  # Decode bytes to string
+
+                # Convert bytes to string if necessary
+                if isinstance(html_content, bytes):
+                    html_content = html_content.decode()
+
+                # Send HTML to PDF rendering service
+                url = os.getenv("HTML_TO_PDF_SERVER_URL")
+                response = requests.post(url, json={"html": html_content})
+                # Check if the request was successful
+
+                if response.status_code == 200:
+                    # Return the PDF as a streaming response
+                    return StreamingResponse(
+                        response.iter_content(chunk_size=10240),
+                        media_type="application/pdf",
+                    )
+                else:
+                    return HTMLResponse(content="Error generating PDF", status_code=500)
 
         return api_router

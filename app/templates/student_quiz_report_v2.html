@@ -1,0 +1,136 @@
+{% extends "layout.html" %}
+{% block title %}Index{% endblock %}
+
+{% block content %}
+
+<div id="name_card">
+  {% if report_data["name"] != "" %}
+  <p><b>Name</b>: {{report_data["name"]}}
+    {% endif %}
+  {% if report_data["test_name"] != "" %}
+  <p><b>Test Name</b>: {{report_data["test_name"]}}
+  {% endif %}
+  {% if report_data["school"] != "" %}
+  <p> <b>School</b>: {{report_data["school"]}}
+  {% endif %}
+</div>
+
+<section id="overall_performance">
+  <div id="section_heading">Performance Summary</div>
+  {% set score_details = report_data["sections"] %}
+
+    <table border="1" id="score_details_v2">
+  <tr>
+    <th></th>
+    {% for subject in score_details %}
+      <th>{{ 'Total' if subject == 'overall' else subject }}</th>
+    {% endfor %}
+  </tr>
+  <tr>
+    <td><b>Score</b></td>
+    {% for subject in score_details %}
+      <td>{{ score_details[subject]['marks_scored']|round(0, 'floor')|int }}</td>
+    {% endfor %}
+  </tr>
+  <tr>
+    <td><b>Attempt Rate</b></td>
+    {% for subject in score_details %}
+      {% set attempt_rate = score_details[subject]['attempt_rate']|float %}
+      <td>
+       {{ "%.2f%%"|format(attempt_rate)}}
+      </td>
+    {% endfor %}
+  </tr>
+  <tr>
+    <td><b>Accuracy</b></td>
+    {% for subject in score_details %}
+      {% set accuracy = score_details[subject]['accuracy']|float %}
+        {% if accuracy <= 50 %}
+          {% set green = 255 * (accuracy / 50.0) %}
+          {% set red = 255 %}
+        {% else %}
+          {% set green = 255 %}
+          {% set red = 255 * (1 - (accuracy - 50) / 50.0) %}
+        {% endif %}
+      {% set color = "rgb({},{},0)".format(red|int, green|int) %}
+      <td style="background-color: {{ color }};">
+        {{ "%.2f%%"|format(accuracy) }}
+      </td>
+      </td>
+    {% endfor %}
+  </tr>
+</table>
+
+<div id="section_heading">
+Attempt Summary
+</div>
+<table border=1 id="score_details_v2">
+  <tr>
+    <th></th>
+    {% for subject in score_details %}
+      <th>{{ 'Total' if subject == 'overall' else subject }}</th>
+    {% endfor %}
+  </tr>
+  <tr>
+    <td><b>Total Questions</b></td>
+    {% for subject in score_details %}
+      <td>{{ score_details[subject]['num_questions'] }}</td>
+    {% endfor %}
+  </tr>
+  <tr>
+    <td><b># Attempted</b></td>
+    {% for subject in score_details %}
+      <td>{{ score_details[subject]['attempted'] }}</td>
+    {% endfor %}
+  </tr>
+  <tr>
+    <td><b># Correct</b></td>
+    {% for subject in score_details %}
+      <td>{{ score_details[subject]['correct'] }}</td>
+    {% endfor %}
+  </tr>
+  <tr>
+    <td><b># Incorrect</b></td>
+    {% for subject in score_details %}
+      <td>{{ score_details[subject]['wrong'] }}</td>
+    {% endfor %}
+  </tr>
+  <tr>
+    <td><b># Skipped</b></td>
+    {% for subject in score_details %}
+      <td>{{ score_details[subject]['skipped'] }}</td>
+    {% endfor %}
+  </tr>
+</table>
+
+</section>
+
+<section id="milestones">
+  {% set milestones = report_data["milestones"] %}
+
+  {% for milestone in milestones %}
+        <div class="milestone">
+          <span class="milestone_heading">{{ milestone.title }}</span>
+        {% for subject, details in milestone.items() if subject not in ['milestone', 'title'] %}
+              <div class="milestone_subject">{{ subject }}</div>
+            <table id="milestone_details">
+                    <tr>
+                        <th>Chapter</th>
+                        <th>Question No.</th>
+                        <th>Your Response</th>
+                    </tr>
+                    {% for detail in details %}
+                        <tr>
+                            <td>{{ detail.chapter }}</td>
+                            <td>{{ detail.question_number }}</td>
+                            <td class="{% if detail.response == 'Correct' %}correct{% elif detail.response == 'Incorrect' %}incorrect{% else %}skipped{% endif %}">{{ detail.response }}</td>
+                        </tr>
+                    {% endfor %}
+            </table>
+        {% endfor %}
+        </div>
+    {% endfor %}
+
+</section>
+
+{% endblock %}

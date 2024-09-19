@@ -1,4 +1,7 @@
 def generate_student_quiz_reports(ddb):
+    """
+    Adds student quiz report table (v1)
+    """
     ddb.create_table(
         TableName="student_quiz_reports",
         AttributeDefinitions=[
@@ -14,9 +17,56 @@ def generate_student_quiz_reports(ddb):
     print("Successfully created Student Quiz Reports Table")
 
 
+def generate_student_quiz_reports_v2(ddb):
+    """
+    Adds student quiz report table (v1)
+    """
+    ddb.create_table(
+        TableName="student_quiz_reports_v2",
+        AttributeDefinitions=[
+            {"AttributeName": "user_id", "AttributeType": "S"},
+            {"AttributeName": "session_id", "AttributeType": "S"},
+        ],
+        KeySchema=[
+            {"AttributeName": "session_id", "KeyType": "HASH"},
+            {"AttributeName": "user_id", "KeyType": "RANGE"},
+        ],
+        BillingMode="PAY_PER_REQUEST",
+    )
+    print("Successfully created Student Quiz Reports V2 Table")
+
+
+def add_secondary_index_v2(ddb):
+    """
+    Adds a secondary index to the student
+    quiz reports table
+    """
+    table = ddb.Table("student_quiz_reports_v2")
+    table.update(
+        AttributeDefinitions=[
+            {"AttributeName": "session_id", "AttributeType": "S"},
+            {"AttributeName": "user_id", "AttributeType": "S"},
+            {"AttributeName": "school_code", "AttributeType": "S"},
+        ],
+        GlobalSecondaryIndexUpdates=[
+            {
+                "Create": {
+                    "IndexName": "gsi_school_code",
+                    "KeySchema": [{"AttributeName": "school_code", "KeyType": "HASH"}],
+                    "Projection": {"ProjectionType": "ALL"},
+                }
+            }
+        ],
+    )
+
+
 def add_secondary_index(ddb):
+    """
+    Adds a secondary index (school code) to the student
+    quiz reports v2 table
+    """
     table = ddb.Table("student_quiz_reports")
-    response = table.update(
+    table.update(
         AttributeDefinitions=[
             {"AttributeName": "session_id", "AttributeType": "S"},
             {"AttributeName": "user_id-section", "AttributeType": "S"},
@@ -36,15 +86,11 @@ def add_secondary_index(ddb):
             }
         ],
     )
-    print(response)
 
 
 def drop_secondary_index(ddb, index_name):
     table = ddb.Table("student_quiz_reports")
-    response = table.update(
-        GlobalSecondaryIndexUpdates=[{"Delete": {"IndexName": index_name}}]
-    )
-    print(response)
+    table.update(GlobalSecondaryIndexUpdates=[{"Delete": {"IndexName": index_name}}])
 
 
 def drop_student_quiz_reports(ddb):

@@ -21,6 +21,9 @@ Parameters:
   MongoAuthCredentials:
     Type: String
     Description: Credentials of Mongo DB
+  HtmltoPdfServerURL:
+    Type: String
+    Description: HTML to PDF Server
 
 Resources:
   Function:
@@ -38,6 +41,7 @@ Resources:
           DYNAMODB_SECRET_KEY: !Ref DynamodbSecretKey
           MONGO_AUTH_CREDENTIALS: !Ref MongoAuthCredentials
           FIRESTORE_CREDENTIALS: !Ref FirestoreCredentials
+          HTML_TO_PDF_SERVER_URL: !Ref HtmltoPdfServerURL
       Events:
         Api:
           Type: HttpApi

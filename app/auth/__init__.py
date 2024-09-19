@@ -19,8 +19,6 @@ async def verify_token(request: Request) -> bool:
 
     token = auth_header[len(bearer_prefix) :]
     headers = {"Authorization": f"Bearer {token}"}
-    print(VERIFICATION_URL)
-    print(token)
     async with httpx.AsyncClient() as client:
         response = await client.get(VERIFICATION_URL, headers=headers)
 
