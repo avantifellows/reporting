@@ -27,7 +27,7 @@ async def verify_token(request: Request) -> bool:
     if response.status_code == 200:
         json_response = response.json()
         if "id" in json_response:
-            return True
+            return token
 
     raise HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
