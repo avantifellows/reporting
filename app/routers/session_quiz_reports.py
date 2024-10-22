@@ -2,6 +2,13 @@ from fastapi import APIRouter, HTTPException, Request
 from fastapi.templating import Jinja2Templates
 from db.sessions_db import SessionsDB
 from db.quiz_db import QuizDB
+from jinja2 import TemplateError
+import logging
+
+# Set up basic configuration for production-level logging
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)
 
 
 class SessionQuizReportsRouter:
@@ -29,19 +36,43 @@ class SessionQuizReportsRouter:
             if not session_id:
                 raise HTTPException(status_code=400, detail="Session ID is required.")
 
-            session_data = self.__sessions_db.get_quiz_session(session_id=session_id)
+            try:
+                session_data = self.__sessions_db.get_quiz_session(
+                    session_id=session_id
+                )
+            except Exception as e:
+                # Log only the critical error to alert production
+                logging.error(
+                    f"Failed to retrieve session data for session_id {session_id}: {str(e)}"
+                )
+                raise HTTPException(status_code=500, detail="Internal server error.")
+
             if session_data is None:
                 raise HTTPException(status_code=404, detail="Session ID not found.")
-            quiz_id = session_data["redirectPlatformParams"]["id"]
-            start_date = session_data["startDate"]
-            end_date = session_data["endDate"]
-            data = self.__quiz_db.get_live_quiz_stats(
-                quiz_id=quiz_id, start_date=start_date, end_date=end_date
-            )
-            return self._templates.TemplateResponse(
-                "live_session_report.html",
-                {"request": request, "session_id": session_id, "data": data},
-            )
+
+            try:
+                quiz_id = session_data["redirectPlatformParams"]["id"]
+                start_date = session_data["startDate"]
+                end_date = session_data["endDate"]
+                data = self.__quiz_db.get_live_quiz_stats(
+                    quiz_id=quiz_id, start_date=start_date, end_date=end_date
+                )
+            except Exception as e:
+                logging.error(
+                    f"Failed to retrieve quiz stats for quiz_id {quiz_id}: {str(e)}"
+                )
+                raise HTTPException(status_code=500, detail="Internal server error.")
+
+            try:
+                return self._templates.TemplateResponse(
+                    "live_session_report.html",
+                    {"request": request, "session_id": session_id, "data": data},
+                )
+            except TemplateError as e:
+                logging.error(
+                    f"Template rendering error for session_id {session_id}: {str(e)}"
+                )
+                raise HTTPException(status_code=500, detail="Template rendering error.")
 
         @api_router.get("/live_quiz_report/{quiz_id}")
         def get_live_quiz_report(request: Request, quiz_id: str = None):
@@ -53,14 +84,28 @@ class SessionQuizReportsRouter:
             if not quiz_id:
                 raise HTTPException(status_code=400, detail="Quiz ID is required.")
 
-            data = self.__quiz_db.get_live_quiz_stats(quiz_id=quiz_id)
+            try:
+                data = self.__quiz_db.get_live_quiz_stats(quiz_id=quiz_id)
+            except Exception as e:
+                logging.error(
+                    f"Failed to retrieve quiz stats for quiz_id {quiz_id}: {str(e)}"
+                )
+                raise HTTPException(status_code=500, detail="Internal server error.")
+
             if not data:
                 raise HTTPException(
-                    status_code=400, detail="Quiz not found with provided Quiz ID."
+                    status_code=404, detail="Quiz not found with provided Quiz ID."
                 )
-            return self._templates.TemplateResponse(
-                "live_session_report.html",
-                {"request": request, "session_id": "", "data": data},
-            )
+
+            try:
+                return self._templates.TemplateResponse(
+                    "live_session_report.html",
+                    {"request": request, "session_id": "", "data": data},
+                )
+            except TemplateError as e:
+                logging.error(
+                    f"Template rendering error for quiz_id {quiz_id}: {str(e)}"
+                )
+                raise HTTPException(status_code=500, detail="Template rendering error.")
 
         return api_router
