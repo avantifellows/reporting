@@ -4,6 +4,8 @@ Welcome to the Avanti Fellows Reporting Engine!
 
 ## Setting up the Reporting Engine locally
 
+Make sure Python 3.9+ is installed in your system
+
 0. Install pre-commit hooks in the repo
 ```
 pip install pre-commit
