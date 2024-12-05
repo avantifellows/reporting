@@ -43,6 +43,7 @@ jobs:
           DYNAMODB_SECRET_KEY: ${{ secrets.DYNAMODB_SECRET_KEY }}
           FIRESTORE_CREDENTIALS: ${{ secrets.FIRESTORE_CREDENTIALS }}
           MONGO_AUTH_CREDENTIALS: ${{ secrets.MONGO_AUTH_CREDENTIALS }}
+          HTML_TO_PDF_SERVER_URL: ${{ secrets.HTML_TO_PDF_SERVER_URL }}
         run: >
            sam deploy
            --stack-name ReportingStaging
@@ -58,3 +59,4 @@ jobs:
            DynamodbSecretKey=$DYNAMODB_SECRET_KEY
            FirestoreCredentials=$FIRESTORE_CREDENTIALS
            MongoAuthCredentials=$MONGO_AUTH_CREDENTIALS
+           HtmltoPdfServerURL=$HTML_TO_PDF_SERVER_URL

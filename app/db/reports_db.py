@@ -1,6 +1,6 @@
-from botocore.exceptions import ClientError
-from boto3.resources.base import ServiceResource
 from boto3.dynamodb.conditions import Key
+from boto3.resources.base import ServiceResource
+from botocore.exceptions import ClientError
 
 
 class ReportsDB:
@@ -28,6 +28,17 @@ class ReportsDB:
             response = table.query(
                 KeyConditionExpression=Key("session_id").eq(session_id)
                 & Key("user_id-section").begins_with(user_id)
+            )
+            return response["Items"]
+        except ClientError as e:
+            raise ValueError(e.response["Error"]["Message"])
+
+    def get_student_quiz_report_v2(self, user_id, session_id):
+        try:
+            table = self.__db.Table("student_quiz_reports_v2")
+            response = table.query(
+                KeyConditionExpression=Key("session_id").eq(session_id)
+                & Key("user_id").eq(user_id)
             )
             return response["Items"]
         except ClientError as e:

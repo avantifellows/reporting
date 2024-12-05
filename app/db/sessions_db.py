@@ -1,8 +1,9 @@
+import base64
+import json
+import os
+
 from dotenv import load_dotenv
 from google.cloud import firestore
-import os
-import json
-import base64
 from google.cloud.firestore_v1.base_query import FieldFilter
 
 

@@ -1,182 +1,241 @@
 html {
-    height: 100%;
+  height: 100%;
 }
 
 body {
-    font-family: "Avenir", Arial, Helvetica, sans-serif;
-    margin-left: auto;
-    margin-right: auto;
-    font-size: 14pt;
-    text-align: center;
-    height: 100%;
-    margin-bottom: 25px;
+  font-family: "Avenir", Arial, Helvetica, sans-serif;
+  margin-left: auto;
+  margin-right: auto;
+  font-size: 14pt;
+  text-align: center;
+  height: 100%;
+  margin-bottom: 25px;
 }
 
 #name_card,
 #total_stats_card {
-    display: table;
-    margin: 30px auto 0 auto;
-    text-align: center;
-    font-size: 22pt;
-    background-color: #EAEDFD;
-    border-radius: 10px;
-    padding: 10px 40px 10px 40px;
-    box-shadow: 1px 1px 5px #535353;
+  display: table;
+  margin: 30px auto 0 auto;
+  text-align: center;
+  font-size: 22pt;
+  background-color: #eaedfd;
+  border-radius: 10px;
+  padding: 10px 40px 10px 40px;
+  box-shadow: 1px 1px 5px #535353;
 }
 
-
 #answer_sheet_button {
-    display: table;
-    margin: 30px auto 0 auto;
-    text-align: center;
-    font-size: 14pt;
-    background-color: #29973E;
-    border-radius: 10px;
-    text-decoration: none;
-    color: white;
-    padding: 10px 40px 10px 40px;
-    box-shadow: 1px 1px 5px #535353;
+  display: table;
+  margin: 30px auto 0 auto;
+  text-align: center;
+  font-size: 14pt;
+  background-color: #29973e;
+  border-radius: 10px;
+  text-decoration: none;
+  color: white;
+  padding: 10px 40px 10px 40px;
+  box-shadow: 1px 1px 5px #535353;
 }
 
 #test_summary_card,
 #report_header_card {
-    display: inline-flex;
-    margin-left: auto;
-    margin-right: auto;
-    margin-top: 50px;
-    font-weight: bold;
-    justify-content: center;
-    background-color: #EBF5FE;
-    border-radius: 10px;
-    padding: 10px 40px 10px 40px;
-    box-shadow: 1px 1px 5px #535353;
+  display: inline-flex;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 50px;
+  font-weight: bold;
+  justify-content: center;
+  background-color: #ebf5fe;
+  border-radius: 10px;
+  padding: 10px 40px 10px 40px;
+  box-shadow: 1px 1px 5px #535353;
 }
 
 #test_summary_card .percentage {
-    margin-right: 20px;
-    justify-content: center;
-    align-items: center;
-    background: orange;
-    border-radius: 50%;
-    /* -moz-border-radius:50%;
+  margin-right: 20px;
+  justify-content: center;
+  align-items: center;
+  background: orange;
+  border-radius: 50%;
+  /* -moz-border-radius:50%;
     -webkit-border-radius:50%; */
-    text-align: center;
-    padding: 5px;
-    aspect-ratio: 1;
-    display: flex;
-    font-size: 20pt;
+  text-align: center;
+  padding: 5px;
+  aspect-ratio: 1;
+  display: flex;
+  font-size: 20pt;
+}
+
+.milestone_heading {
+  font-size: 22pt;
+  font-weight: bold;
+  padding: 8px;
+  display: inline-block;
+  border: 1px solid #000;
+  margin-top: 10px;
+  text-transform: uppercase;
+  break-before: page;
+}
+
+.milestone_subject {
+  font-size: 22pt;
+  font-weight: bold;
+  margin-top: 30px;
+}
+
+.milestone {
+  display: block;
+  margin-top 30px;
+  margin-bottom: 60px;
+  font-size: 22pt;
+  break-before: page;
+}
+
+#milestone_details {
+  margin-top: 30px;
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  break-before: always;
+}
+
+#milestone_details th,
+#milestone_details td {
+  border: 1px solid #ddd;
+  font-size: 18pt;
+  padding: 0px 20px 0px 20px;
+  text-align: center;
+}
+
+#milestone_details .correct {
+  background-color: #d4edda;
+}
+
+#milestone_details .incorrect {
+  background-color: #f8d7da;
+}
+
+#milestone_details .skipped {
+  background-color: #fff3cd;
 }
 
 #test_summary_card .test_details {
-    display: block;
-    margin: auto;
-    font-size: 22pt;
+  display: block;
+  margin: auto;
+  font-size: 22pt;
 }
 
 #section_heading {
-    padding: 8px;
-    font-size: 24pt;
-    font-weight: bold;
-    margin-top: 30px;
-    text-transform: uppercase;
+  padding: 8px;
+  font-size: 24pt;
+  font-weight: bold;
+  margin-top: 30px;
+  text-transform: uppercase;
 }
 
 #chapter_wise_heading {
-    padding: 8px;
-    font-size: 20pt;
-    font-weight: bold;
-    margin-top: 30px;
-    text-transform: uppercase;
+  padding: 8px;
+  font-size: 20pt;
+  font-weight: bold;
+  margin-top: 30px;
+  text-transform: uppercase;
 }
 
 #score_details,
+#score_details_v2,
 #daywise_stats {
-    border-collapse: collapse;
-    padding: 0 30px 0 30px;
-    margin-left: auto;
-    margin-right: auto;
-    table-layout: fixed;
-    margin-top: 30px;
-    margin-bottom: 30px;
-    width: 70%;
+  border-collapse: collapse;
+  padding: 0 30px 0 30px;
+  margin-left: auto;
+  margin-right: auto;
+  table-layout: fixed;
+  margin-top: 30px;
+  margin-bottom: 60px;
+  width: 70%;
+}
+
+table {
+  break-inside: avoid;
+  page-break-inside: avoid;
 }
 
 #score_details,
+#score_details_v2,
 #daywise_stats td {
-    border: 1px solid #ddd;
-    padding: 10px 20px 10px 20px;
-    font-size: 22pt;
-    text-align: center;
+  border: 1px solid #ddd;
+  padding: 10px 20px 10px 20px;
+  font-size: 18pt;
+  text-align: center;
 }
 
 #score_details tr:first-child td,
 #chapter_details tr:first-child td,
 #daywise_stats tr:first-child td {
-    vertical-align: top;
-    background-color: orange;
-    color: black;
-    font-weight: bold;
+  vertical-align: top;
+  background-color: orange;
+  color: black;
+  font-weight: bold;
 }
 
 #score_detailstr:nth-child(even),
 #chapter_details tr:nth-child(even),
 #daywise_stats tr:nth-child(even) {
-    background-color: #FEFBEB;
+  background-color: #fefbeb;
 }
 
 #score_details tr:nth-child(odd),
 #chapter_details tr:nth-child(odd),
 #daywise_stats tr:nth-child(even) {
-    background-color: orange;
+  background-color: orange;
 }
 
 #score_details tr:hover,
 #chapter_details tr:hover,
 #daywise_stats tr:hover {
-    background-color: #ddd;
+  background-color: #ddd;
 }
 
 #chapter_details {
-    border-collapse: collapse;
-    padding: 0 30px 0 30px;
-    margin-left: auto;
-    margin-right: auto;
-    table-layout: fixed;
-    margin-top: 30px;
-    margin-bottom: 30px;
-    width: 70%;
+  border-collapse: collapse;
+  padding: 0 30px 0 30px;
+  margin-left: auto;
+  margin-right: auto;
+  table-layout: fixed;
+  margin-top: 30px;
+  margin-bottom: 30px;
+  width: 70%;
 }
 
 #chapter_details td,
 #daywise_stats td {
-    border: 1px solid #ddd;
-    padding: 10px 20px 10px 20px;
-    font-size: 16pt;
-    text-align: center;
+  border: 1px solid #ddd;
+  padding: 10px 20px 10px 20px;
+  font-size: 16pt;
+  text-align: center;
 }
 
 /* FOOTER */
 
 #main {
-    min-height: 100%;
+  min-height: 100%;
 }
 
 p {
-    margin-bottom: 0;
-    padding-bottom: 0;
+  margin-bottom: 0;
+  padding-bottom: 0;
 }
 
 #content {
-    overflow: auto;
-    padding-bottom: 60px;
-    margin-bottom: 200px;
-    /* must be same height as the footer */
+  overflow: auto;
+  padding-bottom: 60px;
+  margin-bottom: 200px;
+  /* must be same height as the footer */
 }
 
 #footer {
-    position: relative;
-    margin-top: -60px;
-    /* negative value of footer height */
-    height: 60px;
-    clear: both;
+  position: relative;
+  margin-top: -60px;
+  /* negative value of footer height */
+  height: 60px;
+  clear: both;
 }
