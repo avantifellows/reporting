@@ -133,7 +133,7 @@ class StudentQuizReportsRouter:
                 chapter_link = chapter_to_link_map.get(selected_chapter_code, "")
                 return selected_chapter_name, chapter_link
 
-            return "", ""
+            return "", ""  # selected chapter name, chapter link
 
         @api_router.get("/student_reports/{user_id}")
         def get_student_reports(
