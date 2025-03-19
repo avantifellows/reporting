@@ -1,0 +1,41 @@
+{% extends "layout.html" %}
+{% block title %}Live Session Report{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    <div id="report_header_card">
+        <h2>{{ data["quizTitle"] }}</h2>
+    </div>
+
+    {% if session_id %}
+    <div id="report_header_card">
+        <h2>Session ID: {{ session_id }}</h2>
+    </div>
+    {% endif %}
+</div>
+
+<div id="total_stats_card">
+    <h3>Unique users: {{ data["totalSessions"] }}</h3>
+    <h3>Users who finished: {{ data["totalFinishedSessions"] }} </h3>
+</div>
+
+<section id="daywise_performance">
+    <div id="section_heading">Daywise Statistics</div>
+    <table id="daywise_stats">
+        <tr>
+            <td>Date</td>
+            <td>Unique users</td>
+            <td>Users who finished</td>
+        </tr>
+        {% for stat in data["daywiseStats"] %}
+        <tr>
+            <td>{{ stat["date"] }}</td>
+            <td>{{ stat["uniqueSessions"] }}</td>
+            <td> {{ stat["finishedSessions"] }} </td>
+        </tr>
+        {% endfor %}
+    </table>
+</section>
+
+{% endblock %}

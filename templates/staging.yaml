@@ -15,6 +15,15 @@ Parameters:
   DynamodbSecretKey:
     Type: String
     Description: Secret key credentials of Dynamodb instance
+  FirestoreCredentials:
+    Type: String
+    Description: Credentials of Firestore
+  MongoAuthCredentials:
+    Type: String
+    Description: Credentials of Mongo DB
+  BqCredentialsSecretName:
+    Type: String
+    Description: Name of the Secrets Manager secret containing BigQuery credentials
 
 Resources:
   Function:
@@ -30,6 +39,15 @@ Resources:
           DYNAMODB_REGION: !Ref DynamodbRegion
           DYNAMODB_ACCESS_KEY: !Ref DynamodbAccessKey
           DYNAMODB_SECRET_KEY: !Ref DynamodbSecretKey
+          MONGO_AUTH_CREDENTIALS: !Ref MongoAuthCredentials
+          FIRESTORE_CREDENTIALS: !Ref FirestoreCredentials
+          BQ_CREDENTIALS_SECRET_NAME: !Ref BqCredentialsSecretName
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - secretsmanager:GetSecretValue
+              Resource: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${BqCredentialsSecretName}*"
       Events:
         Api:
           Type: HttpApi
