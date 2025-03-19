@@ -33,7 +33,7 @@ body {
     background-color: #29973E;
     border-radius: 3px;
     text-decoration: none;
-    color: black;
+    color: white;
     padding: 18px 60px;
     box-shadow: 1px 1px 5px #535353;
 }
@@ -175,7 +175,7 @@ body {
 #message_section {
     width: 70%;
     margin: 30px auto;
-    padding: 20px;
+    /* padding: 20px; */
     background-color: transparent;
 }
 
@@ -221,7 +221,7 @@ body {
 
 .answer_sheet_button:hover {
     text-decoration: none;
-    color: black;
+    color: white;
 }
 
 #main {
