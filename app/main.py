@@ -3,9 +3,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from mangum import Mangum
 from db.sessions_db import SessionsDB
 from db.quiz_db import QuizDB
+from db.bq_db import BigQueryDB
 from routers.session_quiz_reports import SessionQuizReportsRouter
 
-from internal.db import initialize_quiz_db, initialize_reports_db
+from internal.db import initialize_quiz_db, initialize_reports_db, initialize_bigquery
 
 from db.reports_db import ReportsDB
 from routers.student_quiz_reports import StudentQuizReportsRouter
@@ -18,6 +19,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 reports_db = initialize_reports_db()
 quiz_db = initialize_quiz_db()
+bq_db = initialize_bigquery()
 
 origins = [
     "http://localhost:3000",  # gurukul localhost
@@ -36,9 +38,10 @@ app.add_middleware(
 
 student_quiz_reports_db = ReportsDB(reports_db)
 quiz_db = QuizDB(quiz_db)
+bq_db = BigQueryDB(bq_db)
 sessions_db = SessionsDB()
 student_quiz_reports_router = StudentQuizReportsRouter(
-    reports_db=student_quiz_reports_db
+    reports_db=student_quiz_reports_db, bq_db=bq_db
 )
 quiz_reports_router = SessionQuizReportsRouter(quiz_db=quiz_db, sessions_db=sessions_db)
 

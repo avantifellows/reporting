@@ -2,6 +2,9 @@ import boto3
 from dotenv import load_dotenv
 import os
 from pymongo import MongoClient
+import json
+from google.oauth2 import service_account
+from google.cloud import bigquery
 
 # when running app locally -- use load_dotenv
 # when running app via gh actions -- variables already exist via secrets
@@ -14,6 +17,7 @@ if not all(
         "DYNAMODB_ACCESS_KEY",
         "DYNAMODB_SECRET_KEY",
         "MONGO_AUTH_CREDENTIALS",
+        "BQ_CREDENTIALS_SECRET_NAME",
     ]
 ):
     # Update and use `.env.prod` to access the prod dynamodb table
@@ -37,3 +41,26 @@ def initialize_reports_db():
 def initialize_quiz_db():
     quiz_db = MongoClient(os.getenv("MONGO_AUTH_CREDENTIALS"))
     return quiz_db
+
+
+def initialize_bigquery():
+    secret_name = os.environ.get("BQ_CREDENTIALS_SECRET_NAME")
+    client = boto3.client(
+        "secretsmanager"
+    )  # no need for credentials - lambda will provide
+    secret_value = client.get_secret_value(SecretId=secret_name)
+    credentials_json = json.loads(secret_value["SecretString"])
+    credentials = service_account.Credentials.from_service_account_info(
+        credentials_json
+    )
+
+    bigquery_details = {
+        "project": "avantifellows",
+        "region": "asia-south1",
+    }
+
+    return bigquery.Client(
+        project=bigquery_details["project"],
+        location=bigquery_details["region"],
+        credentials=credentials,
+    )
