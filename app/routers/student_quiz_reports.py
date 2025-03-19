@@ -88,6 +88,55 @@ class StudentQuizReportsRouter:
             section_report["table_data"] = table_data
             return section_report
 
+        def _get_chapter_priority_ordering(section_reports, chapter_to_link_map):
+            """order chapterwise section reports based on priority"""
+            updated_reports = []
+            for section_report in section_reports:
+                updated_section = section_report.copy()
+
+                if (
+                    "table_data" in updated_section
+                    and "chapter_level_data" in updated_section["table_data"]
+                    and updated_section["table_data"]["chapter_level_data"]
+                ):
+
+                    chapter_data = updated_section["table_data"]["chapter_level_data"]
+                    updated_chapters = []
+
+                    for chapter in chapter_data:
+                        updated_chapter = chapter.copy()
+                        chapter_name = chapter.get("chapter_name", "")
+
+                        if "-" in chapter_name:
+                            chapter_code = chapter_name.split("-")[0].strip()
+                        else:
+                            chapter_code = chapter_name.strip()
+
+                        if chapter_code in chapter_to_link_map:
+                            priority = chapter_to_link_map[chapter_code].get(
+                                "Priority", "Low"
+                            )
+                            updated_chapter["priority"] = priority
+                        else:
+                            updated_chapter["priority"] = "Low"
+
+                        updated_chapters.append(updated_chapter)
+
+                    # Sort chapters by priority (High > Medium > Low)
+                    priority_order = {"High": 3, "Medium": 2, "Low": 1}
+                    updated_chapters.sort(
+                        key=lambda x: priority_order.get(x.get("priority"), 0),
+                        reverse=True,
+                    )
+
+                    updated_section["table_data"][
+                        "chapter_level_data"
+                    ] = updated_chapters
+
+                updated_reports.append(updated_section)
+
+            return updated_reports
+
         def _get_chapter_for_revision(section_reports, chapter_to_link_map):
             """Determine which chapter needs revision based on performance metrics."""
             revision_candidates = []
@@ -131,6 +180,12 @@ class StudentQuizReportsRouter:
                 selected_chapter_code = revision_candidates[0]["chapter_code"]
                 selected_chapter_name = revision_candidates[0]["chapter_name"]
                 chapter_link = chapter_to_link_map.get(selected_chapter_code, "")
+                if selected_chapter_code in chapter_to_link_map:
+                    chapter_link = chapter_to_link_map[selected_chapter_code].get(
+                        "Link", ""
+                    )
+                else:
+                    chapter_link = ""
                 return selected_chapter_name, chapter_link
 
             return "", ""  # selected chapter name, chapter link
@@ -360,6 +415,11 @@ class StudentQuizReportsRouter:
             report_data["section_reports"] = section_reports
 
             chapter_to_link_map = json.load(open("./static/chapter_to_links.json", "r"))
+
+            report_data["section_reports"] = _get_chapter_priority_ordering(
+                section_reports, chapter_to_link_map
+            )
+
             (
                 chapter_for_revision,
                 report_data["revision_chapter_link"],

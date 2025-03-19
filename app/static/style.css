@@ -15,26 +15,26 @@ body {
 #name_card,
 #total_stats_card {
     display: table;
-    margin: 30px auto 0 auto;
+    margin: 20px auto 0 auto;
     text-align: center;
-    font-size: 22pt;
+    font-size: 18pt;
     background-color: #EAEDFD;
-    border-radius: 10px;
-    padding: 10px 40px 10px 40px;
-    box-shadow: 1px 1px 5px #535353;
+    border-radius: 8px;
+    padding: 8px 25px;
+    box-shadow: none;
+    width: 40%; /* Reduced from 60% */
 }
-
 
 #answer_sheet_button {
     display: table;
     margin: 30px auto 0 auto;
     text-align: center;
-    font-size: 14pt;
+    font-size: 18pt;
     background-color: #29973E;
-    border-radius: 10px;
+    border-radius: 3px;
     text-decoration: none;
-    color: white;
-    padding: 10px 40px 10px 40px;
+    color: black;
+    padding: 18px 60px;
     box-shadow: 1px 1px 5px #535353;
 }
 
@@ -43,34 +43,34 @@ body {
     display: inline-flex;
     margin-left: auto;
     margin-right: auto;
-    margin-top: 50px;
+    margin-top: 30px;
     font-weight: bold;
     justify-content: center;
     background-color: #EBF5FE;
-    border-radius: 10px;
-    padding: 10px 40px 10px 40px;
-    box-shadow: 1px 1px 5px #535353;
+    border-radius: 8px;
+    padding: 8px 25px;
+    box-shadow: none;
+    width: auto;
+    max-width: 40%; /* Reduced from 60% */
 }
 
 #test_summary_card .percentage {
-    margin-right: 20px;
+    margin-right: 15px;
     justify-content: center;
     align-items: center;
-    background: orange;
+    background: orange; /* Restored orange background */
     border-radius: 50%;
-    /* -moz-border-radius:50%;
-    -webkit-border-radius:50%; */
     text-align: center;
     padding: 5px;
     aspect-ratio: 1;
     display: flex;
-    font-size: 20pt;
+    font-size: 18pt;
 }
 
 #test_summary_card .test_details {
     display: block;
     margin: auto;
-    font-size: 22pt;
+    font-size: 18pt;
 }
 
 #section_heading {
@@ -101,32 +101,45 @@ body {
     width: 70%;
 }
 
-#score_details,
+#score_details td,
 #daywise_stats td {
     padding: 10px 20px 10px 20px;
     font-size: 20pt;
     text-align: center;
+    /* border: 1px solid #ddd; */
 }
 
-#score_details tr:first-child td,
-#chapter_details tr:first-child td,
-#daywise_stats tr:first-child td {
+/* Table coloring for score_details */
+#score_details tr:nth-child(even) {
+    background-color: white;
+}
+
+#score_details tr:nth-child(odd) {
+    background-color: orange;
+}
+
+/* Keep score_details header styling */
+#score_details tr:first-child td {
+    vertical-align: top;
+    color: black;
+    /* font-weight: bold; */
+}
+
+/* Table coloring for chapter_details */
+#chapter_details tr:nth-child(even) {
+    background-color: white;
+}
+
+#chapter_details tr:nth-child(odd) {
+    background-color: #FEFBEB;
+}
+
+/* Make chapter details header row orange */
+#chapter_details tr:first-child td {
     vertical-align: top;
     background-color: orange;
     color: black;
     font-weight: bold;
-}
-
-#score_detailstr:nth-child(even),
-#chapter_details tr:nth-child(even),
-#daywise_stats tr:nth-child(even) {
-    background-color: #FEFBEB;
-}
-
-#score_details tr:nth-child(odd),
-#chapter_details tr:nth-child(odd),
-#daywise_stats tr:nth-child(even) {
-    background-color: orange;
 }
 
 #score_details tr:hover,
@@ -154,7 +167,62 @@ body {
     text-align: center;
 }
 
-/* FOOTER */
+#score_details td:first-child {
+    text-align: left;
+    padding-left: 20px;
+}
+
+#message_section {
+    width: 70%;
+    margin: 30px auto;
+    padding: 20px;
+    background-color: transparent;
+}
+
+.message {
+    margin: 15px 0;
+    font-size: 16pt;
+    text-align: center;
+}
+
+.buttons_container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 30px;
+    margin: 30px 0;
+}
+
+.button_wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 10px;
+}
+
+.help_text {
+    color: #888;
+    font-size: 14px;
+    margin-top: 8px;
+}
+
+.answer_sheet_button {
+    display: table;
+    text-align: center;
+    font-size: 20pt;
+    background-color: #29973E;
+    border-radius: 3px;
+    text-decoration: none;
+    color: black;
+    padding: 18px 60px;
+    box-shadow: 1px 1px 5px #535353;
+}
+
+.answer_sheet_button:hover {
+    text-decoration: none;
+    color: black;
+}
 
 #main {
     min-height: 100%;
@@ -169,62 +237,12 @@ p {
     overflow: auto;
     padding-bottom: 60px;
     margin-bottom: 200px;
-    /* must be same height as the footer */
+    height: 100%;
 }
 
 #footer {
     position: relative;
     margin-top: -60px;
-    /* negative value of footer height */
     height: 60px;
     clear: both;
-}
-
-#score_details td:first-child {
-    text-align: left;
-    padding-left: 20px;
-}
-
-#name_card,
-#test_summary_card {
-width: 70%; /* Set a consistent width */
-box-sizing: border-box;
-margin-left: auto;
-margin-right: auto;
-}
-
-#message_section {
-width: 70%;
-margin: 30px auto;
-background-color: #EAEDFD;
-border-radius: 10px;
-padding: 20px;
-box-shadow: 1px 1px 5px #535353;
-}
-
-.buttons_container {
-display: flex;
-justify-content: center;
-align-items: center; /* Center align the buttons vertically */
-flex-wrap: wrap; /* Allow wrapping on smaller screens */
-gap: 20px;
-margin: 25px 0;
-}
-
-#score_details tr:nth-child(odd),
-#chapter_details tr:nth-child(odd) {
-background-color: #FEFBEB; /* Light color for odd rows */
-}
-
-#score_details tr:nth-child(even),
-#chapter_details tr:nth-child(even) {
-background-color: white; /* White for even rows */
-}
-
-#score_details tr:first-child td,
-#chapter_details tr:first-child td,
-#daywise_stats tr:first-child td {
-background-color: orange;
-color: black;
-font-weight: bold;
 }
