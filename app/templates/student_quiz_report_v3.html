@@ -44,7 +44,7 @@
   <div id="section_heading">Overall Performance</div>
   {% set score_details = report_data["overall_performance"] %}
   <table id="score_details">
-    {% for key, value in score_details["table_data"].items() %}
+    {% for key, value in score_details["table_data"].items() if key not in ["Partially Correct", "Topper Marks", "Percentile", "Rank"] %}
       <tr>
         <td>{{key}}</td>
         <td>{{value}}</td>
@@ -58,7 +58,7 @@
   {% for section_report in section_reports %}
     <div id="section_heading">{{ section_report["name"] }}</div>
     <table id="score_details">
-      {% for key, value in section_report["table_data"].items() if key != "chapter_level_data" %}
+      {% for key, value in section_report["table_data"].items() if key not in ["chapter_level_data", "Partially Correct", "Topper Marks", "Percentile", "Rank"]  %}
         <tr>
           <td>{{key}}</td>
           <td>{{value}}</td>

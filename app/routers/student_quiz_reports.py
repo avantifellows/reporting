@@ -13,7 +13,7 @@ import json
 ROW_NAMES = OrderedDict()
 ROW_NAMES = {
     "marks_scored": "Marks",
-    "num_skipped": "Unattempted",
+    "num_skipped": "Questions Skipped",
     "num_wrong": "Wrong Answers",
     "num_correct": "Correct Answers",
     "num_partially_correct": "Partially Correct",
@@ -341,7 +341,7 @@ class StudentQuizReportsRouter:
             else:
                 report_data[
                     "message_part_1"
-                ] = f"Close enough! You are just {int(marks_to_qualify)} marks away."
+                ] = f"Close enough! You are just {int(marks_to_qualify)} marks away from clearing JEE Mains."
 
             section_reports = []
             overall_performance = {}

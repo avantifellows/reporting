@@ -103,9 +103,8 @@ body {
 
 #score_details,
 #daywise_stats td {
-    border: 1px solid #ddd;
     padding: 10px 20px 10px 20px;
-    font-size: 22pt;
+    font-size: 20pt;
     text-align: center;
 }
 
@@ -179,4 +178,53 @@ p {
     /* negative value of footer height */
     height: 60px;
     clear: both;
+}
+
+#score_details td:first-child {
+    text-align: left;
+    padding-left: 20px;
+}
+
+#name_card,
+#test_summary_card {
+width: 70%; /* Set a consistent width */
+box-sizing: border-box;
+margin-left: auto;
+margin-right: auto;
+}
+
+#message_section {
+width: 70%;
+margin: 30px auto;
+background-color: #EAEDFD;
+border-radius: 10px;
+padding: 20px;
+box-shadow: 1px 1px 5px #535353;
+}
+
+.buttons_container {
+display: flex;
+justify-content: center;
+align-items: center; /* Center align the buttons vertically */
+flex-wrap: wrap; /* Allow wrapping on smaller screens */
+gap: 20px;
+margin: 25px 0;
+}
+
+#score_details tr:nth-child(odd),
+#chapter_details tr:nth-child(odd) {
+background-color: #FEFBEB; /* Light color for odd rows */
+}
+
+#score_details tr:nth-child(even),
+#chapter_details tr:nth-child(even) {
+background-color: white; /* White for even rows */
+}
+
+#score_details tr:first-child td,
+#chapter_details tr:first-child td,
+#daywise_stats tr:first-child td {
+background-color: orange;
+color: black;
+font-weight: bold;
 }
