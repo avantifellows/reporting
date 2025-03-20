@@ -23,7 +23,7 @@
   <div class="buttons_container">
     {% if "revision_chapter_link" in report_data and report_data["revision_chapter_link"] != "" %}
       <div class="button_wrapper">
-        <a class="answer_sheet_button" target="_blank" href={{report_data['revision_chapter_link']}}>
+        <a class="answer_sheet_button" target="_blank" data-track-button="revise_chapter" href={{report_data['revision_chapter_link']}}>
           Revise Chapter
         </a>
       </div>
@@ -31,7 +31,7 @@
 
     {% if "test_link" in report_data %}
       <div class="button_wrapper">
-        <a class="answer_sheet_button" target="_blank" href={{report_data['test_link']}}>
+        <a class="answer_sheet_button" target="_blank" data-track-button="review_quiz" href={{report_data['test_link']}}>
           Review Quiz
         </a>
         <span class="help_text">Check out answer key & solutions</span>
