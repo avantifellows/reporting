@@ -1,22 +1,71 @@
 <!doctype html>
 <html>
-  <head>
-    {% block head %}
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    <link rel="stylesheet" href="{{ url_for('static', path='/style.css') }}">
-    <title>{% block title %}{% endblock %} - Reports</title>
-    {% endblock %}
-  </head>
-  <body>
-  <div id="main">
-    <div id="content">{% block content %}{% endblock %}</div>
-  </div>
-    <div id="footer">
-    <center>
-      {% block footer %}
-      &copy; Copyright 2022 by <a href="https://avantifellows.org">Avanti Fellows</a>.
-      {% endblock %}
-      </center>
-    </div>
-  </body>
+<head>
+ {% block head %}
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-PB91GS5G9Q"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-PB91GS5G9Q');
+</script>
+
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+<link rel="stylesheet" href="{{ url_for('static', path='/style.css') }}">
+<title>{% block title %}{% endblock %} - Reports</title>
+ {% endblock %}
+</head>
+<body>
+<div id="main">
+<div id="content">{% block content %}{% endblock %}</div>
+</div>
+<div id="footer">
+<center>
+ {% block footer %}
+ &copy; Copyright 2022 by <a href="https://avantifellows.org">Avanti Fellows</a>.
+ {% endblock %}
+</center>
+</div>
+
+<!-- Button click tracking script -->
+<script>
+  function extractIdsFromUrl() {
+    const url = window.location.pathname;
+    const pathParts = url.split('/');
+
+    if (pathParts.length >= 5) {
+      const sessionId = pathParts[pathParts.length - 2];
+
+      const studentId = pathParts[pathParts.length - 1];
+
+      const isV3 = url.includes('/v3/');
+
+      return { sessionId, studentId, isV3 };
+    }
+
+    return { sessionId: 'unknown', studentId: 'unknown', isV3: false };
+  }
+
+  // Set up button click tracking
+  document.addEventListener('DOMContentLoaded', function() {
+    // Find all buttons with data-track-button attribute
+    const trackButtons = document.querySelectorAll('[data-track-button]');
+
+    // Add click event listeners to each button
+    trackButtons.forEach(function(button) {
+      button.addEventListener('click', function() {
+        const buttonType = this.getAttribute('data-track-button');
+        const { sessionId, studentId, isV3 } = extractIdsFromUrl();
+
+        gtag('event', 'button_click', {
+          'button_name': buttonType,
+          'report_version': isV3 ? 'v3' : 'standard',
+          'session_id': sessionId,
+          'student_id': studentId
+        });
+      });
+    });
+  });
+</script>
+</body>
 </html>
