@@ -23,7 +23,7 @@
 
 
 {% if "test_link" in report_data %}
-<a id="answer_sheet_button" target="_blank" href={{report_data["test_link"]}}>
+<a id="answer_sheet_button" data-track-button="review_quiz" target="_blank" href={{report_data["test_link"]}}>
   Click here to review your answers
 </a>
 {% endif %}

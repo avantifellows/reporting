@@ -1,0 +1,138 @@
+{% extends "layout.html" %}
+{% block title %}Index{% endblock %}
+{% block content %}
+<div id="name_card">
+  {% if report_data["student_name"] != "" %}
+    <p>Name: {{report_data["student_name"]}}
+  {% endif %}
+  <p>Student ID: {{report_data["student_id"]}}
+</div>
+<div id="test_summary_card">
+  <div class="percentage"> {{report_data["percentage"]}}%</div>
+  <div class="test_details">
+    <div>{{report_data["test_name"]}}</div>
+    <div>{{report_data["test_date"]}}</div>
+  </div>
+</div>
+
+<!-- New message section -->
+<div id="message_section">
+  <p class="message">{{report_data["message_part_1"]}}</p>
+  <p class="message">{{report_data["message_part_2"]}}</p>
+
+  <div class="buttons_container">
+    {% if "revision_chapter_link" in report_data and report_data["revision_chapter_link"] != "" %}
+      <div class="button_wrapper">
+        <a class="answer_sheet_button" target="_blank" data-track-button="revise_chapter" href={{report_data['revision_chapter_link']}}>
+          Revise Chapter
+        </a>
+      </div>
+    {% endif %}
+
+    {% if "test_link" in report_data %}
+      <div class="button_wrapper">
+        <a class="answer_sheet_button" target="_blank" data-track-button="review_quiz" href={{report_data['test_link']}}>
+          Review Quiz
+        </a>
+        <span class="help_text">Check out answer key & solutions</span>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<section id="overall_performance">
+  <div id="section_heading">Overall Performance</div>
+  {% set score_details = report_data["overall_performance"] %}
+  <table id="score_details">
+    {% for key, value in score_details["table_data"].items() if key not in ["Partially Correct", "Topper Marks", "Percentile", "Rank"] %}
+      <tr>
+        <td>{{key}}</td>
+        <td>{{value}}</td>
+      </tr>
+    {% endfor %}
+  </table>
+</section>
+
+<section id="subject_peformance">
+  {% set section_reports = report_data["section_reports"] %}
+  {% for section_report in section_reports %}
+    <div id="section_heading">{{ section_report["name"] }}</div>
+    <table id="score_details">
+      {% for key, value in section_report["table_data"].items() if key not in ["chapter_level_data", "Partially Correct", "Topper Marks", "Percentile", "Rank"]  %}
+        <tr>
+          <td>{{key}}</td>
+          <td>{{value}}</td>
+        </tr>
+      {% endfor %}
+      {% if "chapter_level_data" in section_report["table_data"] %}
+        <table id="chapter_details">
+          <tr>
+            <td>Chapter</td>
+            <td>Score</td>
+            <td>Accuracy</td>
+            <td>Attempt Rate</td>
+            <td>Priority</td>
+          </tr>
+          <div id="chapter_wise_heading">Chapterwise Performance</div>
+          {% for row in section_report["table_data"]["chapter_level_data"] %}
+            <tr>
+              <td>{{ row["chapter_name"] }}</td>
+              <td>{{ row["marks_scored"] }}</td>
+              <td>{{ row["accuracy"] }} </td>
+              <td>{{ row["attempt_percentage"] }}</td>
+              <td>{{ row["priority"] }}</td>
+            </tr>
+          {% endfor %}
+        </table>
+      {% endif %}
+    </table>
+  {% endfor %}
+</section>
+
+<style>
+  .message {
+    margin: 15px 0;
+    font-size: 16pt;
+    text-align: center;
+  }
+
+  .buttons_container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /* Align tops of button wrappers */
+    gap: 20px;
+    margin: 25px 0;
+  }
+
+  .button_wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .help_text {
+    color: #888;
+    font-size: 12px;
+    margin-top: 5px;
+  }
+
+  /* Make answer_sheet_button a class instead of an ID */
+  .answer_sheet_button {
+    display: table;
+    text-align: center;
+    font-size: 18pt;
+    background-color: #29973E;
+    border-radius: 3px;
+    text-decoration: none;
+    color: white;
+    padding: 10px 40px 10px 40px;
+    box-shadow: 1px 1px 5px #535353;
+  }
+
+  /* Prevent underline and color change on hover */
+  .answer_sheet_button:hover {
+    text-decoration: none;
+    color: white;
+  }
+</style>
+{% endblock %}
