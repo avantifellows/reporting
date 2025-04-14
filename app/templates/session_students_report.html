@@ -1,0 +1,129 @@
+{% extends "layout.html" %}
+
+{% block title %}Session Report{% endblock %}
+
+{% block content %}
+
+<style>
+.btn-primary, .btn-success {
+    background-color: #FFD700;  /* Yellow background */
+    border-color: #DAA520;     /* Darker yellow border */
+    color: #000;               /* Black text for better contrast */
+}
+
+.btn-primary:hover, .btn-success:hover {
+    background-color: #DAA520;  /* Darker yellow on hover */
+    border-color: #B8860B;
+    color: #000;
+}
+
+#overall_performance .d-flex {
+    width: 100%;
+    padding: 0;
+    margin-bottom: 1rem !important;
+}
+
+#searchInput {
+    width: 200px;
+}
+</style>
+
+<div id="name_card">
+  <p>Session ID: {{ session_id }}</p>
+</div>
+
+<div id="test_summary_card">
+  <div class="percentage">{{ students|length }}</div>
+  <div class="test_details">
+    <div>Total Students</div>
+  </div>
+</div>
+
+<section id="overall_performance">
+  <div id="section_heading">Students Performance</div>
+  <div style="max-width: 1200px; margin: 0 auto; padding: 10px;">
+  <div class="d-flex justify-content-between mb-3">
+    <!-- Search by Student ID -->
+    <div class="form-inline">
+      <input type="text" id="searchInput" class="form-control form-control-sm mr-2"
+          placeholder="Search by Student ID">
+    </div>
+
+    <div>
+      <!-- Toggle Sorting Button -->
+      <button id="sortToggleBtn" class="btn btn-sm btn-primary">Sort by Highest Score</button>
+
+      <!-- Download Excel -->
+      <a href="/reports/session_students/{{ session_id }}?format=excel" class="btn btn-sm btn-success">Download Excel</a>
+    </div>
+  </div>
+  </div>
+
+  <table id="score_details">
+    <tr>
+      <th>Student ID</th>
+      <th>Marks Scored</th>
+      <th>Percentage</th>
+      <th>Rank</th>
+    </tr>
+    {% for student in students %}
+    <tr>
+      <td>
+        <a href="/reports/student_quiz_report/{{ session_id }}/{{ student.user_id }}">
+          {{ student.user_id }}
+        </a>
+      </td>
+      <td>{{ student.marks_scored }}</td>
+      <td>{{ student.percentage }}%</td>
+      <td>{{ student.rank if student.rank else 'N/A' }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  </div>
+
+</section>
+
+<script>
+    document.getElementById('searchInput').addEventListener('keyup', function () {
+        let filter = this.value.toLowerCase();
+        let rows = document.querySelectorAll("#score_details tr");
+
+        rows.forEach(row => {
+            if (row.querySelector("th")) return; // Skip header row
+            let studentId = row.querySelector("td").innerText.toLowerCase();
+            if (studentId.includes(filter)) {
+                row.style.display = "";
+            } else {
+                row.style.display = "none";
+            }
+        });
+    });
+
+    // Toggle Sorting Logic
+    document.getElementById('sortToggleBtn').addEventListener('click', function () {
+        let currentUrl = new URL(window.location.href);
+        let sortParam = currentUrl.searchParams.get("sort_by");
+
+        if (sortParam === "highest_score") {
+            currentUrl.searchParams.delete("sort_by"); // Reset to Student ID sorting
+            this.textContent = "Sort by Highest Score";
+        } else {
+            currentUrl.searchParams.set("sort_by", "highest_score"); // Apply sorting
+            this.textContent = "Sort by Student ID";
+        }
+
+        window.location.href = currentUrl.toString(); // Reload with updated URL
+    });
+
+    // Set button text on page load
+    window.addEventListener("DOMContentLoaded", function () {
+        let currentUrl = new URL(window.location.href);
+        let sortParam = currentUrl.searchParams.get("sort_by");
+
+        if (sortParam === "highest_score") {
+            document.getElementById("sortToggleBtn").textContent = "Sort by Student ID";
+        }
+    });
+</script>
+
+{% endblock %}

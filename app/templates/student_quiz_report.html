@@ -1,7 +1,9 @@
 {% extends "layout.html" %}
 {% block title %}Index{% endblock %}
 
+
 {% block content %}
+
 
 <div id="name_card">
   {% if report_data["student_name"] != "" %}
@@ -9,6 +11,7 @@
     {% endif %}
   <p>Student ID: {{report_data["student_id"]}}
 </div>
+
 
 <div id="test_summary_card">
   <div class="percentage"> {{report_data["percentage"]}}%</div>
@@ -18,15 +21,18 @@
   </div>
 </div>
 
+
 {% if "test_link" in report_data %}
 <a id="answer_sheet_button" target="_blank" href={{report_data["test_link"]}}>
   Click here to review your answers
 </a>
 {% endif %}
 
+
 <section id="overall_performance">
   <div id="section_heading">Overall Performance</div>
   {% set score_details = report_data["overall_performance"] %}
+
 
   <table id="score_details">
     {% for key, value in score_details["table_data"].items() %}
@@ -37,6 +43,7 @@
     {% endfor %}
   </table>
 </section>
+
 
 <section id="subject_peformance">
   {% set section_reports = report_data["section_reports"] %}
@@ -50,29 +57,33 @@
     </tr>
     {% endfor %}
     {% if "chapter_level_data" in section_report["table_data"] %}
-      <table id="chapter_details">
-        <tr>
-          <td>Chapter</td>
-          <td>Score</td>
-          <td>Accuracy</td>
-          <td>Attempt Rate</td>
-        </tr>
-        <div id="chapter_wise_heading">Chapterwise Performance</div>
-        {% for row in section_report["table_data"]["chapter_level_data"] %}
-        <tr>
-          <td>{{ row["chapter_name"] }}</td>
-          <td>{{ row["marks_scored"] }}</td>
-          <td>{{ row["accuracy"] }} </td>
-          <td>{{ row["attempt_percentage"] }}</td>
-        </tr>
-        {% endfor %}
-      </table>
+    <table id="chapter_details">
+      <tr>
+        <td>Chapter</td>
+        <td>Score</td>
+        <td>Accuracy</td>
+        <td>Attempt Rate</td>
+      </tr>
+      <div id="chapter_wise_heading">Chapterwise Performance</div>
+      {% for row in section_report["table_data"]["chapter_level_data"] %}
+      <tr>
+        <td>{{ row["chapter_name"] }}</td>
+        <td>{{ row["marks_scored"] }}</td>
+        <td>{{ row["accuracy"] }} </td>
+        <td>{{ row["attempt_percentage"] }}</td>
+      </tr>
+      {% endfor %}
+    </table>
     {% endif %}
+
+
 
 
   </table>
 
+
   {% endfor %}
 </section>
+
 
 {% endblock %}

@@ -48,3 +48,35 @@ class ReportsDB:
             return response["Items"]
         except ClientError as e:
             raise ValueError(e.response["Error"]["Message"])
+
+    def get_all_students_by_session(self, session_id):
+        """ "
+        Returns all student reports for a given session ID."
+        params:
+        session_id: The session ID
+        """
+        try:
+            table = self.__db.Table("student_quiz_reports")
+            all_items = []
+            last_evaluated_key = None
+
+            while True:
+                if last_evaluated_key:
+                    response = table.query(
+                        KeyConditionExpression=Key("session_id").eq(session_id),
+                        ExclusiveStartKey=last_evaluated_key,
+                    )
+                else:
+                    response = table.query(
+                        KeyConditionExpression=Key("session_id").eq(session_id)
+                    )
+
+                all_items.extend(response.get("Items", []))
+
+                last_evaluated_key = response.get("LastEvaluatedKey")
+                if not last_evaluated_key:
+                    break
+
+            return all_items
+        except ClientError as e:
+            raise ValueError(e.response["Error"]["Message"])
