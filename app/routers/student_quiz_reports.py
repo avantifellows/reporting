@@ -88,7 +88,9 @@ class StudentQuizReportsRouter:
             section_report["table_data"] = table_data
             return section_report
 
-        def _get_chapter_priority_ordering(section_reports, chapter_to_link_map):
+        def _get_chapter_priority_ordering(
+            section_reports, chapter_to_link_map, stream
+        ):
             """order chapterwise section reports based on priority"""
             updated_reports = []
             for section_report in section_reports:
@@ -113,9 +115,14 @@ class StudentQuizReportsRouter:
                             chapter_code = chapter_name.strip()
 
                         if chapter_code in chapter_to_link_map:
-                            priority = chapter_to_link_map[chapter_code].get(
-                                "Priority", "Low"
-                            )
+                            if stream == "JEE":
+                                priority = chapter_to_link_map[chapter_code].get(
+                                    "Priority_J", "Low"
+                                )
+                            elif stream == "NEET":
+                                priority = chapter_to_link_map[chapter_code].get(
+                                    "Priority_N", "Low"
+                                )
                             updated_chapter["priority"] = priority
                         else:
                             updated_chapter["priority"] = "Low"
@@ -137,7 +144,7 @@ class StudentQuizReportsRouter:
 
             return updated_reports
 
-        def _get_chapter_for_revision(section_reports, chapter_to_link_map):
+        def _get_chapter_for_revision(section_reports, chapter_to_link_map, stream):
             """Determine which chapter needs revision based on performance metrics."""
             revision_candidates = []
 
@@ -181,9 +188,14 @@ class StudentQuizReportsRouter:
                 selected_chapter_name = revision_candidates[0]["chapter_name"]
                 chapter_link = chapter_to_link_map.get(selected_chapter_code, "")
                 if selected_chapter_code in chapter_to_link_map:
-                    chapter_link = chapter_to_link_map[selected_chapter_code].get(
-                        "Link", ""
-                    )
+                    if stream == "JEE":
+                        chapter_link = chapter_to_link_map[selected_chapter_code].get(
+                            "Link_J", ""
+                        )
+                    elif stream == "NEET":
+                        chapter_link = chapter_to_link_map[selected_chapter_code].get(
+                            "Link_N", ""
+                        )
                 else:
                     chapter_link = ""
                 return selected_chapter_name, chapter_link
@@ -387,6 +399,8 @@ class StudentQuizReportsRouter:
             )
             qualification_status = student_al_data["qualification_status"]
             marks_to_qualify = student_al_data["marks_to_qualify"]
+            chapter_for_revision = student_al_data["chapter_curriculum"]
+            revision_chapter_link = student_al_data["dpp_recommendation"]
 
             report_data["message_part_1"] = ""
             if qualification_status == "Qualified":
@@ -400,6 +414,10 @@ class StudentQuizReportsRouter:
 
             section_reports = []
             overall_performance = {}
+
+            # determine if neet or jee; jee by default
+            stream = "JEE"
+
             for section in data:
                 parsed_section_data = _parse_section_data(section)
                 if section["section"] == "overall":
@@ -411,19 +429,24 @@ class StudentQuizReportsRouter:
                     report_data["test_date"] = section["start_date"]
                 else:
                     section_reports.append(parsed_section_data)
+                    if section["section"] == "Biology":
+                        stream = "NEET"
+
             report_data["overall_performance"] = overall_performance
             report_data["section_reports"] = section_reports
 
             chapter_to_link_map = json.load(open("./static/chapter_to_links.json", "r"))
 
             report_data["section_reports"] = _get_chapter_priority_ordering(
-                section_reports, chapter_to_link_map
+                section_reports, chapter_to_link_map, stream
             )
 
-            (
-                chapter_for_revision,
-                report_data["revision_chapter_link"],
-            ) = _get_chapter_for_revision(section_reports, chapter_to_link_map)
+            # (
+            #     chapter_for_revision,
+            #     report_data["revision_chapter_link"],
+            # ) = _get_chapter_for_revision(section_reports, chapter_to_link_map, stream)
+
+            report_data["revision_chapter_link"] = revision_chapter_link
 
             if chapter_for_revision != "":
                 report_data[
