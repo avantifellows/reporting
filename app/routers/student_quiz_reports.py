@@ -402,16 +402,6 @@ class StudentQuizReportsRouter:
             chapter_for_revision = student_al_data["chapter_curriculum"]
             revision_chapter_link = student_al_data["dpp_recommendation"]
 
-            report_data["message_part_1"] = ""
-            if qualification_status == "Qualified":
-                report_data[
-                    "message_part_1"
-                ] = "Good Job! You are on track to clear JEE Mains!"
-            else:
-                report_data[
-                    "message_part_1"
-                ] = f"Close enough! You are just {int(marks_to_qualify)} marks away from clearing JEE Mains."
-
             section_reports = []
             overall_performance = {}
 
@@ -445,6 +435,22 @@ class StudentQuizReportsRouter:
             #     chapter_for_revision,
             #     report_data["revision_chapter_link"],
             # ) = _get_chapter_for_revision(section_reports, chapter_to_link_map, stream)
+
+            exam = "JEE"
+            if stream == "JEE":
+                exam = "JEE Mains"
+            elif stream == "NEET":
+                exam = "NEET"
+
+            report_data["message_part_1"] = ""
+            if qualification_status == "Qualified":
+                report_data[
+                    "message_part_1"
+                ] = f"Good Job! You are on track to clear {exam}!"
+            else:
+                report_data[
+                    "message_part_1"
+                ] = f"Close enough! You are just {int(marks_to_qualify)} marks away from clearing {exam}."
 
             report_data["revision_chapter_link"] = revision_chapter_link
 
