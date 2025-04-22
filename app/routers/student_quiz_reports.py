@@ -8,6 +8,7 @@ from db.reports_db import ReportsDB
 from db.bq_db import BigQueryDB
 from auth import verify_token
 from fastapi.security.api_key import APIKeyHeader
+from utils.pdf_converter import convert_template_to_pdf
 import json
 
 ROW_NAMES = OrderedDict()
@@ -262,7 +263,12 @@ class StudentQuizReportsRouter:
                 )
 
         @api_router.get("/student_quiz_report/{session_id}/{user_id}")
-        def student_quiz_report(request: Request, session_id: str, user_id: str):
+        def student_quiz_report(
+            request: Request,
+            session_id: str,
+            user_id: str,
+            format: Optional[str] = None,
+        ):
             """
             Returns a student quiz report for a given session ID and user ID.
 
@@ -270,12 +276,14 @@ class StudentQuizReportsRouter:
                 request (Request): The request object.
                 session_id (str): The session ID.
                 user_id (str): The user ID.
+                format (str, optional): The format of the report. If "pdf", returns a PDF. Defaults to None.
 
             Raises:
                 HTTPException: If session ID or user ID is not specified.
 
             Returns:
                 TemplateResponse: The student quiz report template response.
+                StreamingResponse: A PDF response if format=pdf.
             """
             if session_id is None or user_id is None:
                 raise HTTPException(
@@ -302,9 +310,12 @@ class StudentQuizReportsRouter:
                     "error_message": "No report found. Please contact admin.",
                     "status_code": 404,
                 }
-                return self._templates.TemplateResponse(
+                template_response = self._templates.TemplateResponse(
                     "error.html", {"request": request, "error_data": error_data}
                 )
+                if format == "pdf":
+                    return convert_template_to_pdf(template_response)
+                return template_response
 
             report_data = {}
             report_data["student_name"] = ""
@@ -332,13 +343,23 @@ class StudentQuizReportsRouter:
                     section_reports.append(parsed_section_data)
             report_data["overall_performance"] = overall_performance
             report_data["section_reports"] = section_reports
-            return self._templates.TemplateResponse(
+
+            template_response = self._templates.TemplateResponse(
                 "student_quiz_report.html",
                 {"request": request, "report_data": report_data},
             )
 
+            if format == "pdf":
+                return convert_template_to_pdf(template_response)
+            return template_response
+
         @api_router.get("/student_quiz_report/v3/{session_id}/{user_id}")
-        def student_quiz_report_v3(request: Request, session_id: str, user_id: str):
+        def student_quiz_report_v3(
+            request: Request,
+            session_id: str,
+            user_id: str,
+            format: Optional[str] = None,
+        ):
             """
             Returns a student quiz report v3 with a chapter recommendation.
 
@@ -346,12 +367,14 @@ class StudentQuizReportsRouter:
                 request (Request): The request object.
                 session_id (str): The session ID.
                 user_id (str): The user ID.
+                format (str, optional): The format of the report. If "pdf", returns a PDF. Defaults to None.
 
             Raises:
                 HTTPException: If session ID or user ID is not specified.
 
             Returns:
                 TemplateResponse: The student quiz report template response.
+                StreamingResponse: A PDF response if format=pdf.
             """
             if session_id is None or user_id is None:
                 raise HTTPException(
@@ -459,9 +482,13 @@ class StudentQuizReportsRouter:
                     "message_part_2"
                 ] = f"We recommend that you focus on the chapter {chapter_for_revision} for the next test."
 
-            return self._templates.TemplateResponse(
+            template_response = self._templates.TemplateResponse(
                 "student_quiz_report_v3.html",
                 {"request": request, "report_data": report_data},
             )
+
+            if format == "pdf":
+                return convert_template_to_pdf(template_response)
+            return template_response
 
         return api_router
