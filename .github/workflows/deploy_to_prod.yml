@@ -30,6 +30,12 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-south-1
 
+      - name: Install WeasyPrint dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential python3-dev python3-pip python3-setuptools python3-wheel python3-cffi \
+          libcairo2 libpango-1.0-0 libpangocairo-1.0-0 libgdk-pixbuf2.0-0 libffi-dev shared-mime-info
+
       - name: Verify dependencies file
         run: |
           echo "Checking requirements.txt file location and content:"
@@ -57,7 +63,6 @@ jobs:
           FIRESTORE_CREDENTIALS: ${{ secrets.FIRESTORE_CREDENTIALS }}
           MONGO_AUTH_CREDENTIALS: ${{ secrets.MONGO_AUTH_CREDENTIALS }}
           BQ_CREDENTIALS_SECRET_NAME: ${{ secrets.BQ_CREDENTIALS_SECRET_NAME }}
-          HTML_TO_PDF_SERVER_URL: ${{ secrets.HTML_TO_PDF_SERVER_URL }}
         run: >
           sam deploy
           --stack-name ReportingProduction
@@ -74,4 +79,3 @@ jobs:
           FirestoreCredentials=$FIRESTORE_CREDENTIALS
           MongoAuthCredentials=$MONGO_AUTH_CREDENTIALS
           BqCredentialsSecretName=$BQ_CREDENTIALS_SECRET_NAME
-          HtmlToPdfUrl=$HTML_TO_PDF_SERVER_URL
