@@ -9,5 +9,34 @@ Resources:
       BuildArchitecture: x86_64
       BuildProperties:
         PreInstallCommands: |
+          # Update package lists
           apt-get update
-          apt-get install -y build-essential python3-dev python3-pip python3-setuptools python3-wheel python3-cffi libcairo2 libpango-1.0-0 libpangocairo-1.0-0 libgdk-pixbuf2.0-0 libffi-dev shared-mime-info
+
+          # Install all required system dependencies for WeasyPrint
+          apt-get install -y --no-install-recommends \
+            build-essential \
+            python3-dev \
+            python3-pip \
+            python3-setuptools \
+            python3-wheel \
+            python3-cffi \
+            libcairo2 \
+            libpango-1.0-0 \
+            libpangocairo-1.0-0 \
+            libgdk-pixbuf2.0-0 \
+            libffi-dev \
+            shared-mime-info \
+            libglib2.0-0 \
+            libglib2.0-dev \
+            libgirepository1.0-dev \
+            gir1.2-pango-1.0 \
+            gir1.2-gtk-3.0
+
+          # Create necessary symlinks for the libraries WeasyPrint expects
+          ln -s /usr/lib/*/libgobject-2.0.so.* /usr/lib/libgobject-2.0-0
+          ln -s /usr/lib/*/libpango-1.0.so.* /usr/lib/libpango-1.0-0
+          ln -s /usr/lib/*/libpangocairo-1.0.so.* /usr/lib/libpangocairo-1.0-0
+          ln -s /usr/lib/*/libglib-2.0.so.* /usr/lib/libglib-2.0-0
+
+          # Set up LD_LIBRARY_PATH to find these libraries
+          echo "export LD_LIBRARY_PATH=/usr/lib:$LD_LIBRARY_PATH" >> /etc/environment

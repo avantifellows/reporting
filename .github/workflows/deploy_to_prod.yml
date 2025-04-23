@@ -33,8 +33,24 @@ jobs:
       - name: Install WeasyPrint dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential python3-dev python3-pip python3-setuptools python3-wheel python3-cffi \
-          libcairo2 libpango-1.0-0 libpangocairo-1.0-0 libgdk-pixbuf2.0-0 libffi-dev shared-mime-info
+          sudo apt-get install -y --no-install-recommends \
+            build-essential \
+            python3-dev \
+            python3-pip \
+            python3-setuptools \
+            python3-wheel \
+            python3-cffi \
+            libcairo2 \
+            libpango-1.0-0 \
+            libpangocairo-1.0-0 \
+            libgdk-pixbuf2.0-0 \
+            libffi-dev \
+            shared-mime-info \
+            libglib2.0-0 \
+            libglib2.0-dev \
+            libgirepository1.0-dev \
+            gir1.2-pango-1.0 \
+            gir1.2-gtk-3.0
 
       - name: Verify dependencies file
         run: |
