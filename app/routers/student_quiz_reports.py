@@ -268,6 +268,7 @@ class StudentQuizReportsRouter:
             session_id: str,
             user_id: str,
             format: Optional[str] = None,
+            debug: bool = False,
         ):
             """
             Returns a student quiz report for a given session ID and user ID.
@@ -277,6 +278,7 @@ class StudentQuizReportsRouter:
                 session_id (str): The session ID.
                 user_id (str): The user ID.
                 format (str, optional): The format of the report. If "pdf", returns a PDF. Defaults to None.
+                debug (bool): If True and format is "pdf", returns the HTML that would be sent to PDF service.
 
             Raises:
                 HTTPException: If session ID or user ID is not specified.
@@ -284,6 +286,7 @@ class StudentQuizReportsRouter:
             Returns:
                 TemplateResponse: The student quiz report template response.
                 StreamingResponse: A PDF response if format=pdf.
+                HTMLResponse: HTML content if format=pdf and debug=True.
             """
             if session_id is None or user_id is None:
                 raise HTTPException(
@@ -314,7 +317,7 @@ class StudentQuizReportsRouter:
                     "error.html", {"request": request, "error_data": error_data}
                 )
                 if format == "pdf":
-                    return convert_template_to_pdf(template_response)
+                    return convert_template_to_pdf(template_response, debug=debug)
                 return template_response
 
             report_data = {}
@@ -350,7 +353,7 @@ class StudentQuizReportsRouter:
             )
 
             if format == "pdf":
-                return convert_template_to_pdf(template_response)
+                return convert_template_to_pdf(template_response, debug=debug)
             return template_response
 
         @api_router.get("/student_quiz_report/v3/{session_id}/{user_id}")
@@ -359,6 +362,7 @@ class StudentQuizReportsRouter:
             session_id: str,
             user_id: str,
             format: Optional[str] = None,
+            debug: bool = False,
         ):
             """
             Returns a student quiz report v3 with a chapter recommendation.
@@ -368,6 +372,7 @@ class StudentQuizReportsRouter:
                 session_id (str): The session ID.
                 user_id (str): The user ID.
                 format (str, optional): The format of the report. If "pdf", returns a PDF. Defaults to None.
+                debug (bool): If True and format is "pdf", returns the HTML that would be sent to PDF service.
 
             Raises:
                 HTTPException: If session ID or user ID is not specified.
@@ -375,6 +380,7 @@ class StudentQuizReportsRouter:
             Returns:
                 TemplateResponse: The student quiz report template response.
                 StreamingResponse: A PDF response if format=pdf.
+                HTMLResponse: HTML content if format=pdf and debug=True.
             """
             if session_id is None or user_id is None:
                 raise HTTPException(
@@ -488,7 +494,7 @@ class StudentQuizReportsRouter:
             )
 
             if format == "pdf":
-                return convert_template_to_pdf(template_response)
+                return convert_template_to_pdf(template_response, debug=debug)
             return template_response
 
         return api_router

@@ -1,6 +1,7 @@
 annotated-types==0.6.0
 anyio==3.7.1
 autopep8==1.6.0
+beautifulsoup4==4.12.2
 boto3==1.24.35
 botocore==1.27.35
 cachetools==5.3.2
