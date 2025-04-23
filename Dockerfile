@@ -8,7 +8,9 @@ WORKDIR /code
 COPY requirements.txt /code/requirements.txt
 ADD generate_table /app
 
-RUN pip install -r /code/requirements.txt
+# Update pip first, then install with no cache and fix dependency resolution
+RUN pip install --upgrade pip && \
+    pip install --no-cache-dir -r /code/requirements.txt
 
 COPY ./app /code
 
