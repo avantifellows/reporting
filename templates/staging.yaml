@@ -36,6 +36,8 @@ Resources:
       CodeUri: ../app
       Handler: main.handler
       Runtime: python3.9
+      Timeout: 60
+      MemorySize: 1024
       Environment:
         Variables:
           DYNAMODB_URL: !Ref DynamodbUrl
