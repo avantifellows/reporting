@@ -32,8 +32,23 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-south-1
 
-      - name: Build
-        run: sam build --use-container -t templates/staging.yaml
+      - name: Verify dependencies file
+        run: |
+          echo "Checking requirements.txt file location and content:"
+          ls -la
+          ls -la app/
+          echo "Content of requirements.txt:"
+          cat requirements.txt
+          echo "Copying requirements.txt to app directory if needed:"
+          cp requirements.txt app/ || true
+
+      - name: Clean SAM build cache
+        run: |
+          rm -rf .aws-sam || true
+          sam --version
+
+      - name: Build with SAM
+        run: sam build --use-container -t templates/staging.yaml --debug
 
       - name: Deploy
         env:

@@ -57,6 +57,9 @@ Resources:
           Type: HttpApi
           Properties:
             ApiId: !Ref Api
+    Metadata:
+      BuildMethod: python3.9
+      BuildArchitecture: x86_64
 
   Api:
     Type: AWS::Serverless::HttpApi
