@@ -1,0 +1,67 @@
+{% extends "layout.html" %}
+{% block title %}Student Reports{% endblock %}
+
+{% block content %}
+
+<div id="name_card">
+  <p>Student ID: {{student_id}}</p>
+</div>
+
+<section id="student_reports">
+  <div id="section_heading">TEST REPORTS</div>
+
+  {% if reports and reports|length > 0 %}
+    <table id="score_details">
+      <tr>
+        <td>Test Name</td>
+        <td>Test Date</td>
+        <td>Percentile</td>
+        <td>Rank</td>
+        <td>Report</td>
+      </tr>
+      {% for report in reports %}
+        <tr>
+          <td>{{ report.test_name }}</td>
+          <td>{{ report.start_date }}</td>
+          <td>{{ report.percentile }}</td>
+          <td>{{ report.rank }}</td>
+          <td>
+            <a href="{{ report.report_link }}" class="report-link" target="_blank">
+              View Report
+            </a>
+          </td>
+        </tr>
+      {% endfor %}
+    </table>
+  {% else %}
+    <div class="message">No test reports found for this student.</div>
+  {% endif %}
+</section>
+
+<style>
+  .report-link {
+    display: inline-block;
+    background-color: #29973E;
+    color: white;
+    padding: 8px 15px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 14pt;
+    box-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+    transition: background-color 0.2s, transform 0.1s;
+  }
+
+  .report-link:hover {
+    background-color: #2AAF4A;
+    transform: translateY(-2px);
+    text-decoration: none;
+    color: white;
+  }
+
+  #score_details td {
+    padding: 15px;
+    vertical-align: middle;
+  }
+</style>
+
+{% endblock %}
