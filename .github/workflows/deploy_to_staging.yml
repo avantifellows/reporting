@@ -44,6 +44,7 @@ jobs:
           FIRESTORE_CREDENTIALS: ${{ secrets.FIRESTORE_CREDENTIALS }}
           MONGO_AUTH_CREDENTIALS: ${{ secrets.MONGO_AUTH_CREDENTIALS }}
           BQ_CREDENTIALS_SECRET_NAME: ${{ secrets.BQ_CREDENTIALS_SECRET_NAME }}
+          HTML_TO_PDF_URL: ${{ secrets.HTML_TO_PDF_URL }}
         run: >
            sam deploy
            --stack-name ReportingStaging
@@ -60,3 +61,4 @@ jobs:
            FirestoreCredentials=$FIRESTORE_CREDENTIALS
            MongoAuthCredentials=$MONGO_AUTH_CREDENTIALS
            BqCredentialsSecretName=$BQ_CREDENTIALS_SECRET_NAME
+           HtmlToPdfUrl=$HTML_TO_PDF_URL
