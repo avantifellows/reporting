@@ -6,8 +6,25 @@ from bs4 import BeautifulSoup
 from fastapi.responses import StreamingResponse, HTMLResponse
 from io import BytesIO
 
-# Import WeasyPrint from the layer
-from weasyprint import HTML
+# Import WeasyPrint from the layer, with fallback
+try:
+    from weasyprint import HTML
+
+    WEASYPRINT_AVAILABLE = True
+    logging.info("WeasyPrint successfully imported")
+except ImportError as e:
+    logging.error(f"Error importing WeasyPrint: {str(e)}")
+    logging.error(
+        "Make sure the WeasyPrint layer is properly attached to the Lambda function"
+    )
+    WEASYPRINT_AVAILABLE = False
+    HTML = None
+
+# Debug line to print Python environment details
+logging.info(f"Python executable: {os.sys.executable}")
+logging.info(f"Python version: {os.sys.version}")
+logging.info(f"PYTHONPATH: {os.environ.get('PYTHONPATH', 'Not set')}")
+logging.info(f"LD_LIBRARY_PATH: {os.environ.get('LD_LIBRARY_PATH', 'Not set')}")
 
 
 def convert_template_to_pdf(
@@ -31,6 +48,14 @@ def convert_template_to_pdf(
     # If debug is True, return the HTML content
     if debug:
         return HTMLResponse(content=html_content, status_code=200)
+
+    # Check if WeasyPrint is available
+    if not WEASYPRINT_AVAILABLE:
+        logging.error("WeasyPrint is not available. Cannot convert HTML to PDF.")
+        return HTMLResponse(
+            content="<h1>Error: PDF conversion is not available</h1><p>WeasyPrint library could not be loaded.</p>",
+            status_code=500,
+        )
 
     # Parse the HTML and inline CSS
     soup = BeautifulSoup(html_content, "html.parser")
