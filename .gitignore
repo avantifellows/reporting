@@ -166,4 +166,5 @@ cython_debug/
 .pyrighconfig.json
 
 # WeasyPrint layer zip files
+layers/
 layers/*.zip

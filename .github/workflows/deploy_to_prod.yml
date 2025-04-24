@@ -74,6 +74,15 @@ jobs:
           rm -rf .aws-sam || true
           sam --version
 
+      - name: Create build exclusions
+        run: |
+          mkdir -p .aws-sam
+          echo '[function_build_definitions]' > .aws-sam/build.toml
+          echo '[function_build_definitions.Function]' >> .aws-sam/build.toml
+          echo 'exclude_dir = ["layers"]' >> .aws-sam/build.toml
+          echo "Created SAM build exclusions file:"
+          cat .aws-sam/build.toml
+
       - name: Build with SAM
         run: sam build --use-container -t templates/prod.yaml --debug
 

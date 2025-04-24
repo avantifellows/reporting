@@ -1,0 +1,3 @@
+[function_build_definitions]
+[function_build_definitions.Function]
+exclude_dir = ["layers"]
