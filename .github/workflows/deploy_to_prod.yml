@@ -34,7 +34,7 @@ jobs:
         run: |
           mkdir -p layers
           echo "Downloading WeasyPrint layer from GitHub releases..."
-          curl -L -o layers/weasyprint-layer-python3.9-x86_64.zip \
+          curl -L -o layers/weasyprint-layer.zip \
             https://github.com/kotify/cloud-print-utils/releases/download/weasyprint-65.1/weasyprint-layer-python3.13-arm64.zip
           ls -la layers/
 
@@ -49,8 +49,9 @@ jobs:
             echo "Publishing WeasyPrint layer..."
             LAYER_VERSION=$(aws lambda publish-layer-version \
               --layer-name $LAYER_NAME \
-              --zip-file fileb://layers/weasyprint-layer-python3.9-x86_64.zip \
-              --compatible-runtimes python3.9 \
+              --zip-file fileb://layers/weasyprint-layer.zip \
+              --compatible-runtimes python3.13 \
+              --compatible-architectures arm64 \
               --query 'LayerVersionArn' \
               --output text)
           fi
