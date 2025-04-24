@@ -67,5 +67,4 @@ urllib3>=1.26.10,<2.0.0
 uvicorn>=0.18.2
 virtualenv==20.24.5
 websockets==10.4
-weasyprint>=60.0
 zipp==3.19.0

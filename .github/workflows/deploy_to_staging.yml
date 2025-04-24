@@ -81,12 +81,20 @@ jobs:
           mkdir -p .aws-sam
           echo '[function_build_definitions]' > .aws-sam/build.toml
           echo '[function_build_definitions.Function]' >> .aws-sam/build.toml
-          echo 'exclude_dir = ["layers"]' >> .aws-sam/build.toml
+          echo 'exclude_dir = ["layers", "tests", "__pycache__", ".pytest_cache", ".venv", "venv", "env", ".env"]' >> .aws-sam/build.toml
+          echo 'exclude_glob = ["*.zip", "*.pyc", "*.pyo", "*.so", "*.dist-info", "*.egg-info"]' >> .aws-sam/build.toml
           echo "Created SAM build exclusions file:"
           cat .aws-sam/build.toml
 
       - name: Build with SAM
         run: sam build --use-container -t templates/staging.yaml --debug
+
+      - name: Check package size
+        run: |
+          echo "Checking package size..."
+          find .aws-sam -type f -name "*.zip" -exec ls -lh {} \;
+          echo "Directory sizes:"
+          du -sh .aws-sam/*
 
       - name: Deploy
         env:
