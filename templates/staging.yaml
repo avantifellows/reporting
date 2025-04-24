@@ -35,7 +35,7 @@ Resources:
       FunctionName: "ReportingStaging"
       CodeUri: ../app
       Handler: main.handler
-      Runtime: python3.13
+      Runtime: python3.9
       Timeout: 120
       MemorySize: 1536
       Environment:
@@ -67,7 +67,7 @@ Resources:
           Properties:
             ApiId: !Ref Api
     Metadata:
-      BuildMethod: python3.13
+      BuildMethod: python3.9
       BuildArchitecture: x86_64
 
   Api:
