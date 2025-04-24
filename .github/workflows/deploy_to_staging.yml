@@ -32,6 +32,36 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-south-1
 
+      - name: Download WeasyPrint Layer
+        run: |
+          mkdir -p layers
+          echo "Downloading WeasyPrint layer from GitHub releases..."
+          curl -L -o layers/weasyprint-layer.zip \
+            https://github.com/kotify/cloud-print-utils/releases/download/weasyprint-65.1/weasyprint-layer-python3.13-x86_64.zip
+          ls -la layers/
+
+      - name: Publish WeasyPrint Layer
+        id: publish-layer
+        run: |
+          # Check if WeasyPrint layer already exists
+          LAYER_NAME="WeasyPrintLayer"
+          LAYER_VERSION=$(aws lambda list-layer-versions --layer-name $LAYER_NAME --query 'LayerVersions[0].LayerVersionArn' --output text 2>/dev/null || echo "")
+
+          if [ -z "$LAYER_VERSION" ] || [ "$LAYER_VERSION" == "None" ]; then
+            echo "Publishing WeasyPrint layer..."
+            LAYER_VERSION=$(aws lambda publish-layer-version \
+              --layer-name $LAYER_NAME \
+              --zip-file fileb://layers/weasyprint-layer.zip \
+              --compatible-runtimes python3.9 python3.13 \
+              --compatible-architectures x86_64 \
+              --description "WeasyPrint for PDF generation (Python 3.13 layer for Python 3.9 runtime)" \
+              --query 'LayerVersionArn' \
+              --output text)
+          fi
+
+          echo "WEASYPRINT_LAYER_ARN=$LAYER_VERSION" >> $GITHUB_ENV
+          echo "WeasyPrint Layer ARN: $LAYER_VERSION"
+
       - name: Verify dependencies file
         run: |
           echo "Checking requirements.txt file location and content:"
@@ -47,8 +77,25 @@ jobs:
           rm -rf .aws-sam || true
           sam --version
 
+      - name: Create build exclusions
+        run: |
+          mkdir -p .aws-sam
+          echo '[function_build_definitions]' > .aws-sam/build.toml
+          echo '[function_build_definitions.Function]' >> .aws-sam/build.toml
+          echo 'exclude_dir = ["layers", "tests", "__pycache__", ".pytest_cache", ".venv", "venv", "env", ".env"]' >> .aws-sam/build.toml
+          echo 'exclude_glob = ["*.zip", "*.pyc", "*.pyo", "*.so", "*.dist-info", "*.egg-info"]' >> .aws-sam/build.toml
+          echo "Created SAM build exclusions file:"
+          cat .aws-sam/build.toml
+
       - name: Build with SAM
         run: sam build --use-container -t templates/staging.yaml --debug
+
+      - name: Check package size
+        run: |
+          echo "Checking package size..."
+          find .aws-sam -type f -name "*.zip" -exec ls -lh {} \;
+          echo "Directory sizes:"
+          du -sh .aws-sam/*
 
       - name: Deploy
         env:
@@ -59,7 +106,6 @@ jobs:
           FIRESTORE_CREDENTIALS: ${{ secrets.FIRESTORE_CREDENTIALS }}
           MONGO_AUTH_CREDENTIALS: ${{ secrets.MONGO_AUTH_CREDENTIALS }}
           BQ_CREDENTIALS_SECRET_NAME: ${{ secrets.BQ_CREDENTIALS_SECRET_NAME }}
-          HTML_TO_PDF_SERVER_URL: ${{ secrets.HTML_TO_PDF_SERVER_URL }}
         run: >
            sam deploy
            --stack-name ReportingStaging
@@ -76,4 +122,4 @@ jobs:
            FirestoreCredentials=$FIRESTORE_CREDENTIALS
            MongoAuthCredentials=$MONGO_AUTH_CREDENTIALS
            BqCredentialsSecretName=$BQ_CREDENTIALS_SECRET_NAME
-           HtmlToPdfUrl=$HTML_TO_PDF_SERVER_URL
+           WeasyPrintLayerArn=$WEASYPRINT_LAYER_ARN

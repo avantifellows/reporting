@@ -1,0 +1,4 @@
+[function_build_definitions]
+[function_build_definitions.Function]
+exclude_dir = ["layers", "tests", "__pycache__", ".pytest_cache", ".venv", "venv", "env", ".env"]
+exclude_glob = ["*.zip", "*.pyc", "*.pyo", "*.so", "*.dist-info", "*.egg-info"]

@@ -164,3 +164,7 @@ cython_debug/
 
 # Zed specific
 .pyrighconfig.json
+
+# WeasyPrint layer zip files
+layers/
+layers/*.zip
