@@ -24,9 +24,9 @@ Parameters:
   BqCredentialsSecretName:
     Type: String
     Description: Name of the Secrets Manager secret containing BigQuery credentials
-  HtmlToPdfUrl:
+  WeasyPrintLayerArn:
     Type: String
-    Description: URL of the HTML to PDF conversion service
+    Description: ARN of the WeasyPrint Lambda Layer
 
 Resources:
   Function:
@@ -36,8 +36,8 @@ Resources:
       CodeUri: ../app
       Handler: main.handler
       Runtime: python3.9
-      Timeout: 60
-      MemorySize: 1024
+      Timeout: 120
+      MemorySize: 1536
       Environment:
         Variables:
           DYNAMODB_URL: !Ref DynamodbUrl
@@ -47,7 +47,13 @@ Resources:
           MONGO_AUTH_CREDENTIALS: !Ref MongoAuthCredentials
           FIRESTORE_CREDENTIALS: !Ref FirestoreCredentials
           BQ_CREDENTIALS_SECRET_NAME: !Ref BqCredentialsSecretName
-          HTML_TO_PDF_SERVER_URL: !Ref HtmlToPdfUrl
+          # WeasyPrint environment variables
+          LD_LIBRARY_PATH: "/opt/lib"
+          FONTCONFIG_PATH: "/opt/fonts"
+          GDK_PIXBUF_MODULE_FILE: "/opt/lib/loaders.cache"
+          XDG_DATA_DIRS: "/opt/lib"
+      Layers:
+        - !Ref WeasyPrintLayerArn
       Policies:
         - Statement:
             - Effect: Allow

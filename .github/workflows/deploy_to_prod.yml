@@ -30,27 +30,33 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-south-1
 
-      - name: Install WeasyPrint dependencies
+      - name: Download WeasyPrint Layer
         run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends \
-            build-essential \
-            python3-dev \
-            python3-pip \
-            python3-setuptools \
-            python3-wheel \
-            python3-cffi \
-            libcairo2 \
-            libpango-1.0-0 \
-            libpangocairo-1.0-0 \
-            libgdk-pixbuf2.0-0 \
-            libffi-dev \
-            shared-mime-info \
-            libglib2.0-0 \
-            libglib2.0-dev \
-            libgirepository1.0-dev \
-            gir1.2-pango-1.0 \
-            gir1.2-gtk-3.0
+          mkdir -p layers
+          echo "Downloading WeasyPrint layer from GitHub releases..."
+          curl -L -o layers/weasyprint-layer-python3.9-x86_64.zip \
+            https://github.com/kotify/cloud-print-utils/releases/download/weasyprint-65.1/weasyprint-layer-python3.13-arm64.zip
+          ls -la layers/
+
+      - name: Publish WeasyPrint Layer
+        id: publish-layer
+        run: |
+          # Check if WeasyPrint layer already exists
+          LAYER_NAME="WeasyPrintLayer"
+          LAYER_VERSION=$(aws lambda list-layer-versions --layer-name $LAYER_NAME --query 'LayerVersions[0].LayerVersionArn' --output text 2>/dev/null || echo "")
+
+          if [ -z "$LAYER_VERSION" ] || [ "$LAYER_VERSION" == "None" ]; then
+            echo "Publishing WeasyPrint layer..."
+            LAYER_VERSION=$(aws lambda publish-layer-version \
+              --layer-name $LAYER_NAME \
+              --zip-file fileb://layers/weasyprint-layer-python3.9-x86_64.zip \
+              --compatible-runtimes python3.9 \
+              --query 'LayerVersionArn' \
+              --output text)
+          fi
+
+          echo "WEASYPRINT_LAYER_ARN=$LAYER_VERSION" >> $GITHUB_ENV
+          echo "WeasyPrint Layer ARN: $LAYER_VERSION"
 
       - name: Verify dependencies file
         run: |
@@ -95,3 +101,4 @@ jobs:
           FirestoreCredentials=$FIRESTORE_CREDENTIALS
           MongoAuthCredentials=$MONGO_AUTH_CREDENTIALS
           BqCredentialsSecretName=$BQ_CREDENTIALS_SECRET_NAME
+          WeasyPrintLayerArn=$WEASYPRINT_LAYER_ARN

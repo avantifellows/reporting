@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup
 from fastapi.responses import StreamingResponse, HTMLResponse
 from io import BytesIO
 
-# Import WeasyPrint
+# Import WeasyPrint from the layer
 from weasyprint import HTML
 
 
