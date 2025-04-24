@@ -27,9 +27,9 @@ if [ -z "$LAYER_VERSION" ] || [ "$LAYER_VERSION" == "None" ]; then
     --region $REGION \
     --layer-name $LAYER_NAME \
     --zip-file fileb://layers/weasyprint-layer.zip \
-    --compatible-runtimes python3.13 \
+    --compatible-runtimes python3.9 python3.13 \
     --compatible-architectures x86_64 \
-    --description "WeasyPrint for PDF generation (Python 3.13)" \
+    --description "WeasyPrint for PDF generation (Python 3.13 layer for Python 3.9 runtime)" \
     --query 'LayerVersionArn' \
     --output text)
 
@@ -40,9 +40,9 @@ else
     --region $REGION \
     --layer-name $LAYER_NAME \
     --zip-file fileb://layers/weasyprint-layer.zip \
-    --compatible-runtimes python3.13 \
+    --compatible-runtimes python3.9 python3.13 \
     --compatible-architectures x86_64 \
-    --description "WeasyPrint for PDF generation (Python 3.13)" \
+    --description "WeasyPrint for PDF generation (Python 3.13 layer for Python 3.9 runtime)" \
     --query 'LayerVersionArn' \
     --output text)
 
