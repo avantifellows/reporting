@@ -13,7 +13,12 @@ from routers.student_quiz_reports import StudentQuizReportsRouter
 
 from fastapi.staticfiles import StaticFiles
 
-app = FastAPI()
+
+app = FastAPI(
+    title="Reporting API",
+    description="API for generating reports",
+    version="0.1.0",
+)
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
@@ -52,6 +57,12 @@ app.include_router(quiz_reports_router.router)
 @app.get("/")
 def index():
     return "Hello World! Welcome to Reporting Engine!"
+
+
+@app.get("/debug/weasyprint")
+async def debug_weasyprint():
+    """Debug endpoint for testing WeasyPrint layer"""
+    return app.test_weasyprint.handler({}, None)
 
 
 handler = Mangum(app)
