@@ -35,7 +35,7 @@ Resources:
       FunctionName: "ReportingStaging"
       CodeUri: ../app
       Handler: main.handler
-      Runtime: python3.9
+      Runtime: python3.13
       Timeout: 120
       MemorySize: 1536
       Environment:
@@ -52,7 +52,7 @@ Resources:
           FONTCONFIG_PATH: "/opt/fonts"
           GDK_PIXBUF_MODULE_FILE: "/opt/lib/loaders.cache"
           XDG_DATA_DIRS: "/opt/lib"
-          PYTHONPATH: "/var/runtime:/var/task:/opt/python/lib/python3.9/site-packages"
+          PYTHONPATH: "/var/runtime:/var/task:/opt/python/lib/python3.13/site-packages"
       Layers:
         - !Ref WeasyPrintLayerArn
       Policies:
@@ -67,7 +67,7 @@ Resources:
           Properties:
             ApiId: !Ref Api
     Metadata:
-      BuildMethod: python3.9
+      BuildMethod: python3.13
       BuildArchitecture: x86_64
 
   Api:
