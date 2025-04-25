@@ -1,5 +1,9 @@
+import io
+from typing import Optional
 from fastapi import APIRouter, HTTPException, Request
+from fastapi.responses import StreamingResponse
 from fastapi.templating import Jinja2Templates
+import pandas as pd
 from db.sessions_db import SessionsDB
 from db.quiz_db import QuizDB
 
@@ -61,6 +65,80 @@ class SessionQuizReportsRouter:
             return self._templates.TemplateResponse(
                 "live_session_report.html",
                 {"request": request, "session_id": "", "data": data},
+            )
+
+        @api_router.get("/session_report/{session_id}")
+        def get_session_report(
+            request: Request,
+            session_id: str,
+            format: Optional[str] = None,
+            sort_by: Optional[str] = None,
+        ):
+            """
+            Returns list of all the students for a given Session ID
+            params:
+                session_id: The session ID
+            """
+            students = self.__reports_db.get_all_students_by_session(session_id)
+
+            # Formatting students for response
+            formatted_students = [
+                {
+                    "user_id": item["user_id-section"].split("#")[0],
+                    "marks_scored": item.get("marks_scored", 0),
+                    "percentage": item.get("percentage", 0),
+                    "rank": item.get("rank", None),
+                }
+                for item in students
+                if "user_id-section" in item and "overall" in item["user_id-section"]
+            ]
+
+            if sort_by == "highest_score":
+                formatted_students.sort(
+                    key=lambda x: (
+                        -x["marks_scored"]
+                        if x["marks_scored"] is not None
+                        else float("-inf")
+                    )
+                )
+            if format == "json":
+                return {"session_id": session_id, "students": formatted_students}
+            elif format == "excel":
+                # Create DataFrame for Excel export
+                df = pd.DataFrame(formatted_students)
+                # Rename columns for better readability
+                df = df.rename(
+                    columns={
+                        "user_id": "Student ID",
+                        "marks_scored": "Marks",
+                        "percentage": "Percentage",
+                        "rank": "Rank",
+                    }
+                )
+
+                # Create Excel file
+                output = io.BytesIO()
+                with pd.ExcelWriter(output, engine="openpyxl") as writer:
+                    df.to_excel(writer, index=False, sheet_name="Student Reports")
+                output.seek(0)
+
+                # Return Excel file as response
+                headers = {
+                    "Content-Disposition": f'attachment; filename="session_{session_id}_report.xlsx"'
+                }
+                return StreamingResponse(
+                    output,
+                    media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    headers=headers,
+                )
+
+            return self._templates.TemplateResponse(
+                "session_report.html",
+                {
+                    "request": request,
+                    "session_id": session_id,
+                    "students": formatted_students,
+                },
             )
 
         return api_router

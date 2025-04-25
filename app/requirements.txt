@@ -1,97 +1,56 @@
-# annotated-types==0.6.0
-# anyio==3.7.1
-# autopep8==1.6.0
-# boto3==1.24.35
-# botocore==1.27.35
-# cachetools==5.3.2
-# certifi==2022.12.7
-# cfgv==3.4.0
-# charset-normalizer==3.3.2
-# click==8.1.3
-# distlib==0.3.7
-# dnspython==2.4.2
-# fastapi==0.103.2
-# filelock==3.12.4
-# google-api-core==2.15.0
-# google-auth==2.26.2
-# google-cloud-core==2.4.1
-# google-cloud-firestore==2.14.0
-# googleapis-common-protos==1.62.0
-# grpcio==1.60.0
-# grpcio-status==1.60.0
-# h11==0.13.0
-# httpcore==0.16.3
-# httpx==0.23.3
-# identify==2.5.30
-# idna==3.3
-# Jinja2==3.1.2
-# jmespath==1.0.1
-# mangum==0.15.1
-# MarkupSafe==2.1.1
-# nodeenv==1.8.0
-# platformdirs==3.11.0
-# pre-commit==3.4.0
-# proto-plus==1.23.0
-# protobuf==4.25.2
-# pyasn1==0.5.1
-# pyasn1-modules==0.3.0
-# pycodestyle==2.8.0
-# pydantic==2.4.2
-# pydantic_core==2.10.1
-# pymongo==4.6.1
-# python-dateutil==2.8.2
-# python-dotenv==0.20.0
-# PyYAML==6.0.1
-# requests==2.31.0
-# rfc3986==1.5.0
-# rsa==4.9
-# s3transfer==0.6.0
-# six==1.16.0
-# sniffio==1.2.0
-# starlette==0.27.0
-# toml==0.10.2
-# typing_extensions==4.8.0
-# urllib3==1.26.10
-# uvicorn==0.18.2
-# virtualenv==20.24.5
-annotated-types
-anyio
-autopep8
-boto3
-botocore
-certifi
-cfgv
-click
-distlib
-fastapi
-filelock
-h11
-httpcore
-httpx
-identify
-idna
-Jinja2
-jmespath
-mangum
-MarkupSafe
-nodeenv
-platformdirs
-pre-commit
-pycodestyle
-pydantic
-pydantic_core
-python-dateutil
-python-dotenv
-PyYAML
-rfc3986
-s3transfer
-six
-sniffio
-starlette
-toml
-typing_extensions
-urllib3
-uvicorn
-virtualenv
-google-cloud
-pandas
+annotated-types==0.6.0
+anyio==3.7.1
+autopep8==1.6.0
+boto3==1.24.35
+botocore==1.27.35
+cachetools==5.3.2
+certifi==2022.12.7
+cfgv==3.4.0
+charset-normalizer==3.3.2
+click==8.1.3
+distlib==0.3.7
+dnspython==2.4.2
+fastapi==0.103.2
+filelock==3.12.4
+google-api-core==2.15.0
+google-auth==2.26.2
+google-cloud-core==2.4.1
+google-cloud-firestore==2.14.0
+googleapis-common-protos==1.62.0
+grpcio==1.60.0
+grpcio-status==1.60.0
+h11==0.13.0
+httpcore==0.16.3
+httpx==0.23.3
+identify==2.5.30
+idna==3.3
+Jinja2==3.1.2
+jmespath==1.0.1
+mangum==0.15.1
+MarkupSafe==2.1.1
+nodeenv==1.8.0
+platformdirs==3.11.0
+pre-commit==3.4.0
+proto-plus==1.23.0
+protobuf==4.25.2
+pyasn1==0.5.1
+pyasn1-modules==0.3.0
+pycodestyle==2.8.0
+pydantic==2.4.2
+pydantic_core==2.10.1
+pymongo==4.6.1
+python-dateutil==2.8.2
+python-dotenv==0.20.0
+PyYAML==6.0.1
+requests==2.31.0
+rfc3986==1.5.0
+rsa==4.9
+s3transfer==0.6.0
+six==1.16.0
+sniffio==1.2.0
+starlette==0.27.0
+toml==0.10.2
+typing_extensions==4.8.0
+urllib3==1.26.10
+uvicorn==0.18.2
+virtualenv==20.24.5

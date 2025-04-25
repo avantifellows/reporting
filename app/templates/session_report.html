@@ -8,7 +8,7 @@
 .btn-primary, .btn-success {
     background-color: #FFD700;  /* Yellow background */
     border-color: #DAA520;     /* Darker yellow border */
-    color: #000;               /* Black text for better contrast */
+    color: #000;               /* Black text */
 }
 
 .btn-primary:hover, .btn-success:hover {
@@ -54,7 +54,7 @@
       <button id="sortToggleBtn" class="btn btn-sm btn-primary">Sort by Highest Score</button>
 
       <!-- Download Excel -->
-      <a href="/reports/session_students/{{ session_id }}?format=excel" class="btn btn-sm btn-success">Download Excel</a>
+      <a href="/reports/session_report/{{ session_id }}?format=excel" class="btn btn-sm btn-success">Download Excel</a>
     </div>
   </div>
   </div>

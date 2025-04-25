@@ -1,5 +1,4 @@
 from fastapi import APIRouter, Request
-from fastapi.responses import StreamingResponse
 from fastapi.templating import Jinja2Templates
 from fastapi import HTTPException, Depends
 from collections import OrderedDict
@@ -9,8 +8,6 @@ from db.reports_db import ReportsDB
 from db.bq_db import BigQueryDB
 from auth import verify_token
 from fastapi.security.api_key import APIKeyHeader
-import pandas as pd
-import io
 
 import json
 
@@ -92,7 +89,9 @@ class StudentQuizReportsRouter:
             section_report["table_data"] = table_data
             return section_report
 
-        def _get_chapter_priority_ordering(section_reports, chapter_to_link_map):
+        def _get_chapter_priority_ordering(
+            section_reports, chapter_to_link_map, stream
+        ):
             """order chapterwise section reports based on priority"""
             updated_reports = []
             for section_report in section_reports:
@@ -117,9 +116,14 @@ class StudentQuizReportsRouter:
                             chapter_code = chapter_name.strip()
 
                         if chapter_code in chapter_to_link_map:
-                            priority = chapter_to_link_map[chapter_code].get(
-                                "Priority", "Low"
-                            )
+                            if stream == "JEE":
+                                priority = chapter_to_link_map[chapter_code].get(
+                                    "Priority_J", "Low"
+                                )
+                            elif stream == "NEET":
+                                priority = chapter_to_link_map[chapter_code].get(
+                                    "Priority_N", "Low"
+                                )
                             updated_chapter["priority"] = priority
                         else:
                             updated_chapter["priority"] = "Low"
@@ -141,7 +145,7 @@ class StudentQuizReportsRouter:
 
             return updated_reports
 
-        def _get_chapter_for_revision(section_reports, chapter_to_link_map):
+        def _get_chapter_for_revision(section_reports, chapter_to_link_map, stream):
             """Determine which chapter needs revision based on performance metrics."""
             revision_candidates = []
 
@@ -185,9 +189,14 @@ class StudentQuizReportsRouter:
                 selected_chapter_name = revision_candidates[0]["chapter_name"]
                 chapter_link = chapter_to_link_map.get(selected_chapter_code, "")
                 if selected_chapter_code in chapter_to_link_map:
-                    chapter_link = chapter_to_link_map[selected_chapter_code].get(
-                        "Link", ""
-                    )
+                    if stream == "JEE":
+                        chapter_link = chapter_to_link_map[selected_chapter_code].get(
+                            "Link_J", ""
+                        )
+                    elif stream == "NEET":
+                        chapter_link = chapter_to_link_map[selected_chapter_code].get(
+                            "Link_N", ""
+                        )
                 else:
                     chapter_link = ""
                 return selected_chapter_name, chapter_link
@@ -329,76 +338,6 @@ class StudentQuizReportsRouter:
                 {"request": request, "report_data": report_data},
             )
 
-        @api_router.get("/session_students/{session_id}")
-        def get_session_students(
-            request: Request,
-            session_id: str,
-            format: Optional[str] = None,
-            sort_by: Optional[str] = None,
-        ):
-            students = self.__reports_db.get_all_students_by_session(session_id)
-
-            # Formatting students for response
-            formatted_students = [
-                {
-                    "user_id": item["user_id-section"].split("#")[0],
-                    "marks_scored": item.get("marks_scored", 0),
-                    "percentage": item.get("percentage", 0),
-                    "rank": item.get("rank", None),
-                }
-                for item in students
-                if "user_id-section" in item and "overall" in item["user_id-section"]
-            ]
-
-            if sort_by == "highest_score":
-                formatted_students.sort(
-                    key=lambda x: (
-                        -x["marks_scored"]
-                        if x["marks_scored"] is not None
-                        else float("-inf")
-                    )
-                )
-
-            if format == "json":
-                return {"session_id": session_id, "students": formatted_students}
-            elif format == "excel":
-                # Create DataFrame for Excel export
-                df = pd.DataFrame(formatted_students)
-                # Rename columns for better readability
-                df = df.rename(
-                    columns={
-                        "user_id": "Student ID",
-                        "marks_scored": "Marks",
-                        "percentage": "Percentage",
-                        "rank": "Rank",
-                    }
-                )
-
-                # Create Excel file
-                output = io.BytesIO()
-                with pd.ExcelWriter(output, engine="openpyxl") as writer:
-                    df.to_excel(writer, index=False, sheet_name="Student Reports")
-                output.seek(0)
-
-                # Return Excel file as response
-                headers = {
-                    "Content-Disposition": f'attachment; filename="session_{session_id}_students.xlsx"'
-                }
-                return StreamingResponse(
-                    output,
-                    media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                    headers=headers,
-                )
-
-            return self._templates.TemplateResponse(
-                "session_students_report.html",
-                {
-                    "request": request,
-                    "session_id": session_id,
-                    "students": formatted_students,
-                },
-            )
-
         @api_router.get("/student_quiz_report/v3/{session_id}/{user_id}")
         def student_quiz_report_v3(request: Request, session_id: str, user_id: str):
             """
@@ -461,19 +400,15 @@ class StudentQuizReportsRouter:
             )
             qualification_status = student_al_data["qualification_status"]
             marks_to_qualify = student_al_data["marks_to_qualify"]
-
-            report_data["message_part_1"] = ""
-            if qualification_status == "Qualified":
-                report_data["message_part_1"] = (
-                    "Good Job! You are on track to clear JEE Mains!"
-                )
-            else:
-                report_data["message_part_1"] = (
-                    f"Close enough! You are just {int(marks_to_qualify)} marks away from clearing JEE Mains."
-                )
+            chapter_for_revision = student_al_data["chapter_curriculum"]
+            revision_chapter_link = student_al_data["dpp_recommendation"]
 
             section_reports = []
             overall_performance = {}
+
+            # determine if neet or jee; jee by default
+            stream = "JEE"
+
             for section in data:
                 parsed_section_data = _parse_section_data(section)
                 if section["section"] == "overall":
@@ -485,19 +420,40 @@ class StudentQuizReportsRouter:
                     report_data["test_date"] = section["start_date"]
                 else:
                     section_reports.append(parsed_section_data)
+                    if section["section"] == "Biology":
+                        stream = "NEET"
+
             report_data["overall_performance"] = overall_performance
             report_data["section_reports"] = section_reports
 
             chapter_to_link_map = json.load(open("./static/chapter_to_links.json", "r"))
 
             report_data["section_reports"] = _get_chapter_priority_ordering(
-                section_reports, chapter_to_link_map
+                section_reports, chapter_to_link_map, stream
             )
 
-            (
-                chapter_for_revision,
-                report_data["revision_chapter_link"],
-            ) = _get_chapter_for_revision(section_reports, chapter_to_link_map)
+            # (
+            #     chapter_for_revision,
+            #     report_data["revision_chapter_link"],
+            # ) = _get_chapter_for_revision(section_reports, chapter_to_link_map, stream)
+
+            exam = "JEE"
+            if stream == "JEE":
+                exam = "JEE Mains"
+            elif stream == "NEET":
+                exam = "NEET"
+
+            report_data["message_part_1"] = ""
+            if qualification_status == "Qualified":
+                report_data["message_part_1"] = (
+                    f"Good Job! You are on track to clear {exam}!"
+                )
+            else:
+                report_data["message_part_1"] = (
+                    f"Close enough! You are just {int(marks_to_qualify)} marks away from clearing {exam}."
+                )
+
+            report_data["revision_chapter_link"] = revision_chapter_link
 
             if chapter_for_revision != "":
                 report_data["message_part_2"] = (
