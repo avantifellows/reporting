@@ -1,18 +1,18 @@
-# Base image
-FROM python:3.9
+FROM python:3.9-slim
 
-LABEL Pritam "pritam@avantifellows.org"
+WORKDIR /app
 
-WORKDIR /code
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
 
-COPY requirements.txt /code/requirements.txt
-ADD generate_table /app
+# Install Python dependencies
+COPY app/requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-RUN pip install -r /code/requirements.txt
+# Copy application code
+COPY app/ .
 
-COPY ./app /code
-
-EXPOSE 80
-
-# RUN python generate_table
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "5050", "--reload"]
+# Run the application
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "5050"]

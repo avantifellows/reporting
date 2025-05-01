@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./app:/app
+    ports:
+      - "5050:5050"
+    environment:
+      - DYNAMODB_URL=http://dynamodb:8000
+      - DYNAMODB_REGION=us-east-1
+      - DYNAMODB_ACCESS_KEY=localkey
+      - DYNAMODB_SECRET_KEY=localsecret
+      - MONGO_AUTH_CREDENTIALS=mongodb://mongo:27017/quiz_db
+      - BQ_CREDENTIALS_SECRET_NAME=local-bq-credentials
+    depends_on:
+      - dynamodb
+      - mongo
+    command: uvicorn main:app --host 0.0.0.0 --port 5050 --reload
+
+  dynamodb:
+    image: amazon/dynamodb-local
+    ports:
+      - "8000:8000"
+    volumes:
+      - dynamodb_data:/home/dynamodblocal/data
+    command: "-jar DynamoDBLocal.jar -sharedDb -dbPath /home/dynamodblocal/data"
+
+  dynamodb-admin:
+    image: aaronshaf/dynamodb-admin
+    ports:
+      - "8001:8001"
+    environment:
+      - DYNAMO_ENDPOINT=http://dynamodb:8000
+      - AWS_REGION=us-east-1
+      - AWS_ACCESS_KEY_ID=localkey
+      - AWS_SECRET_ACCESS_KEY=localsecret
+    depends_on:
+      - dynamodb
+
+  mongo:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  mongo-express:
+    image: mongo-express
+    ports:
+      - "8081:8081"
+    environment:
+      - ME_CONFIG_MONGODB_SERVER=mongo
+    depends_on:
+      - mongo
+
+volumes:
+  dynamodb_data:
+    external: true
+  mongo_data:
