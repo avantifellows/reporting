@@ -24,6 +24,9 @@ Parameters:
   BqCredentialsSecretName:
     Type: String
     Description: Name of the Secrets Manager secret containing BigQuery credentials
+  HtmlToPdfUrl:
+    Type: String
+    Description: URL of the HTML to PDF conversion service
 
 Resources:
   Function:
@@ -33,6 +36,8 @@ Resources:
       CodeUri: ../app
       Handler: main.handler
       Runtime: python3.9
+      Timeout: 60
+      MemorySize: 1024
       Environment:
         Variables:
           DYNAMODB_URL: !Ref DynamodbUrl
@@ -42,6 +47,7 @@ Resources:
           MONGO_AUTH_CREDENTIALS: !Ref MongoAuthCredentials
           FIRESTORE_CREDENTIALS: !Ref FirestoreCredentials
           BQ_CREDENTIALS_SECRET_NAME: !Ref BqCredentialsSecretName
+          HTML_TO_PDF_SERVER_URL: !Ref HtmlToPdfUrl
       Policies:
         - Statement:
             - Effect: Allow
@@ -53,6 +59,9 @@ Resources:
           Type: HttpApi
           Properties:
             ApiId: !Ref Api
+    Metadata:
+      BuildMethod: python3.9
+      BuildArchitecture: x86_64
 
   Api:
     Type: AWS::Serverless::HttpApi
