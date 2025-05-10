@@ -485,7 +485,7 @@ class StudentQuizReportsRouter:
                 exam = "NEET"
 
             report_data["message_part_1"] = ""
-            if qualification_status == "Qualified":
+            if qualification_status == "Qualified" or marks_to_qualify is None:
                 report_data[
                     "message_part_1"
                 ] = f"Good Job! You are on track to clear {exam}!"
