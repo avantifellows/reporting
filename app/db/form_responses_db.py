@@ -20,23 +20,24 @@ class FormResponsesDB:
             user_id: The user ID
         """
         try:
-            table_name = os.environ.get("DYNAMODB_FORM_RESPONSES_TABLE_NAME", "form_question_responses")
+            table_name = os.environ.get(
+                "DYNAMODB_FORM_RESPONSES_TABLE_NAME", "form_question_responses"
+            )
             table = self.__db.Table(table_name)
-            
+
             # Query by session_id and filter by user_id
             response = table.query(
                 KeyConditionExpression=Key("session_id").eq(session_id)
             )
-            
+
             # Filter responses for the specific user
             user_responses = [
-                item for item in response["Items"] 
-                if item.get("user_id") == user_id
+                item for item in response["Items"] if item.get("user_id") == user_id
             ]
-            
+
             # Sort by question_position_index to maintain order
             user_responses.sort(key=lambda x: int(x.get("question_position_index", 0)))
-            
+
             return user_responses
         except ClientError as e:
             raise ValueError(e.response["Error"]["Message"])
@@ -48,11 +49,13 @@ class FormResponsesDB:
             session_id: The session ID
         """
         try:
-            table_name = os.environ.get("DYNAMODB_FORM_RESPONSES_TABLE_NAME", "form_question_responses")
+            table_name = os.environ.get(
+                "DYNAMODB_FORM_RESPONSES_TABLE_NAME", "form_question_responses"
+            )
             table = self.__db.Table(table_name)
             response = table.query(
                 KeyConditionExpression=Key("session_id").eq(session_id)
             )
             return response.get("Items", [])
         except ClientError as e:
-            raise ValueError(e.response["Error"]["Message"]) 
+            raise ValueError(e.response["Error"]["Message"])
