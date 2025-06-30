@@ -1,0 +1,188 @@
+{% extends "layout.html" %}
+{% block title %}Form Responses{% endblock %}
+{% block content %}
+
+<div id="name_card">
+  <p>User ID: {{report_data["user_id"]}}
+  <p>Session ID: {{report_data["session_id"]}}
+</div>
+
+<div id="test_summary_card">
+  <div class="form_summary">
+    <div class="test_details">
+      <div>{{report_data["test_name"]}}</div>
+      {% if report_data["start_date"] %}
+        <div>{{report_data["start_date"]}}</div>
+      {% endif %}
+      <div>Total Questions: {{report_data["total_questions"]}}</div>
+    </div>
+  </div>
+</div>
+
+<section id="form_responses_section">
+  <div id="section_heading">Form Responses</div>
+  
+  <table id="form_responses_table">
+    <thead>
+      <tr>
+        <th class="question_number_col">Question #</th>
+        <th class="theme_col">Theme</th>
+        <th class="question_text_col">Question</th>
+        <th class="response_col">Response</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for response in report_data["responses"] %}
+        <tr>
+          <td class="question_number">{{ response["question_number"] }}</td>
+          <td class="theme">{{ response["question_set_title"] }}</td>
+          <td class="question_text">{{ response["question_text"] }}</td>
+          <td class="user_response {% if response['user_response'] == 'None' %}unanswered{% endif %}">
+            {{ response["user_response"] }}
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+
+<style>
+  #form_responses_table {
+    width: 70%;
+    border-collapse: collapse;
+    margin: 30px auto;
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+
+  #form_responses_table th {
+    background-color: orange;
+    color: black;
+    font-weight: bold;
+    padding: 10px 8px;
+    text-align: center;
+    border: 1px solid #ddd;
+    font-size: 16pt;
+  }
+
+  #form_responses_table td {
+    padding: 10px 8px;
+    border: 1px solid #ddd;
+    vertical-align: top;
+    font-size: 16pt;
+  }
+
+  /* Alternating row colors like other Avanti tables */
+  #form_responses_table tr:nth-child(even) {
+    background-color: white;
+  }
+
+  #form_responses_table tr:nth-child(odd) {
+    background-color: #FEFBEB;
+  }
+
+  #form_responses_table tr:hover {
+    background-color: #ddd;
+  }
+
+  .question_number_col {
+    width: 10%;
+  }
+
+  .theme_col {
+    width: 20%;
+  }
+
+  .question_text_col {
+    width: 45%;
+  }
+
+  .response_col {
+    width: 25%;
+  }
+
+  .question_number {
+    text-align: center;
+    font-weight: bold;
+    color: #333;
+  }
+
+  .theme {
+    font-weight: bold;
+    color: #333;
+    text-align: center;
+    word-wrap: break-word;
+  }
+
+  .question_text {
+    line-height: 1.4;
+    text-align: left;
+    word-wrap: break-word;
+    white-space: normal;
+  }
+
+  .user_response {
+    font-weight: 500;
+    text-align: left;
+    word-wrap: break-word;
+    white-space: normal;
+  }
+
+  .unanswered {
+    color: #6c757d;
+    font-style: italic;
+  }
+
+  .form_summary {
+    text-align: center;
+    padding: 20px;
+    background-color: transparent;
+    border-radius: 8px;
+    margin: 20px 0;
+  }
+
+  .test_details {
+    font-size: 18px;
+  }
+
+  .test_details div {
+    margin: 5px 0;
+  }
+
+  .test_details div:first-child {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+  }
+
+  @media (max-width: 768px) {
+    #form_responses_table {
+      width: 95%;
+      font-size: 14px;
+    }
+    
+    #form_responses_table th,
+    #form_responses_table td {
+      padding: 8px 4px;
+      font-size: 14pt;
+    }
+    
+    .question_number_col {
+      width: 8%;
+    }
+    
+    .theme_col {
+      width: 18%;
+    }
+    
+    .question_text_col {
+      width: 47%;
+    }
+    
+    .response_col {
+      width: 27%;
+    }
+  }
+</style>
+
+{% endblock %} 
