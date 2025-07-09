@@ -42,10 +42,10 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-south-1
 
-      - name: Export requirements for SAM
+      - name: Generate requirements for SAM
         run: |
-          echo "Exporting requirements.txt from pyproject.toml for SAM compatibility:"
-          uv export --format requirements-txt --output-file app/requirements.txt
+          echo "Generating requirements.txt using uv pip freeze:"
+          uv pip freeze > app/requirements.txt
           echo "Generated requirements.txt content:"
           cat app/requirements.txt
 

@@ -1,31 +1,7 @@
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
-
 [project]
 name = "avanti-reporting"
 version = "0.1.0"
-description = "Avanti Fellows Reporting Engine - FastAPI-based web application for student quiz reports"
-readme = "README.md"
 requires-python = ">=3.11"
-license = {text = "MIT"}
-authors = [
-    {name = "Avanti Fellows", email = "team@avantifellows.org"},
-]
-keywords = ["reporting", "education", "fastapi", "quiz", "analytics"]
-classifiers = [
-    "Development Status :: 4 - Beta",
-    "Framework :: FastAPI",
-    "Intended Audience :: Education",
-    "License :: OSI Approved :: MIT License",
-    "Operating System :: OS Independent",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
-    "Programming Language :: Python :: 3.13",
-    "Topic :: Education",
-    "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
-]
 
 dependencies = [
     "annotated-types>=0.7.0",
@@ -98,18 +74,10 @@ dev = [
     "zipp>=3.23.0",
 ]
 
-[project.urls]
-Homepage = "https://github.com/avantifellows/reporting"
-Repository = "https://github.com/avantifellows/reporting"
-Issues = "https://github.com/avantifellows/reporting/issues"
+[tool.hatch.build.targets.wheel]
+packages = ["app"]
 
 [tool.uv]
 dev-dependencies = [
     "pre-commit>=4.2.0",
 ]
-
-[tool.hatch.build.targets.wheel]
-packages = ["app"]
-
-[tool.hatch.metadata]
-allow-direct-references = true
