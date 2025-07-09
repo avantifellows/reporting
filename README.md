@@ -4,13 +4,7 @@ Welcome to the Avanti Fellows Reporting Engine!
 
 ## Setting up the Reporting Engine locally
 
-Make sure Python 3.9+ is installed in your system
-
-0. Install pre-commit hooks in the repo
-```
-pip install pre-commit
-pre-commit install
-```
+Make sure Python 3.11+ is installed in your system
 
 1. Get everything running with:
 
@@ -41,23 +35,61 @@ Reporting FastAPI Server: localhost:5050 (docs and API tryout at localhost:5050/
 DynamoDB server: localhost:8000 (we won't access this directly)
 
 
-## Connect with DynamoDB Server
-0. Install pre-commit hooks in the repo
+## Local Setup Without Docker
+
+### Prerequisites
+- Python 3.11+ installed
+- [uv](https://docs.astral.sh/uv/) package manager installed
+
+### Setup Steps
+
+1. **Install dependencies and create virtual environment**
+```bash
+uv sync
 ```
-pip install pre-commit
-pre-commit install
+
+2. **Install pre-commit hooks**
+```bash
+uv run pre-commit install
 ```
-1. Create a `.env.local` file using `.env.example`.
-```sh
+
+3. **Create environment file**
+```bash
 cp .env.example .env.local
 ```
-2. Obtain credentials to replace local keys in the newly created `.env.local` file from repository owners.
 
-3. Run the following to get app at `localhost:5050/docs`
+4. **Configure credentials**
+Obtain credentials from repository owners and replace the local keys in the `.env.local` file.
+
+5. **Run the FastAPI server**
+```bash
+uv run uvicorn app.main:app --port 5050 --reload
 ```
-cd app; uvicorn main:app --port 5050 --reload
+
+The application will be available at `localhost:5050/docs`
+
+### Development Commands
+
+**Update dependencies:**
+```bash
+uv sync --upgrade
 ```
-### Deployment
+
+**Run code quality checks:**
+```bash
+uv run pre-commit run --all-files
+```
+
+**Add new dependency:**
+```bash
+uv add <package-name>
+```
+
+**Add development dependency:**
+```bash
+uv add --dev <package-name>
+```
+## Deployment
 We deploy our FastAPI instance on AWS Lambda which is triggered via an API Gateway. In order to automate the process, we use AWS SAM, which creates the stack required for deployment and updates it as needed with just a couple of commands and without having to do anything manually on the AWS GUI. Refer to this [blog](https://www.eliasbrange.dev/posts/deploy-fastapi-on-aws-part-1-lambda-api-gateway/) post for more details.
 
 The actual deployment happens through Github Actions. Look at `.github/workflows/deploy_to_staging.yml` to understand the deployment to Staging and `.github/workflows/deploy_to_prod.yml` for Production.
