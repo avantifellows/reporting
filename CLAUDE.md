@@ -8,37 +8,24 @@ This is the Avanti Fellows Reporting Engine - a FastAPI-based web application th
 
 ## Development Setup
 
-### Local Development with Docker
+### Local Development with uv
 ```bash
+# Install dependencies and create virtual environment
+uv sync
+
 # Install pre-commit hooks
-pip install pre-commit
-pre-commit install
+uv run pre-commit install
 
-# Build and run with Docker Compose
-docker-compose up --build
-
-# First-time setup: Create DynamoDB volume
-docker volume create --name=dynamodb_data
-
-# Initialize the database table (run inside app container)
-python generate_table
-```
-
-### Local Development without Docker
-```bash
 # Copy environment file
 cp .env.example .env.local
 # (Add actual credentials to .env.local)
 
 # Run the FastAPI server
-cd app
-uvicorn main:app --port 5050 --reload
+uv run uvicorn app.main:app --port 5050 --reload
 ```
 
 ### Access Points
 - FastAPI Server: http://localhost:5050 (API docs at /docs)
-- DynamoDB Admin: http://localhost:8001
-- DynamoDB Server: http://localhost:8000
 
 ## Code Quality
 
@@ -51,11 +38,14 @@ The repository uses pre-commit hooks for code quality:
 ### Running Code Quality Checks
 ```bash
 # Run pre-commit on all files
-pre-commit run --all-files
+uv run pre-commit run --all-files
 
 # Run specific hooks
-pre-commit run black
-pre-commit run flake8
+uv run pre-commit run black
+uv run pre-commit run flake8
+
+# Install dependencies (if not already done)
+uv sync
 ```
 
 ## Architecture
