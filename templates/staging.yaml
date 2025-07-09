@@ -60,7 +60,7 @@ Resources:
           Properties:
             ApiId: !Ref Api
     Metadata:
-      BuildMethod: python3.9
+      BuildMethod: python3.13
       BuildArchitecture: x86_64
 
   Api:
