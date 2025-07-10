@@ -38,6 +38,61 @@
   {% endif %}
 </section>
 
+{% if chapter_analysis and (chapter_analysis.weak_chapters or chapter_analysis.strong_chapters) %}
+<section id="chapter_analysis">
+  <div id="section_heading">CHAPTER ANALYSIS - {{ chapter_analysis.most_recent_test }}</div>
+
+  {% if chapter_analysis.weak_chapters %}
+    <div class="chapter_section weak_chapters">
+      <h3 class="chapter_title weak_title">Weak Chapters (Need Improvement)</h3>
+      <table class="chapter_table">
+        <tr>
+          <td>Chapter</td>
+          <td>Section</td>
+          <td>Accuracy</td>
+          <td>Attempt Rate</td>
+          <td>Marks</td>
+        </tr>
+        {% for chapter in chapter_analysis.weak_chapters %}
+        <tr>
+          <td>{{ chapter.name }}</td>
+          <td>{{ chapter.section }}</td>
+          <td>{{ chapter.accuracy }}</td>
+          <td>{{ chapter.attempt_rate }}</td>
+          <td>{{ chapter.marks }}</td>
+        </tr>
+        {% endfor %}
+      </table>
+    </div>
+  {% endif %}
+
+  {% if chapter_analysis.strong_chapters %}
+    <div class="chapter_section strong_chapters">
+      <h3 class="chapter_title strong_title">Strong Chapters (Good Performance)</h3>
+      <table class="chapter_table">
+        <tr>
+          <td>Chapter</td>
+          <td>Section</td>
+          <td>Accuracy</td>
+          <td>Attempt Rate</td>
+          <td>Marks</td>
+        </tr>
+        {% for chapter in chapter_analysis.strong_chapters %}
+        <tr>
+          <td>{{ chapter.name }}</td>
+          <td>{{ chapter.section }}</td>
+          <td>{{ chapter.accuracy }}</td>
+          <td>{{ chapter.attempt_rate }}</td>
+          <td>{{ chapter.marks }}</td>
+        </tr>
+        {% endfor %}
+      </table>
+    </div>
+  {% endif %}
+</section>
+{% endif %}
+
+
 <style>
   .report-link {
     display: inline-block;
@@ -58,10 +113,107 @@
     color: white;
   }
 
-  #score_details td {
-    padding: 15px;
-    vertical-align: middle;
+  #score_details {
+    border-collapse: collapse;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    background: white;
   }
+
+  #score_details td {
+    padding: 12px 15px;
+    vertical-align: middle;
+    font-size: 16pt;
+    border: 1px solid #ddd;
+  }
+
+  #score_details tr:first-child td {
+    font-weight: bold;
+    background-color: orange;
+    color: black;
+  }
+
+  /* Chapter Analysis Styles */
+  #chapter_analysis {
+    margin-top: 30px;
+  }
+
+  .chapter_section {
+    margin-bottom: 30px;
+  }
+
+  .chapter_title {
+    font-size: 20pt;
+    margin-bottom: 15px;
+    font-weight: bold;
+  }
+
+  .weak_title {
+    color: #D32F2F;
+  }
+
+  .strong_title {
+    color: #2E7D32;
+  }
+
+  .chapter_table {
+    border-collapse: collapse;
+    padding: 0 30px 0 30px;
+    margin-left: auto;
+    margin-right: auto;
+    table-layout: fixed;
+    margin-top: 30px;
+    margin-bottom: 30px;
+    width: 70%;
+  }
+
+  .chapter_table td {
+    padding: 10px 20px 10px 20px;
+    font-size: 16pt;
+    text-align: center;
+    border: 1px solid #ddd;
+  }
+
+  .chapter_table td:first-child {
+    text-align: left;
+    padding-left: 20px;
+  }
+
+  /* Table coloring for both weak and strong chapters */
+  .weak_chapters .chapter_table tr:nth-child(even),
+  .strong_chapters .chapter_table tr:nth-child(even) {
+    background-color: white;
+  }
+
+  .weak_chapters .chapter_table tr:nth-child(odd),
+  .strong_chapters .chapter_table tr:nth-child(odd) {
+    background-color: #FEFBEB;
+  }
+
+  /* Make both weak and strong chapters header row orange */
+  .weak_chapters .chapter_table tr:first-child td,
+  .strong_chapters .chapter_table tr:first-child td {
+    vertical-align: top;
+    background-color: orange;
+    color: black;
+    font-weight: bold;
+  }
+
+  .chapter_table tr:hover {
+    background-color: #ddd;
+  }
+
+  @media (max-width: 768px) {
+    .chapter_table {
+      font-size: 14px;
+    }
+
+    .chapter_table td {
+      padding: 8px;
+    }
+  }
+
 </style>
 
 {% endblock %}
