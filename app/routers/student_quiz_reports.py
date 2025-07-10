@@ -56,6 +56,57 @@ class StudentQuizReportsRouter:
         self.__bq_db = bq_db
         self._templates = Jinja2Templates(directory="templates")
 
+    def _analyze_chapters(self, recent_test_data):
+        """Analyze chapters from recent test data to identify weak and strong chapters."""
+        weak_chapters = []
+        strong_chapters = []
+
+        for section in recent_test_data:
+            if "chapter_wise_data" in section and section["chapter_wise_data"]:
+                for chapter in section["chapter_wise_data"]:
+                    chapter_name = chapter.get("chapter_name", "")
+                    accuracy = float(chapter.get("accuracy", 0))
+                    attempt_rate = float(chapter.get("attempt_percentage", 0))
+                    marks_scored = chapter.get("marks_scored", 0)
+                    max_score = chapter.get("max_score", 0)
+
+                    # Clean up chapter name (remove chapter code if present)
+                    if "-" in chapter_name:
+                        display_name = chapter_name.split("-")[1].strip()
+                    else:
+                        display_name = chapter_name.strip()
+
+                    chapter_data = {
+                        "name": display_name,
+                        "accuracy": f"{accuracy:.1f}%",
+                        "attempt_rate": f"{attempt_rate:.1f}%",
+                        "marks": f"{marks_scored}/{max_score}",
+                        "section": section.get("section", "").capitalize(),
+                    }
+
+                    # Classify as weak or strong based on performance
+                    # Weak: accuracy < 60% or attempt rate < 50%
+                    # Strong: accuracy >= 80% and attempt rate >= 70%
+                    if accuracy < 60 or attempt_rate < 50:
+                        weak_chapters.append(chapter_data)
+                    elif accuracy >= 80 and attempt_rate >= 70:
+                        strong_chapters.append(chapter_data)
+
+        # Sort weak chapters by accuracy (lowest first)
+        weak_chapters.sort(key=lambda x: float(x["accuracy"].replace("%", "")))
+        # Sort strong chapters by accuracy (highest first)
+        strong_chapters.sort(
+            key=lambda x: float(x["accuracy"].replace("%", "")), reverse=True
+        )
+
+        return {
+            "weak_chapters": weak_chapters,
+            "strong_chapters": strong_chapters,
+            "most_recent_test": recent_test_data[0]["test_name"]
+            if recent_test_data
+            else None,
+        }
+
     @property
     def router(self):
         api_router = APIRouter(prefix="/reports", tags=["reports"])
@@ -235,9 +286,7 @@ class StudentQuizReportsRouter:
                     detail="User ID has to be specified",
                 )
 
-            print("Getting student reports for user ID: ", user_id)
             data = self.__reports_db.get_student_reports(user_id)
-            print(data)
 
             # Create a structured response with student reports
             student_reports = []
@@ -256,15 +305,39 @@ class StudentQuizReportsRouter:
                 }
                 student_reports.append(result)
 
+            # Get chapter analysis for the most recent test
+            chapter_analysis = None
+            if student_reports:
+                # Sort by start_date to get the most recent test
+                student_reports.sort(key=lambda x: x["start_date"], reverse=True)
+                most_recent_session = student_reports[0]["test_session_id"]
+
+                # Get detailed data for the most recent test
+                try:
+                    recent_test_data = self.__reports_db.get_student_quiz_report(
+                        user_id, most_recent_session
+                    )
+                    chapter_analysis = self._analyze_chapters(recent_test_data)
+                except Exception as e:
+                    print(f"Unable to load chapter analysis: {e}")
+                    chapter_analysis = None
+
             # Return JSON response if format=json
             if format is not None and format == "json":
                 response = {"student_id": user_id, "reports": student_reports}
+                if chapter_analysis:
+                    response.update(chapter_analysis)
                 return response
 
             # Return HTML or PDF response
             template_response = self._templates.TemplateResponse(
                 "student_reports.html",
-                {"request": request, "student_id": user_id, "reports": student_reports},
+                {
+                    "request": request,
+                    "student_id": user_id,
+                    "reports": student_reports,
+                    "chapter_analysis": chapter_analysis,
+                },
             )
 
             if format == "pdf":
@@ -478,7 +551,7 @@ class StudentQuizReportsRouter:
             exam = "JEE"
             if stream == "JEE":
                 if "Advanced" in report_data["test_name"]:
-                    exam = "JEE Advanced" # bad
+                    exam = "JEE Advanced"  # bad
                 else:
                     exam = "JEE Mains"
             elif stream == "NEET":
