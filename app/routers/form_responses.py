@@ -58,6 +58,7 @@ class FormResponsesRouter:
                     question_number = idx + 1
                     question_set_title = response.get("question_set_title", "")
                     question_text = response.get("question_text", "")
+                    question_priority = response.get("priority", "")
                     user_response_labels = response.get("user_response_labels", "")
                     is_answered = response.get("is_answered", False)
 
@@ -74,6 +75,7 @@ class FormResponsesRouter:
                             "question_set_title": question_set_title,
                             "question_text": question_text,
                             "user_response": display_response,
+                            "question_priority": question_priority,
                         }
                     )
 

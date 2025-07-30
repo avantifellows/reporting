@@ -39,6 +39,7 @@
     </thead>
     <tbody>
       {% for response in report_data["responses"] %}
+        {% if response["question_priority"] == "high" %}
         <tr>
           <td class="question_number">{{ response["question_number"] }}</td>
           <td class="theme">{{ response["question_set_title"] }}</td>
@@ -47,6 +48,7 @@
             {{ response["user_response"] }}
           </td>
         </tr>
+        {% endif %}
       {% endfor %}
     </tbody>
   </table>
