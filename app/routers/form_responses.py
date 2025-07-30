@@ -2,6 +2,7 @@ from fastapi import APIRouter, Request, HTTPException
 from fastapi.templating import Jinja2Templates
 from typing import Optional
 from db.form_responses_db import FormResponsesDB
+from utils.pdf_converter import convert_template_to_pdf
 
 
 class FormResponsesRouter:
@@ -23,9 +24,21 @@ class FormResponsesRouter:
             session_id: str,
             user_id: str,
             format: Optional[str] = None,
+            debug: bool = False,
         ):
             """
             Get form responses for a specific user and session.
+            
+            Args:
+                request (Request): The request object.
+                session_id (str): The session ID.
+                user_id (str): The user ID.
+                format (str, optional): The format of the report. If "pdf", returns a PDF. Defaults to None.
+                debug (bool): If True and format is "pdf", returns the HTML that would be sent to PDF service.
+            
+            Returns:
+                TemplateResponse: The form responses template response.
+                StreamingResponse: A PDF response if format=pdf.
             """
             try:
                 # Get form responses from database
@@ -75,10 +88,15 @@ class FormResponsesRouter:
                     "total_questions": len(processed_responses),
                 }
 
-                return self._templates.TemplateResponse(
+                template_response = self._templates.TemplateResponse(
                     "form_responses.html",
                     {"request": request, "report_data": report_data},
                 )
+
+                if format == "pdf":
+                    return convert_template_to_pdf(template_response, debug=debug)
+
+                return template_response
 
             except ValueError as e:
                 raise HTTPException(status_code=400, detail=str(e))

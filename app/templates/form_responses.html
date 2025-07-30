@@ -19,6 +19,12 @@
   </div>
 </div>
 
+<div class="download_section">
+  <a class="download_pdf_button" href="?format=pdf" target="_blank" data-track-button="download_pdf">
+    Download PDF Report
+  </a>
+</div>
+
 <section id="form_responses_section">
   <div id="section_heading">Form Responses</div>
 
@@ -153,6 +159,32 @@
     font-size: 24px;
     font-weight: bold;
     color: #333;
+  }
+
+  .download_section {
+    text-align: center;
+    margin: 25px 0;
+  }
+
+  .download_pdf_button {
+    display: inline-block;
+    text-align: center;
+    font-size: 16pt;
+    background-color: #29973E;
+    border-radius: 4px;
+    text-decoration: none;
+    color: white;
+    padding: 12px 25px;
+    box-shadow: 1px 1px 4px rgba(0,0,0,0.3);
+    transition: background-color 0.2s, transform 0.1s;
+    font-weight: 500;
+  }
+
+  .download_pdf_button:hover {
+    background-color: #2AAF4A;
+    transform: translateY(-2px);
+    text-decoration: none;
+    color: white;
   }
 
   @media (max-width: 768px) {
