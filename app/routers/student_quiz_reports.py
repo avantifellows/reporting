@@ -478,7 +478,7 @@ class StudentQuizReportsRouter:
             exam = "JEE"
             if stream == "JEE":
                 if "Advanced" in report_data["test_name"]:
-                    exam = "JEE Advanced" # bad
+                    exam = "JEE Advanced"  # bad
                 else:
                     exam = "JEE Mains"
             elif stream == "NEET":
