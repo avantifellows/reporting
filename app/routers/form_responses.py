@@ -1,8 +1,10 @@
 from fastapi import APIRouter, Request, HTTPException
 from fastapi.templating import Jinja2Templates
 from typing import Optional
+import asyncio
 from db.form_responses_db import FormResponsesDB
 from utils.pdf_converter import convert_template_to_pdf
+from utils.llm_summary import generate_theme_summary
 
 
 class FormResponsesRouter:
@@ -19,7 +21,7 @@ class FormResponsesRouter:
         api_router = APIRouter(prefix="/reports", tags=["form_responses"])
 
         @api_router.get("/form_responses/{session_id}/{user_id}")
-        def get_form_responses(
+        async def get_form_responses(
             request: Request,
             session_id: str,
             user_id: str,
@@ -82,14 +84,36 @@ class FormResponsesRouter:
                         }
                     )
 
-                # Convert to list format for template
+                # Convert to list format for template and generate AI summaries
                 themed_responses = []
-                for theme, responses in responses_by_theme.items():
+
+                # Generate summaries for each theme concurrently
+                summary_tasks = []
+                themes_list = list(responses_by_theme.items())
+
+                for theme, responses in themes_list:
+                    task = generate_theme_summary(theme, responses, user_id)
+                    summary_tasks.append(task)
+
+                # Wait for all summaries to complete
+                summaries = await asyncio.gather(*summary_tasks, return_exceptions=True)
+
+                # Build themed_responses with summaries
+                for i, (theme, responses) in enumerate(themes_list):
+                    # Get summary, handling exceptions
+                    summary = (
+                        summaries[i]
+                        if i < len(summaries)
+                        and not isinstance(summaries[i], Exception)
+                        else None
+                    )
+
                     themed_responses.append(
                         {
                             "theme": theme,
                             "responses": responses,
                             "question_count": len(responses),
+                            "ai_summary": summary,
                         }
                     )
 
