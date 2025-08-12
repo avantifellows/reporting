@@ -28,14 +28,14 @@ class FormResponsesRouter:
         ):
             """
             Get form responses for a specific user and session.
-            
+
             Args:
                 request (Request): The request object.
                 session_id (str): The session ID.
                 user_id (str): The user ID.
                 format (str, optional): The format of the report. If "pdf", returns a PDF. Defaults to None.
                 debug (bool): If True and format is "pdf", returns the HTML that would be sent to PDF service.
-            
+
             Returns:
                 TemplateResponse: The form responses template response.
                 StreamingResponse: A PDF response if format=pdf.
@@ -51,12 +51,13 @@ class FormResponsesRouter:
                         status_code=404, detail="No form responses found"
                     )
 
-                # Process the form responses for display
-                processed_responses = []
+                # Process and group form responses by theme
+                responses_by_theme = {}
+                overall_question_number = 0
 
                 for idx, response in enumerate(form_responses):
-                    question_number = idx + 1
-                    question_set_title = response.get("question_set_title", "")
+                    overall_question_number += 1
+                    theme = response.get("question_set_title", "Unknown Theme")
                     question_text = response.get("question_text", "")
                     question_priority = response.get("priority", "")
                     user_response_labels = response.get("user_response_labels", "")
@@ -69,13 +70,26 @@ class FormResponsesRouter:
                         else "None"
                     )
 
-                    processed_responses.append(
+                    if theme not in responses_by_theme:
+                        responses_by_theme[theme] = []
+
+                    responses_by_theme[theme].append(
                         {
-                            "question_number": question_number,
-                            "question_set_title": question_set_title,
+                            "question_number": overall_question_number,
                             "question_text": question_text,
                             "user_response": display_response,
                             "question_priority": question_priority,
+                        }
+                    )
+
+                # Convert to list format for template
+                themed_responses = []
+                for theme, responses in responses_by_theme.items():
+                    themed_responses.append(
+                        {
+                            "theme": theme,
+                            "responses": responses,
+                            "question_count": len(responses),
                         }
                     )
 
@@ -86,8 +100,8 @@ class FormResponsesRouter:
                     "session_id": session_id,
                     "test_name": first_response.get("test_name", "Form Response"),
                     "start_date": first_response.get("start_date", ""),
-                    "responses": processed_responses,
-                    "total_questions": len(processed_responses),
+                    "themed_responses": themed_responses,
+                    "total_questions": len(form_responses),
                 }
 
                 template_response = self._templates.TemplateResponse(
