@@ -29,12 +29,28 @@ class LLMSummaryGenerator:
             AI-generated summary string or None if generation fails
         """
         try:
-            # Filter out empty/None responses for better analysis
-            valid_responses = [
+            # Filter for high-priority responses first, then others if needed
+            high_priority_responses = [
                 r
                 for r in responses
-                if r.get("user_response") and r["user_response"] != "None"
+                if r.get("user_response")
+                and r["user_response"] != "None"
+                and r.get("question_priority") == "high"
             ]
+
+            # Use high-priority responses if available, otherwise fall back to all valid responses
+            if high_priority_responses:
+                valid_responses = high_priority_responses[
+                    :8
+                ]  # Limit high-priority to 8
+            else:
+                valid_responses = [
+                    r
+                    for r in responses
+                    if r.get("user_response") and r["user_response"] != "None"
+                ][
+                    :5
+                ]  # Limit regular responses to 5
 
             if not valid_responses:
                 return f"No responses provided for {theme} section."
@@ -46,17 +62,15 @@ class LLMSummaryGenerator:
                     "answer": r["user_response"],
                     "priority": r.get("question_priority", "standard"),
                 }
-                for r in valid_responses[
-                    :10
-                ]  # Limit to first 10 responses to avoid token limits
+                for r in valid_responses
             ]
 
             prompt = self._create_summary_prompt(theme, response_data, user_id)
 
             response = await self.client.chat.completions.create(
-                model="gpt-3.5-turbo",
+                model="gpt-4o-mini",
                 messages=[{"role": "user", "content": prompt}],
-                max_tokens=150,
+                max_tokens=100,
                 temperature=0.7,
             )
 
@@ -77,17 +91,11 @@ class LLMSummaryGenerator:
         user_context = f" for student {user_id}" if user_id else ""
 
         prompt = f"""
-Analyze the following form responses{user_context} for the "{theme}" section and provide a brief, insightful summary.
+Analyze responses{user_context} for "{theme}" section:
 
-Responses:
 {json.dumps(response_data, indent=2, ensure_ascii=False)}
 
-Please provide a 2-3 sentence summary that:
-1. Identifies key themes or patterns in the responses
-2. Highlights any notable insights or areas of strength/concern
-3. Uses encouraging, constructive language suitable for educational feedback
-
-Keep the summary concise, actionable, and focused on learning insights.
+Provide a clear summary in 2-3 short, broken sentences that focus on the high priority questions. Each sentence should be concise and give specific insights about the student's responses. Use constructive educational language.
         """.strip()
 
         return prompt

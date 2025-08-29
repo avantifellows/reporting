@@ -27,22 +27,32 @@
 </div>
 {% endif %}
 
+<!-- Combined AI Summary Section for All Themes -->
+{% set themes_with_summaries = report_data["themed_responses"] | selectattr("ai_summary") | list %}
+{% if themes_with_summaries %}
+<section class="combined_summary_section">
+  <div class="summary_header">
+    <h2 class="summary_title">🤖 Summary</h2>
+  </div>
+  <div class="summary_content">
+    {% for theme_data in themes_with_summaries %}
+    <div class="theme_summary_subsection">
+      <h3 class="theme_summary_title">{{ theme_data["theme"] }}</h3>
+      <div class="theme_summary_text">
+        {{ theme_data["ai_summary"] }}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
 {% for theme_data in report_data["themed_responses"] %}
 <section class="theme_section">
   <div class="theme_header">
     <h2 class="theme_title">📚 {{ theme_data["theme"] }}</h2>
     <div class="theme_count">{{ theme_data["question_count"] }} questions</div>
   </div>
-
-  <!-- AI Summary Section -->
-  {% if theme_data.get("ai_summary") %}
-  <div class="ai_summary_section">
-    <h3 class="ai_summary_title">🤖 AI Insights</h3>
-    <div class="ai_summary_content">
-      {{ theme_data["ai_summary"] }}
-    </div>
-  </div>
-  {% endif %}
 
   <!-- High Priority Questions -->
   <div class="high_priority_section">
@@ -311,35 +321,77 @@
     padding: 20px;
   }
 
-  /* AI Summary Styles */
-  .ai_summary_section {
-    background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
-    border-radius: 8px;
-    padding: 16px;
-    margin: 20px 0;
-    border-left: 4px solid #2196f3;
-    box-shadow: 0 2px 8px rgba(33, 150, 243, 0.1);
+  /* Combined Summary Section Styles */
+  .combined_summary_section {
+    margin: 40px auto;
+    max-width: 900px;
+    padding: 0 20px;
   }
 
-  .ai_summary_title {
-    font-size: 16px;
+  .summary_header {
+    text-align: center;
+    margin-bottom: 20px;
+    padding: 20px;
+    background: linear-gradient(135deg, #e8f5e8 0%, #f0f8ff 100%);
+    border-radius: 12px;
+    border-left: 6px solid #4caf50;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+
+  .summary_title {
+    font-size: 28px;
+    font-weight: bold;
+    color: #2e7d32;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .summary_content {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    border: 1px solid #e9ecef;
+  }
+
+  .theme_summary_subsection {
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #e9ecef;
+  }
+
+  .theme_summary_subsection:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+  }
+
+  .theme_summary_title {
+    font-size: 18px;
     font-weight: 600;
-    color: #1565c0;
+    color: #4caf50;
     margin: 0 0 8px 0;
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
   }
 
-  .ai_summary_content {
+  .theme_summary_title::before {
+    content: "📚";
+    font-size: 16px;
+  }
+
+  .theme_summary_text {
     font-size: 14px;
     color: #333;
     line-height: 1.6;
-    font-style: italic;
-    background: rgba(255, 255, 255, 0.6);
+    background: rgba(232, 245, 232, 0.3);
     padding: 12px;
     border-radius: 6px;
-    border: 1px solid rgba(33, 150, 243, 0.2);
+    border: 1px solid rgba(76, 175, 80, 0.2);
   }
 
   .form_summary {
@@ -440,17 +492,31 @@
       font-weight: bold;
     }
 
-    /* Mobile AI Summary */
-    .ai_summary_section {
-      margin: 15px 0;
-      padding: 14px;
+    /* Mobile Combined Summary */
+    .combined_summary_section {
+      padding: 0 15px;
+      margin: 20px auto;
     }
 
-    .ai_summary_title {
-      font-size: 14px;
+    .summary_header {
+      padding: 15px;
     }
 
-    .ai_summary_content {
+    .summary_title {
+      font-size: 22px;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .summary_content {
+      padding: 18px;
+    }
+
+    .theme_summary_title {
+      font-size: 16px;
+    }
+
+    .theme_summary_text {
       font-size: 13px;
       padding: 10px;
     }
