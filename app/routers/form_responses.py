@@ -28,14 +28,14 @@ class FormResponsesRouter:
         ):
             """
             Get form responses for a specific user and session.
-            
+
             Args:
                 request (Request): The request object.
                 session_id (str): The session ID.
                 user_id (str): The user ID.
                 format (str, optional): The format of the report. If "pdf", returns a PDF. Defaults to None.
                 debug (bool): If True and format is "pdf", returns the HTML that would be sent to PDF service.
-            
+
             Returns:
                 TemplateResponse: The form responses template response.
                 StreamingResponse: A PDF response if format=pdf.

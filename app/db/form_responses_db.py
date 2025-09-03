@@ -26,14 +26,10 @@ class FormResponsesDB:
             table = self.__db.Table(table_name)
 
             # Query by session_id and filter by user_id
-            response = table.query(
+            user_responses = table.query(
                 KeyConditionExpression=Key("session_id").eq(session_id)
-            )
-
-            # Filter responses for the specific user
-            user_responses = [
-                item for item in response["Items"] if item.get("user_id") == user_id
-            ]
+                & Key("user_id-question_position_index").begins_with(user_id)
+            )["Items"]
 
             # Sort by question_position_index to maintain order
             user_responses.sort(key=lambda x: int(x.get("question_position_index", 0)))
