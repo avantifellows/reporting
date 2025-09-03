@@ -27,6 +27,12 @@ Parameters:
   HtmlToPdfUrl:
     Type: String
     Description: URL of the HTML to PDF conversion service
+  DynamodbStudentReportsTableName:
+    Type: String
+    Description: Name of the DynamoDB table for student reports
+  OpenaiApiKey:
+    Type: String
+    Description: OpenAI API key for AI features
 
 Resources:
   Function:
@@ -47,6 +53,8 @@ Resources:
           MONGO_AUTH_CREDENTIALS: !Ref MongoAuthCredentials
           FIRESTORE_CREDENTIALS: !Ref FirestoreCredentials
           BQ_CREDENTIALS_SECRET_NAME: !Ref BqCredentialsSecretName
+          DYNAMODB_STUDENT_REPORTS_TABLE_NAME: !Ref DynamodbStudentReportsTableName
+          OPENAI_API_KEY: !Ref OpenaiApiKey
           HTML_TO_PDF_SERVER_URL: !Ref HtmlToPdfUrl
       Policies:
         - Statement:
