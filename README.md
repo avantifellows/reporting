@@ -30,7 +30,7 @@ Obtain credentials from repository owners and replace the local keys in the `.en
 
 5. **Run the FastAPI server**
 ```bash
-uv run uvicorn app.main:app --port 5050 --reload
+cd app; uv run uvicorn app.main:app --port 5050 --reload
 ```
 
 The application will be available at `localhost:5050/docs`
