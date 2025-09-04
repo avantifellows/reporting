@@ -87,26 +87,42 @@ class FormResponsesRouter:
                 # Convert to list format for template and generate AI summaries
                 themed_responses = []
 
-                # Generate summaries for each theme concurrently
+                # Generate summaries only for themes with high priority questions
                 summary_tasks = []
                 themes_list = list(responses_by_theme.items())
+                themes_with_high_priority = []
 
                 for theme, responses in themes_list:
-                    task = generate_theme_summary(theme, responses, user_id)
-                    summary_tasks.append(task)
+                    # Check if this theme has any high priority questions
+                    has_high_priority = any(
+                        r.get("question_priority") == "high" for r in responses
+                    )
+
+                    if has_high_priority:
+                        themes_with_high_priority.append((theme, responses))
+                        task = generate_theme_summary(theme, responses, user_id)
+                        summary_tasks.append(task)
 
                 # Wait for all summaries to complete
                 summaries = await asyncio.gather(*summary_tasks, return_exceptions=True)
 
                 # Build themed_responses with summaries
-                for i, (theme, responses) in enumerate(themes_list):
-                    # Get summary, handling exceptions
-                    summary = (
-                        summaries[i]
-                        if i < len(summaries)
-                        and not isinstance(summaries[i], Exception)
-                        else None
+                summary_index = 0
+                for theme, responses in themes_list:
+                    # Check if this theme has high priority questions
+                    has_high_priority = any(
+                        r.get("question_priority") == "high" for r in responses
                     )
+
+                    # Get summary only if theme has high priority questions
+                    summary = None
+                    if has_high_priority and summary_index < len(summaries):
+                        summary = (
+                            summaries[summary_index]
+                            if not isinstance(summaries[summary_index], Exception)
+                            else None
+                        )
+                        summary_index += 1
 
                     themed_responses.append(
                         {
