@@ -13,10 +13,14 @@ from db.form_responses_db import FormResponsesDB
 from routers.student_quiz_reports import StudentQuizReportsRouter
 from routers.form_responses import FormResponsesRouter
 
+from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
+
+from routers import futures_college_predictor, futures
 
 app = FastAPI()
 
+# Mount static files
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 reports_db = initialize_reports_db()
@@ -53,6 +57,11 @@ quiz_reports_router = SessionQuizReportsRouter(quiz_db=quiz_db, sessions_db=sess
 app.include_router(student_quiz_reports_router.router)
 app.include_router(form_responses_router.router)
 app.include_router(quiz_reports_router.router)
+app.include_router(futures_college_predictor.router)
+app.include_router(futures.router)
+
+# Setup templates
+templates = Jinja2Templates(directory="templates")
 
 
 @app.get("/")
