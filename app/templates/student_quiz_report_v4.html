@@ -206,7 +206,7 @@
     color: white;
   }
 
-  /* Modal Styles - NEW in v4 */
+  /* Modal Styles - Using existing color schema */
   .modal {
     position: fixed;
     z-index: 1000;
@@ -221,13 +221,13 @@
   }
 
   .modal-content {
-    background-color: white;
-    border-radius: 10px;
+    background-color: #EAEDFD;
+    border-radius: 8px;
     width: 90%;
     max-width: 600px;
     max-height: 90vh;
     overflow-y: auto;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    box-shadow: 1px 1px 5px #535353;
   }
 
   .modal-header {
@@ -235,35 +235,41 @@
     justify-content: space-between;
     align-items: center;
     padding: 20px;
-    border-bottom: 1px solid #eee;
+    background-color: #29973E;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
   }
 
   .modal-header h2 {
     margin: 0;
-    color: #333;
+    color: white;
+    font-size: 24pt;
+    font-weight: bold;
   }
 
   .close {
-    color: #aaa;
-    float: right;
+    color: white;
     font-size: 28px;
     font-weight: bold;
     cursor: pointer;
   }
 
   .close:hover {
-    color: black;
+    color: #ddd;
   }
 
   .modal-body {
     padding: 20px;
+    background-color: white;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
   }
 
   .prediction-info {
     text-align: center;
     margin-bottom: 20px;
-    font-size: 16px;
-    color: #666;
+    font-size: 16pt;
+    color: #333;
   }
 
   .loader {
@@ -288,45 +294,50 @@
 
   .results-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
     gap: 15px;
     margin-bottom: 20px;
   }
 
   .result-card {
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-    border-radius: 10px;
+    background-color: #EBF5FE;
+    border-radius: 8px;
     padding: 20px;
     text-align: center;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    box-shadow: 1px 1px 5px #535353;
   }
 
   .result-value {
-    font-size: 24px;
+    font-size: 20pt;
     font-weight: bold;
     color: #333;
     margin-bottom: 5px;
   }
 
   .result-label {
-    font-size: 14px;
+    font-size: 14pt;
     color: #666;
   }
 
   .status-badge {
-    background: linear-gradient(135deg, #29973E 0%, #22803c 100%);
-    color: white;
+    background-color: orange;
+    color: black;
     padding: 15px;
-    border-radius: 10px;
+    border-radius: 8px;
     text-align: center;
     margin-bottom: 20px;
-    font-weight: 600;
+    font-weight: bold;
+    font-size: 16pt;
   }
 
   .error-section {
     text-align: center;
     color: #d32f2f;
+    background-color: #FEFBEB;
     padding: 20px;
+    border-radius: 8px;
+    font-size: 16pt;
   }
 </style>
 
