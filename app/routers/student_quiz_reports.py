@@ -444,8 +444,16 @@ class StudentQuizReportsRouter:
             section_reports = []
             overall_performance = {}
 
-            # determine stream: CA, CLAT, NEET, or JEE (default)
-            stream = "JEE"
+            # determine stream: use data["stream"] if available, otherwise fallback to section-based detection
+            stream = "JEE"  # default
+            if len(data) > 0 and "stream" in data[0]:
+                stream_mapping = {
+                    "engineering": "JEE",
+                    "medical": "NEET",
+                    "ca": "CA",
+                    "clat": "CLAT"
+                }
+                stream = stream_mapping.get(data[0]["stream"].lower(), "JEE")
 
             for section in data:
                 parsed_section_data = _parse_section_data(section)
@@ -458,12 +466,6 @@ class StudentQuizReportsRouter:
                     report_data["test_date"] = section["start_date"]
                 else:
                     section_reports.append(parsed_section_data)
-                    if section["section"] == "Biology":
-                        stream = "NEET"
-                    elif section["section"] == "CA" or "CA" in section["section"]:
-                        stream = "CA"
-                    elif section["section"] == "CLAT" or "CLAT" in section["section"]:
-                        stream = "CLAT"
 
             report_data["overall_performance"] = overall_performance
             report_data["section_reports"] = section_reports
