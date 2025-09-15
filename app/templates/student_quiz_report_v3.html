@@ -16,9 +16,14 @@
 </div>
 
 <!-- New message section -->
+{% if report_data["message_part_1"] is not none or report_data["message_part_2"] is not none %}
 <div id="message_section">
-  <p class="message">{{report_data["message_part_1"]}}</p>
-  <p class="message">{{report_data["message_part_2"]}}</p>
+  {% if report_data["message_part_1"] is not none %}
+    <p class="message">{{report_data["message_part_1"]}}</p>
+  {% endif %}
+  {% if report_data["message_part_2"] is not none %}
+    <p class="message">{{report_data["message_part_2"]}}</p>
+  {% endif %}
 
   <div class="buttons_container">
     {% if "revision_chapter_link" in report_data and report_data["revision_chapter_link"] != "" %}
@@ -39,6 +44,7 @@
     {% endif %}
   </div>
 </div>
+{% endif %}
 
 <section id="overall_performance">
   <div id="section_heading">Overall Performance</div>
