@@ -444,8 +444,16 @@ class StudentQuizReportsRouter:
             section_reports = []
             overall_performance = {}
 
-            # determine if neet or jee; jee by default
-            stream = "JEE"
+            # determine stream: use data["stream"] if available, otherwise fallback to section-based detection
+            stream = "JEE"  # default
+            if len(data) > 0 and "stream" in data[0]:
+                stream_mapping = {
+                    "engineering": "JEE",
+                    "medical": "NEET",
+                    "ca": "CA",
+                    "clat": "CLAT"
+                }
+                stream = stream_mapping.get(data[0]["stream"].lower(), "JEE")
 
             for section in data:
                 parsed_section_data = _parse_section_data(section)
@@ -458,8 +466,6 @@ class StudentQuizReportsRouter:
                     report_data["test_date"] = section["start_date"]
                 else:
                     section_reports.append(parsed_section_data)
-                    if section["section"] == "Biology":
-                        stream = "NEET"
 
             report_data["overall_performance"] = overall_performance
             report_data["section_reports"] = section_reports
@@ -483,23 +489,34 @@ class StudentQuizReportsRouter:
                     exam = "JEE Mains"
             elif stream == "NEET":
                 exam = "NEET"
+            elif stream == "CA":
+                exam = "CA"
+            elif stream == "CLAT":
+                exam = "CLAT"
 
-            report_data["message_part_1"] = ""
-            if qualification_status == "Qualified" or marks_to_qualify is None:
-                report_data[
-                    "message_part_1"
-                ] = f"Good Job! You are on track to clear {exam}!"
+            # Set messages to None for CA and CLAT streams, only show for JEE/NEET
+            if stream in ["CA", "CLAT"]:
+                report_data["message_part_1"] = None
+                report_data["message_part_2"] = None
             else:
-                report_data[
-                    "message_part_1"
-                ] = f"Close enough! You are just {int(marks_to_qualify)} marks away from clearing {exam}."
+                report_data["message_part_1"] = ""
+                if qualification_status == "Qualified" or marks_to_qualify is None:
+                    report_data[
+                        "message_part_1"
+                    ] = f"Good Job! You are on track to clear {exam}!"
+                else:
+                    report_data[
+                        "message_part_1"
+                    ] = f"Close enough! You are just {int(marks_to_qualify)} marks away from clearing {exam}."
+
+                if chapter_for_revision != "":
+                    report_data[
+                        "message_part_2"
+                    ] = f"We recommend that you focus on the chapter {chapter_for_revision} for the next test."
+                else:
+                    report_data["message_part_2"] = None
 
             report_data["revision_chapter_link"] = revision_chapter_link
-
-            if chapter_for_revision != "":
-                report_data[
-                    "message_part_2"
-                ] = f"We recommend that you focus on the chapter {chapter_for_revision} for the next test."
 
             template_response = self._templates.TemplateResponse(
                 "student_quiz_report_v3.html",
