@@ -29,7 +29,7 @@ class LLMSummaryGenerator:
             AI-generated summary string or None if generation fails
         """
         try:
-            # Filter for high-priority responses first, then others if needed
+            # Filter for high-priority responses only
             high_priority_responses = [
                 r
                 for r in responses
@@ -38,22 +38,11 @@ class LLMSummaryGenerator:
                 and r.get("question_priority") == "high"
             ]
 
-            # Use high-priority responses if available, otherwise fall back to all valid responses
-            if high_priority_responses:
-                valid_responses = high_priority_responses[
-                    :8
-                ]  # Limit high-priority to 8
-            else:
-                valid_responses = [
-                    r
-                    for r in responses
-                    if r.get("user_response") and r["user_response"] != "None"
-                ][
-                    :5
-                ]  # Limit regular responses to 5
+            # Only use high-priority responses, limit to 8
+            valid_responses = high_priority_responses[:8]
 
             if not valid_responses:
-                return f"No responses provided for {theme} section."
+                return f"No high priority responses provided for {theme} section."
 
             # Prepare data for LLM
             response_data = [
