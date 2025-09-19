@@ -49,9 +49,18 @@ class FormResponsesRouter:
                 )
 
                 if not form_responses:
-                    raise HTTPException(
-                        status_code=404, detail="No form responses found"
+                    error_data = {
+                        "session_id": session_id,
+                        "user_id": user_id,
+                        "error_message": "No report found. Please contact admin.",
+                        "status_code": 404,
+                    }
+                    template_response = self._templates.TemplateResponse(
+                        "error.html", {"request": request, "error_data": error_data}
                     )
+                    if format == "pdf":
+                        return convert_template_to_pdf(template_response, debug=debug)
+                    return template_response
 
                 # Process and group form responses by theme
                 responses_by_theme = {}

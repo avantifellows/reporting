@@ -28,7 +28,7 @@ class FormResponsesDB:
             # Query by session_id and filter by user_id
             user_responses = table.query(
                 KeyConditionExpression=Key("session_id").eq(session_id)
-                & Key("user_id-question_position_index").begins_with(user_id)
+                & Key("user_id-question_position_index").begins_with(f"{user_id}-")
             )["Items"]
 
             # Sort by question_position_index to maintain order
