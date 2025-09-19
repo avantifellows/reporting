@@ -115,23 +115,24 @@ class FormResponsesRouter:
                     )
 
                     # Get summary only if theme has high priority questions
-                    summary = None
-                    if has_high_priority and summary_index < len(summaries):
-                        summary = (
-                            summaries[summary_index]
-                            if not isinstance(summaries[summary_index], Exception)
-                            else None
-                        )
-                        summary_index += 1
+                    if has_high_priority:
+                        summary = None
+                        if summary_index < len(summaries):
+                            summary = (
+                                summaries[summary_index]
+                                if not isinstance(summaries[summary_index], Exception)
+                                else None
+                            )
+                            summary_index += 1
 
-                    themed_responses.append(
-                        {
-                            "theme": theme,
-                            "responses": responses,
-                            "question_count": len(responses),
-                            "ai_summary": summary,
-                        }
-                    )
+                        themed_responses.append(
+                            {
+                                "theme": theme,
+                                "responses": responses,
+                                "question_count": len(responses),
+                                "ai_summary": summary,
+                            }
+                        )
 
                 # Get basic info from first response
                 first_response = form_responses[0]

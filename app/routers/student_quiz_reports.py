@@ -451,7 +451,7 @@ class StudentQuizReportsRouter:
                     "engineering": "JEE",
                     "medical": "NEET",
                     "ca": "CA",
-                    "clat": "CLAT"
+                    "clat": "CLAT",
                 }
                 stream = stream_mapping.get(data[0]["stream"].lower(), "JEE")
 
