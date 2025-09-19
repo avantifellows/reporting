@@ -27,7 +27,7 @@ class ReportsDB:
             table = self.__db.Table("student_quiz_reports")
             response = table.query(
                 KeyConditionExpression=Key("session_id").eq(session_id)
-                & Key("user_id-section").begins_with(user_id)
+                & Key("user_id-section").begins_with(f"{user_id}-")
             )
             return response["Items"]
         except ClientError as e:
