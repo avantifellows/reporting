@@ -476,11 +476,6 @@ class StudentQuizReportsRouter:
                 section_reports, chapter_to_link_map, stream
             )
 
-            # (
-            #     chapter_for_revision,
-            #     report_data["revision_chapter_link"],
-            # ) = _get_chapter_for_revision(section_reports, chapter_to_link_map, stream)
-
             exam = "JEE"
             if stream == "JEE":
                 if "Advanced" in report_data["test_name"]:
@@ -520,6 +515,145 @@ class StudentQuizReportsRouter:
 
             template_response = self._templates.TemplateResponse(
                 "student_quiz_report_v3.html",
+                {"request": request, "report_data": report_data},
+            )
+
+            if format == "pdf":
+                return convert_template_to_pdf(template_response, debug=debug)
+            return template_response
+
+        @api_router.get("/student_quiz_report/v4/{session_id}/{user_id}")
+        def student_quiz_report_v4(
+            request: Request,
+            session_id: str,
+            user_id: str,
+            format: Optional[str] = None,
+            debug: bool = False,
+        ):
+            """
+            Returns a student quiz report v4 with prediction feature.
+
+            Args:
+                request (Request): The request object.
+                session_id (str): The session ID.
+                user_id (str): The user ID.
+                format (str, optional): The format of the report. If "pdf", returns a PDF. Defaults to None.
+                debug (bool): If True and format is "pdf", returns the HTML that would be sent to PDF service.
+
+            Raises:
+                HTTPException: If session ID or user ID is not specified.
+
+            Returns:
+                TemplateResponse: The student quiz report template response.
+                StreamingResponse: A PDF response if format=pdf.
+                HTMLResponse: HTML content if format=pdf and debug=True.
+            """
+            if session_id is None or user_id is None:
+                raise HTTPException(
+                    status_code=400,
+                    detail="Session ID and User ID have to be specified",
+                )
+            # decoding URL encoded values. As this information is coming through a URL,
+            # it's possible that the strings are URL encoded.
+            session_id = unquote(session_id)
+            user_id = unquote(user_id)
+            try:
+                data = self.__reports_db.get_student_quiz_report(user_id, session_id)
+            except KeyError:
+                raise HTTPException(
+                    status_code=400,
+                    detail="No student_quiz_report found. Unknown error occurred.",
+                )
+
+            if len(data) == 0:
+                # no data
+                error_data = {
+                    "session_id": session_id,
+                    "user_id": user_id,
+                    "error_message": "No report found. Please contact admin.",
+                    "status_code": 404,
+                }
+                return self._templates.TemplateResponse(
+                    "error.html", {"request": request, "error_data": error_data}
+                )
+
+            report_data = {}
+            report_data["student_name"] = ""
+            test_id = data[0]["test_id"]
+            user_id = data[0]["user_id"]
+
+            report_data["student_id"] = user_id
+            if "platform" in data[0] and data[0]["platform"] == "quizengine":
+                report_data["test_link"] = QUIZ_URL.format(
+                    quiz_id=test_id, user_id=user_id, api_key=AF_API_KEY
+                )
+
+            # bigquery
+            student_al_data = self.__bq_db.get_student_qualification_data(
+                user_id, test_id
+            )
+            qualification_status = student_al_data["qualification_status"]
+            marks_to_qualify = student_al_data["marks_to_qualify"]
+            chapter_for_revision = student_al_data["chapter_curriculum"]
+            revision_chapter_link = student_al_data["dpp_recommendation"]
+
+            section_reports = []
+            overall_performance = {}
+
+            # determine if neet or jee; jee by default
+            stream = "JEE"
+
+            for section in data:
+                parsed_section_data = _parse_section_data(section)
+                if section["section"] == "overall":
+                    overall_performance = parsed_section_data
+                    report_data["percentage"] = parsed_section_data["table_data"][
+                        "Percentage"
+                    ]
+                    report_data["test_name"] = section["test_name"]
+                    report_data["test_date"] = section["start_date"]
+                else:
+                    section_reports.append(parsed_section_data)
+                    if section["section"] == "Biology":
+                        stream = "NEET"
+
+            report_data["overall_performance"] = overall_performance
+            report_data["section_reports"] = section_reports
+
+            chapter_to_link_map = json.load(open("./static/chapter_to_links.json", "r"))
+
+            report_data["section_reports"] = _get_chapter_priority_ordering(
+                section_reports, chapter_to_link_map, stream
+            )
+
+            exam = "JEE"
+            if stream == "JEE":
+                if "Advanced" in report_data["test_name"]:
+                    exam = "JEE Advanced"  # bad
+                else:
+                    exam = "JEE Mains"
+            elif stream == "NEET":
+                exam = "NEET"
+
+            report_data["message_part_1"] = ""
+            if qualification_status == "Qualified" or marks_to_qualify is None:
+                report_data[
+                    "message_part_1"
+                ] = f"Good Job! You are on track to clear {exam}!"
+            else:
+                report_data[
+                    "message_part_1"
+                ] = f"Close enough! You are just {int(marks_to_qualify)} marks away from clearing {exam}."
+
+            report_data["revision_chapter_link"] = revision_chapter_link
+
+            if chapter_for_revision != "":
+                report_data[
+                    "message_part_2"
+                ] = f"We recommend that you focus on the chapter {chapter_for_revision} for the next test."
+
+            template_response = self._templates.TemplateResponse(
+                "student_quiz_report_v4.html",
                 {"request": request, "report_data": report_data},
             )
 

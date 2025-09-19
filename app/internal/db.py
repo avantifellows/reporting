@@ -46,7 +46,7 @@ def initialize_quiz_db():
 def initialize_bigquery():
     secret_name = os.environ.get("BQ_CREDENTIALS_SECRET_NAME")
     client = boto3.client(
-        "secretsmanager"
+        "secretsmanager", region_name="ap-south-1"
     )  # no need for credentials - lambda will provide
     secret_value = client.get_secret_value(SecretId=secret_name)
     credentials_json = json.loads(secret_value["SecretString"])
