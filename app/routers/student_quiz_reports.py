@@ -451,7 +451,7 @@ class StudentQuizReportsRouter:
                     "engineering": "JEE",
                     "medical": "NEET",
                     "ca": "CA",
-                    "clat": "CLAT"
+                    "clat": "CLAT",
                 }
                 stream = stream_mapping.get(data[0]["stream"].lower(), "JEE")
 
@@ -509,7 +509,7 @@ class StudentQuizReportsRouter:
                         "message_part_1"
                     ] = f"Close enough! You are just {int(marks_to_qualify)} marks away from clearing {exam}."
 
-                if chapter_for_revision != "":
+                if chapter_for_revision != "" and chapter_for_revision is not None:
                     report_data[
                         "message_part_2"
                     ] = f"We recommend that you focus on the chapter {chapter_for_revision} for the next test."
