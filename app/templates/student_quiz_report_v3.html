@@ -26,7 +26,7 @@
   {% endif %}
 
   <div class="buttons_container">
-    {% if "revision_chapter_link" in report_data and report_data["revision_chapter_link"] != "" %}
+    {% if "revision_chapter_link" in report_data and report_data["revision_chapter_link"] %}
       <div class="button_wrapper">
         <a class="answer_sheet_button" target="_blank" data-track-button="revise_chapter" href={{report_data['revision_chapter_link']}}>
           Revise Chapter
