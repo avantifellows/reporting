@@ -21,7 +21,7 @@ cp .env.example .env.local
 # (Add actual credentials to .env.local)
 
 # Run the FastAPI server
-uv run uvicorn app.main:app --port 5050 --reload
+cd app && uv run uvicorn main:app --port 5050 --reload
 ```
 
 ### Access Points
