@@ -366,6 +366,47 @@ class StudentQuizReportsRouter:
                 return convert_template_to_pdf(template_response, debug=debug)
             return template_response
 
+        @api_router.get("/student_quiz_report/v2/{session_id}/{user_id}")
+        def student_quiz_report_v2(
+            session_id: str,
+            user_id: str,
+        ):
+            """
+            Returns raw student quiz report data as JSON for a given session ID and user ID.
+
+            Args:
+                session_id (str): The session ID.
+                user_id (str): The user ID.
+
+            Raises:
+                HTTPException: If session ID or user ID is not specified, or no data found.
+
+            Returns:
+                dict: The raw DynamoDB items as JSON.
+            """
+            if session_id is None or user_id is None:
+                raise HTTPException(
+                    status_code=400,
+                    detail="Session ID and User ID have to be specified",
+                )
+            session_id = unquote(session_id)
+            user_id = unquote(user_id)
+            try:
+                data = self.__reports_db.get_student_quiz_report_v2(user_id, session_id)
+            except ValueError as e:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Error fetching report: {str(e)}",
+                )
+
+            if len(data) == 0:
+                raise HTTPException(
+                    status_code=404,
+                    detail="No report found for the given session ID and user ID.",
+                )
+
+            return {"session_id": session_id, "user_id": user_id, "data": data}
+
         @api_router.get("/student_quiz_report/v3/{session_id}/{user_id}")
         def student_quiz_report_v3(
             request: Request,

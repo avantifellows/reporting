@@ -48,3 +48,20 @@ class ReportsDB:
             return response["Items"]
         except ClientError as e:
             raise ValueError(e.response["Error"]["Message"])
+
+    def get_student_quiz_report_v2(self, user_id, session_id):
+        """
+        Returns a student quiz report from the v2 table for a given session ID and user ID.
+        params:
+            user_id: The user ID
+            session_id: The session ID
+        """
+        try:
+            table = self.__db.Table("student_quiz_reports_v2")
+            response = table.get_item(
+                Key={"session_id": session_id, "user_id": user_id}
+            )
+            item = response.get("Item")
+            return [item] if item else []
+        except ClientError as e:
+            raise ValueError(e.response["Error"]["Message"])
