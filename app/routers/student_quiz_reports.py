@@ -282,20 +282,26 @@ class StudentQuizReportsRouter:
         ):
             """
             Returns a student quiz report for a given session ID and user ID.
+            First checks v2 table, falls back to v1 template if not found.
+
+            For v2 reports:
+            - Default: Display version with colors (student_quiz_report_v2_display.html)
+            - ?print=true: Print-optimized version (student_quiz_report_v2.html)
+            - ?format=pdf: Generates PDF using print-optimized template
 
             Args:
                 request (Request): The request object.
                 session_id (str): The session ID.
                 user_id (str): The user ID.
-                format (str, optional): The format of the report. If "pdf", returns a PDF. Defaults to None.
-                debug (bool): If True and format is "pdf", returns the HTML that would be sent to PDF service.
+                format (str, optional): If "pdf", returns a PDF. Defaults to None.
+                debug (bool): If True and format is "pdf", returns HTML instead of PDF.
 
             Raises:
                 HTTPException: If session ID or user ID is not specified.
 
             Returns:
-                TemplateResponse: The student quiz report template response.
-                StreamingResponse: A PDF response if format=pdf.
+                TemplateResponse: HTML report (display or print version).
+                StreamingResponse: PDF response if format=pdf.
                 HTMLResponse: HTML content if format=pdf and debug=True.
             """
             if session_id is None or user_id is None:
@@ -307,6 +313,29 @@ class StudentQuizReportsRouter:
             # it's possible that the strings are URL encoded.
             session_id = unquote(session_id)
             user_id = unquote(user_id)
+
+            # Try v2 table first - render v2 template if found
+            try:
+                v2_data = self.__reports_db.get_student_quiz_report_v2(user_id, session_id)
+                if len(v2_data) > 0:
+                    report = v2_data[0]
+
+                    # Use print template for PDF or if ?print=true, otherwise display template
+                    use_print = format == "pdf" or request.query_params.get("print") == "true"
+                    template_name = "student_quiz_report_v2_print.html" if use_print else "student_quiz_report_v2.html"
+
+                    template_response = self._templates.TemplateResponse(
+                        template_name,
+                        {"request": request, "report": report},
+                    )
+
+                    if format == "pdf":
+                        return convert_template_to_pdf(template_response, debug=debug)
+                    return template_response
+            except ValueError:
+                pass  # Fall through to v1
+
+            # Fall back to v1 table
             try:
                 data = self.__reports_db.get_student_quiz_report(user_id, session_id)
             except KeyError:
@@ -365,47 +394,6 @@ class StudentQuizReportsRouter:
             if format == "pdf":
                 return convert_template_to_pdf(template_response, debug=debug)
             return template_response
-
-        @api_router.get("/student_quiz_report/v2/{session_id}/{user_id}")
-        def student_quiz_report_v2(
-            session_id: str,
-            user_id: str,
-        ):
-            """
-            Returns raw student quiz report data as JSON for a given session ID and user ID.
-
-            Args:
-                session_id (str): The session ID.
-                user_id (str): The user ID.
-
-            Raises:
-                HTTPException: If session ID or user ID is not specified, or no data found.
-
-            Returns:
-                dict: The raw DynamoDB items as JSON.
-            """
-            if session_id is None or user_id is None:
-                raise HTTPException(
-                    status_code=400,
-                    detail="Session ID and User ID have to be specified",
-                )
-            session_id = unquote(session_id)
-            user_id = unquote(user_id)
-            try:
-                data = self.__reports_db.get_student_quiz_report_v2(user_id, session_id)
-            except ValueError as e:
-                raise HTTPException(
-                    status_code=400,
-                    detail=f"Error fetching report: {str(e)}",
-                )
-
-            if len(data) == 0:
-                raise HTTPException(
-                    status_code=404,
-                    detail="No report found for the given session ID and user ID.",
-                )
-
-            return {"session_id": session_id, "user_id": user_id, "data": data}
 
         @api_router.get("/student_quiz_report/v3/{session_id}/{user_id}")
         def student_quiz_report_v3(

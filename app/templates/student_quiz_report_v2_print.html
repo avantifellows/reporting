@@ -1,0 +1,675 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>AIET Performance Report</title>
+        <style>
+            /* CSS Variables */
+            :root {
+                --gray-50: #f9fafb;
+                --gray-100: #f3f4f6;
+                --gray-300: #e5e7eb;
+                --gray-600: #4b5563;
+                --gray-700: #374151;
+                --gray-800: #1f2937;
+                --gray-900: #111827;
+                --amber-100: #fef3c7;
+                --amber-500: #f59e0b;
+                --amber-800: #92400e;
+            }
+
+            /* Reset & Base */
+            * {
+                box-sizing: border-box;
+            }
+            html,
+            body {
+                margin: 0;
+                padding: 0;
+                background: white;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            body {
+                font-family:
+                    "Inter",
+                    -apple-system,
+                    BlinkMacSystemFont,
+                    "Segoe UI",
+                    "Helvetica Neue",
+                    Arial,
+                    sans-serif;
+                font-size: 9pt;
+                color: var(--gray-800);
+                line-height: 1.4;
+            }
+
+            /* A4 Layout */
+            @page {
+                size: A4;
+                margin: 10mm 12mm 8mm 12mm;
+            }
+            .report-a4 {
+                width: 210mm;
+                min-height: 297mm;
+                margin: 0 auto;
+                padding: 24px;
+                background: white;
+            }
+
+            /* Print Styles */
+            @media print {
+                .report-a4 {
+                    width: auto;
+                    min-height: auto;
+                    padding: 0;
+                }
+                .pad-for-footer {
+                    padding-bottom: 12mm !important;
+                }
+                .print-page-break {
+                    display: block !important;
+                    break-before: page;
+                    page-break-before: always;
+                }
+                .print-footer {
+                    display: block !important;
+                }
+                .footer {
+                    display: none;
+                }
+            }
+
+            /* Typography */
+            .font-medium {
+                font-weight: 500;
+            }
+            .font-semibold {
+                font-weight: 600;
+            }
+
+            /* Header */
+            .report-title {
+                text-align: center;
+                font-size: 24px;
+                font-weight: 800;
+                letter-spacing: -0.025em;
+                color: var(--gray-800);
+                margin-bottom: 16px;
+            }
+            .header-info {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 24px;
+                margin-top: 16px;
+                line-height: 1.1;
+            }
+            .header-column {
+                display: flex;
+                flex-direction: column;
+            }
+            .header-item {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+            .header-label {
+                font-weight: 600;
+            }
+
+            /* Dividers */
+            .divider,
+            .section-divider {
+                height: 1px;
+                background-color: var(--gray-300);
+            }
+            .divider {
+                margin: 16px 0;
+            }
+            .section-divider {
+                margin: 8px 0 16px;
+            }
+
+            /* Section Headers */
+            .section-header {
+                font-size: 17px;
+                font-weight: 600;
+                color: var(--gray-800);
+                letter-spacing: -0.025em;
+                margin-top: 24px;
+                margin-bottom: 12px;
+            }
+
+            /* Boxes */
+            .overall-score,
+            .recommendation {
+                border: 1px solid var(--gray-300);
+            }
+            .overall-score {
+                margin-top: 16px;
+                padding: 12px 16px;
+                background-color: var(--gray-50);
+                text-align: center;
+                font-size: 17px;
+                font-weight: 600;
+                color: var(--gray-900);
+            }
+            .recommendation {
+                margin-top: 20px;
+                padding: 8px 16px;
+            }
+            .recommendation p {
+                text-align: center;
+                font-size: 13px;
+                color: var(--gray-900);
+                margin: 0;
+            }
+            .recommendation p:first-child {
+                margin-bottom: 4px;
+            }
+
+            /* Tables - Base */
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                table-layout: fixed;
+            }
+            .table-container {
+                border: 1px solid var(--gray-300);
+                background: white;
+                margin-bottom: 16px;
+                overflow: hidden;
+            }
+            th,
+            td {
+                padding: 8px 16px;
+                font-size: 8pt;
+                border-bottom: 1px solid var(--gray-300);
+                border-right: 1px solid var(--gray-300);
+            }
+            th {
+                background-color: var(--gray-50);
+                text-align: left;
+                font-weight: 600;
+                color: var(--gray-700);
+            }
+            td {
+                color: var(--gray-800);
+            }
+            th:last-child,
+            td:last-child {
+                border-right: none;
+            }
+            tbody tr:nth-child(even) {
+                background-color: rgba(249, 250, 251, 0.6);
+            }
+
+            /* Metrics Table */
+            .metrics-split th:nth-child(3),
+            .metrics-split td:nth-child(3) {
+                border-left: 1px solid var(--gray-300);
+            }
+
+            /* Recommended Chapters Table */
+            .recommended-chapters-container {
+                margin: 16px auto 0;
+                display: flex;
+                justify-content: center;
+            }
+            .recommended-chapters-container .table-container {
+                width: auto;
+                min-width: 60%;
+                max-width: 90%;
+            }
+            .recommended-chapters-container th,
+            .recommended-chapters-container td {
+                white-space: nowrap;
+            }
+            .recommended-chapters-container td:last-child {
+                white-space: normal;
+                max-width: 300px;
+            }
+
+            /* Subject Cards */
+            .subject-cards {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 16px;
+                margin-bottom: 16px;
+                break-inside: avoid;
+            }
+            .subject-card {
+                border: 1px solid var(--gray-300);
+                padding: 16px;
+                break-inside: avoid;
+            }
+            .subject-card-title {
+                text-align: center;
+                font-size: 13px;
+                font-weight: 600;
+                letter-spacing: 0.05em;
+                color: var(--gray-900);
+                margin-bottom: 8px;
+            }
+            .subject-card-content {
+                border-top: 1px solid var(--gray-300);
+            }
+            .subject-card-line {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 4px 0;
+                font-size: 8pt;
+                border-top: 1px solid var(--gray-300);
+            }
+            .subject-card-line:first-child {
+                border-top: none;
+            }
+            .subject-card-label {
+                color: var(--gray-700);
+            }
+            .subject-card-value {
+                font-weight: 500;
+                color: var(--gray-900);
+            }
+
+            /* Chapter Tables */
+            .chapters-section {
+                margin-bottom: 32px;
+            }
+            .chapter-section-title {
+                font-size: 13px;
+                font-weight: 600;
+                letter-spacing: -0.025em;
+                color: var(--gray-800);
+                margin-bottom: 8px;
+            }
+            .chapters-table .table-container {
+                border: none;
+            }
+            .chapters-table table {
+                border-collapse: separate;
+                border-spacing: 0;
+                border: 1px solid var(--gray-300);
+                break-inside: auto;
+                page-break-inside: auto;
+            }
+            .chapters-table thead {
+                display: table-header-group;
+            }
+            .chapters-table tr {
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+            .chapters-table tbody tr {
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+            .chapters-table th,
+            .chapters-table td {
+                border: 1px solid var(--gray-300) !important;
+                border-top: none !important;
+                border-left: none !important;
+            }
+            .chapters-table th:first-child,
+            .chapters-table td:first-child {
+                border-left: 1px solid var(--gray-300) !important;
+            }
+            .chapters-table tr:first-child th {
+                border-top: 1px solid var(--gray-300) !important;
+            }
+            .chapters-table td:first-child {
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            .chapters-table th:nth-child(n + 4),
+            .chapters-table td:nth-child(n + 4) {
+                text-align: center;
+                white-space: nowrap;
+            }
+
+            /* Warning */
+            .incomplete-test-warning {
+                margin-top: 24px;
+                padding: 12px 16px;
+                background-color: var(--amber-100);
+                border: 1px solid var(--amber-500);
+                border-radius: 4px;
+                text-align: center;
+            }
+            .incomplete-test-warning p {
+                margin: 0;
+                font-size: 13px;
+                font-weight: 500;
+                color: var(--amber-800);
+            }
+
+            /* Footer */
+            .footer {
+                margin-top: 40px;
+                padding-top: 16px;
+                border-top: 1px solid var(--gray-300);
+                text-align: center;
+                color: var(--gray-600);
+            }
+            .print-footer {
+                position: fixed;
+                left: 0;
+                right: 0;
+                bottom: 2mm;
+                background: white;
+                border-top: 1px solid var(--gray-300);
+                padding: 3px 0;
+                font-size: 11px;
+                color: var(--gray-600);
+                text-align: center;
+                z-index: 2147483647;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="report-a4 pad-for-footer">
+            <!-- Header -->
+            <header>
+                <h1 class="report-title">AIET PERFORMANCE REPORT</h1>
+                <div class="header-info">
+                    <div class="header-column">
+                        <div class="header-item">
+                            <span class="header-label">Student ID:</span>
+                            <span
+                                >{{ report.report_header.student_id or "—"
+                                }}</span
+                            >
+                        </div>
+                        <div class="header-item">
+                            <span class="header-label">Student Name:</span>
+                            <span
+                                >{{ report.report_header.student_name or "—"
+                                }}</span
+                            >
+                        </div>
+                    </div>
+                    <div class="header-column">
+                        <div class="header-item">
+                            <span class="header-label">Test Name:</span>
+                            <span
+                                >{{ report.report_header.test_name or "—"
+                                }}</span
+                            >
+                        </div>
+                        <div class="header-item">
+                            <span class="header-label">Test Date:</span>
+                            <span
+                                >{{ report.report_header.test_date or "—"
+                                }}</span
+                            >
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="divider"></div>
+
+            <!-- Overall Score -->
+            <div class="overall-score">
+                Overall Score: {{ report.overall_performance.marks_scored|int }}
+                / {{ report.overall_performance.max_marks_possible|int }}
+            </div>
+
+            <!-- Recommendation -->
+            <div class="recommendation">
+                <p>
+                    <span class="font-semibold">Recommendation:</span> {{
+                    report.recommendation.message }}
+                </p>
+                {% if report.recommendation.recommended_chapters %}
+                <p>
+                    Based on your performance, we recommend that you focus on
+                    the following chapters:
+                </p>
+                <div class="recommended-chapters-container">
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>SUBJECT</th>
+                                    <th>RECOMMENDED CHAPTER</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for chapter in
+                                report.recommendation.recommended_chapters %}
+                                <tr>
+                                    <td class="font-medium">
+                                        {{ chapter.subject }}
+                                    </td>
+                                    <td>{{ chapter.chapter_name }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Overall Performance Summary -->
+            <h2 class="section-header">Overall Performance Summary</h2>
+            <div class="section-divider"></div>
+            <div class="table-container metrics-split">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>METRIC</th>
+                            <th>VALUE</th>
+                            <th>METRIC</th>
+                            <th>VALUE</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="font-medium">Total Marks</td>
+                            <td>
+                                {{ report.overall_performance.marks_scored|int
+                                }} / {{
+                                report.overall_performance.max_marks_possible|int
+                                }}
+                            </td>
+                            <td class="font-medium">Questions Skipped</td>
+                            <td>
+                                {{ report.overall_performance.num_skipped }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="font-medium">Correct Answers</td>
+                            <td>
+                                {{ report.overall_performance.num_correct }}
+                            </td>
+                            <td class="font-medium">Wrong Answers</td>
+                            <td>{{ report.overall_performance.num_wrong }}</td>
+                        </tr>
+                        <tr>
+                            <td class="font-medium">Percentage</td>
+                            <td>
+                                {{
+                                "%.2f"|format(report.overall_performance.percentage)
+                                }}%
+                            </td>
+                            <td class="font-medium">Accuracy</td>
+                            <td>
+                                {{
+                                "%.2f"|format(report.overall_performance.accuracy)
+                                }}%
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Subject-wise Performance Analysis -->
+            <h2 class="section-header">Subject-wise Performance Analysis</h2>
+            <div class="section-divider"></div>
+            <div class="subject-cards">
+                {% set ordered_subjects = [] %} {% if
+                report.report_header.course == 'NEET' or
+                report.report_header.stream == 'medical' %} {% set subject_names
+                = ['Physics', 'Chemistry', 'Biology'] %} {% else %} {% set
+                subject_names = ['Physics', 'Chemistry', 'Mathematics'] %} {%
+                endif %} {% for subject_name in subject_names %} {% for subject
+                in report.subject_performance %} {% if subject.subject ==
+                subject_name or (subject_name == 'Mathematics' and
+                subject.subject in ['Maths', 'Mathematics']) %} {% set _ =
+                ordered_subjects.append(subject) %} {% endif %} {% endfor %} {%
+                endfor %} {% for subject in (ordered_subjects if
+                ordered_subjects else report.subject_performance) %}
+                <div class="subject-card">
+                    <h3 class="subject-card-title">
+                        {% if subject.subject == 'Maths' %}MATHEMATICS{% else
+                        %}{{ subject.subject.upper() }}{% endif %}
+                    </h3>
+                    <div class="subject-card-content">
+                        <div class="subject-card-line">
+                            <span class="subject-card-label">Marks</span>
+                            <span class="subject-card-value"
+                                >{{ subject.marks_scored|int }} / {{
+                                subject.max_marks_possible|int }}</span
+                            >
+                        </div>
+                        <div class="subject-card-line">
+                            <span class="subject-card-label">Skipped</span>
+                            <span class="subject-card-value"
+                                >{{ subject.num_skipped }}</span
+                            >
+                        </div>
+                        <div class="subject-card-line">
+                            <span class="subject-card-label">Wrong</span>
+                            <span class="subject-card-value"
+                                >{{ subject.num_wrong }}</span
+                            >
+                        </div>
+                        <div class="subject-card-line">
+                            <span class="subject-card-label">Correct</span>
+                            <span class="subject-card-value"
+                                >{{ subject.num_correct }}</span
+                            >
+                        </div>
+                        <div class="subject-card-line">
+                            <span class="subject-card-label">Percentage</span>
+                            <span class="subject-card-value"
+                                >{{ "%.0f"|format(subject.percentage) }}%</span
+                            >
+                        </div>
+                        <div class="subject-card-line">
+                            <span class="subject-card-label">Accuracy</span>
+                            <span class="subject-card-value"
+                                >{{ "%.2f"|format(subject.accuracy) }}%</span
+                            >
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="print-page-break"></div>
+
+            <!-- Chapter-wise Performance Analysis -->
+            <h2 class="section-header">Chapter-wise Performance Analysis</h2>
+            <div class="section-divider"></div>
+            <div class="chapters-section">
+                {% set chapter_subjects = {} %} {% for chapter in
+                report.chapter_performance %} {% if chapter.subject not in
+                chapter_subjects %} {% set _ =
+                chapter_subjects.update({chapter.subject: []}) %} {% endif %} {%
+                set _ = chapter_subjects[chapter.subject].append(chapter) %} {%
+                endfor %} {% if report.report_header.course == 'NEET' or
+                report.report_header.stream == 'medical' %} {% set subject_order
+                = [('Physics', 'Physics Chapters'), ('Chemistry', 'Chemistry
+                Chapters'), ('Biology', 'Biology Chapters')] %} {% else %} {%
+                set subject_order = [('Physics', 'Physics Chapters'),
+                ('Chemistry', 'Chemistry Chapters'), ('Maths', 'Mathematics
+                Chapters')] %} {% endif %} {% for subject_key, section_title in
+                subject_order %} {% if subject_key in chapter_subjects or
+                (subject_key == 'Maths' and 'Mathematics' in chapter_subjects)
+                %} {% set chapters = chapter_subjects.get(subject_key,
+                chapter_subjects.get('Mathematics', [])) %}
+                <div style="margin-bottom: 32px">
+                    <h3 class="chapter-section-title">{{ section_title }}</h3>
+                    <div class="chapters-table">
+                        <div class="table-container">
+                            <table>
+                                <colgroup>
+                                    <col style="width: 40%" />
+                                    <col style="width: 12%" />
+                                    <col style="width: 12%" />
+                                    <col style="width: 12%" />
+                                    <col style="width: 12%" />
+                                    <col style="width: 12%" />
+                                </colgroup>
+                                <thead>
+                                    <tr>
+                                        <th>CHAPTER NAME</th>
+                                        <th>PRIORITY</th>
+                                        <th>SCORE</th>
+                                        <th>#CORRECT</th>
+                                        <th>#WRONG</th>
+                                        <th>#SKIPPED</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% set ordered_chapters = [] %} {% for
+                                    priority in ['High', 'Medium', 'Low',
+                                    'Unknown'] %} {% for chapter in
+                                    chapters|sort(attribute='chapter_name') %}
+                                    {% if chapter.priority == priority %} {% set
+                                    _ = ordered_chapters.append(chapter) %} {%
+                                    endif %} {% endfor %} {% endfor %} {% for
+                                    chapter in ordered_chapters %}
+                                    <tr>
+                                        <td>
+                                            {{ chapter.chapter_name or 'Unknown
+                                            Chapter' }}
+                                        </td>
+                                        <td>{{ chapter.priority or '-' }}</td>
+                                        <td>
+                                            {{ chapter.marks_scored|int }} / {{
+                                            chapter.max_marks_possible|int }}
+                                        </td>
+                                        <td>{{ chapter.num_correct or 0 }}</td>
+                                        <td>{{ chapter.num_wrong or 0 }}</td>
+                                        <td>{{ chapter.num_skipped or 0 }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                {% endif %} {% endfor %}
+            </div>
+
+            {% if report.metadata.test_incomplete %}
+            <div class="incomplete-test-warning">
+                <p>
+                    ⚠️ Student did not click "End Test". Report may be
+                    incomplete.
+                </p>
+            </div>
+            {% endif %}
+
+            <footer class="footer">
+                <p>
+                    This report is generated by Avanti Fellows to improve your
+                    testprep strategy. For detailed guidance, consult your
+                    teacher.
+                </p>
+            </footer>
+        </div>
+
+        <footer class="print-footer">
+            This report is generated by Avanti Fellows to improve your testprep
+            strategy. For detailed guidance, consult your teacher.
+        </footer>
+    </body>
+</html>
