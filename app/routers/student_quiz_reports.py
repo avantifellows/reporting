@@ -344,11 +344,8 @@ class StudentQuizReportsRouter:
             # Fall back to v1 table
             try:
                 data = self.__reports_db.get_student_quiz_report(user_id, session_id)
-            except KeyError:
-                raise HTTPException(
-                    status_code=400,
-                    detail="No student_quiz_report found. Unknown error occurred.",
-                )
+            except (KeyError, ValueError):
+                data = []
 
             if len(data) == 0:
                 # no data
