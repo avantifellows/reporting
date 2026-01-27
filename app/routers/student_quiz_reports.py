@@ -285,8 +285,8 @@ class StudentQuizReportsRouter:
             First checks v2 table, falls back to v1 template if not found.
 
             For v2 reports:
-            - Default: Display version with colors (student_quiz_report_v2_display.html)
-            - ?print=true: Print-optimized version (student_quiz_report_v2.html)
+            - Default: Display version with colors (student_quiz_report_v2.html)
+            - ?print=true: Print-optimized version (student_quiz_report_v2_print.html)
             - ?format=pdf: Generates PDF using print-optimized template
 
             Args:
@@ -316,17 +316,23 @@ class StudentQuizReportsRouter:
 
             # Try v2 table first - render v2 template if found
             try:
-                v2_data = self.__reports_db.get_student_quiz_report_v2(user_id, session_id)
-                if len(v2_data) > 0:
-                    report = v2_data[0]
-
+                v2_report = self.__reports_db.get_student_quiz_report_v2(
+                    user_id, session_id
+                )
+                if v2_report:
                     # Use print template for PDF or if ?print=true, otherwise display template
-                    use_print = format == "pdf" or request.query_params.get("print") == "true"
-                    template_name = "student_quiz_report_v2_print.html" if use_print else "student_quiz_report_v2.html"
+                    use_print = (
+                        format == "pdf" or request.query_params.get("print") == "true"
+                    )
+                    template_name = (
+                        "student_quiz_report_v2_print.html"
+                        if use_print
+                        else "student_quiz_report_v2.html"
+                    )
 
                     template_response = self._templates.TemplateResponse(
                         template_name,
-                        {"request": request, "report": report},
+                        {"request": request, "report": v2_report},
                     )
 
                     if format == "pdf":

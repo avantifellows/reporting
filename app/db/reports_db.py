@@ -55,13 +55,14 @@ class ReportsDB:
         params:
             user_id: The user ID
             session_id: The session ID
+        Returns:
+            The report item if found, None otherwise.
         """
         try:
             table = self.__db.Table("student_quiz_reports_v2")
             response = table.get_item(
                 Key={"session_id": session_id, "user_id": user_id}
             )
-            item = response.get("Item")
-            return [item] if item else []
+            return response.get("Item")
         except ClientError as e:
             raise ValueError(e.response["Error"]["Message"])
