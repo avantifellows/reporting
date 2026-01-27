@@ -314,34 +314,45 @@ class StudentQuizReportsRouter:
             session_id = unquote(session_id)
             user_id = unquote(user_id)
 
-            # Try v2 table first - render v2 template if found
+            # Helper to render v2 template
+            def render_v2_report(report):
+                use_print = (
+                    format == "pdf" or request.query_params.get("print") == "true"
+                )
+                template_name = (
+                    "student_quiz_report_v2_print.html"
+                    if use_print
+                    else "student_quiz_report_v2.html"
+                )
+                template_response = self._templates.TemplateResponse(
+                    template_name,
+                    {"request": request, "report": report},
+                )
+                if format == "pdf":
+                    return convert_template_to_pdf(template_response, debug=debug)
+                return template_response
+
+            # Step 1: Try v2 table with user_id (primary key lookup)
             try:
                 v2_report = self.__reports_db.get_student_quiz_report_v2(
                     user_id, session_id
                 )
                 if v2_report:
-                    # Use print template for PDF or if ?print=true, otherwise display template
-                    use_print = (
-                        format == "pdf" or request.query_params.get("print") == "true"
-                    )
-                    template_name = (
-                        "student_quiz_report_v2_print.html"
-                        if use_print
-                        else "student_quiz_report_v2.html"
-                    )
-
-                    template_response = self._templates.TemplateResponse(
-                        template_name,
-                        {"request": request, "report": v2_report},
-                    )
-
-                    if format == "pdf":
-                        return convert_template_to_pdf(template_response, debug=debug)
-                    return template_response
+                    return render_v2_report(v2_report)
             except ValueError:
-                pass  # Fall through to v1
+                pass
 
-            # Fall back to v1 table
+            # Step 2: Try v2 table by session_id GSI, match student_id or apaar_id
+            try:
+                v2_report = self.__reports_db.get_student_quiz_report_v2_by_alt_id(
+                    user_id, session_id
+                )
+                if v2_report:
+                    return render_v2_report(v2_report)
+            except ValueError:
+                pass
+
+            # Step 3: Fall back to v1 table
             try:
                 data = self.__reports_db.get_student_quiz_report(user_id, session_id)
             except (KeyError, ValueError):

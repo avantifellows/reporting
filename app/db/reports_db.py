@@ -66,3 +66,29 @@ class ReportsDB:
             return response.get("Item")
         except ClientError as e:
             raise ValueError(e.response["Error"]["Message"])
+
+    def get_student_quiz_report_v2_by_alt_id(self, identifier, session_id):
+        """
+        Returns a student quiz report from the v2 table by querying the session_id GSI
+        and matching student_id or apaar_id.
+        params:
+            identifier: The student_id or apaar_id to match
+            session_id: The session ID
+        Returns:
+            The report item if found, None otherwise.
+        """
+        try:
+            table = self.__db.Table("student_quiz_reports_v2")
+            response = table.query(
+                IndexName="session_id-index",
+                KeyConditionExpression=Key("session_id").eq(session_id),
+            )
+            for item in response.get("Items", []):
+                if (
+                    item.get("student_id") == identifier
+                    or item.get("apaar_id") == identifier
+                ):
+                    return item
+            return None
+        except ClientError as e:
+            raise ValueError(e.response["Error"]["Message"])
