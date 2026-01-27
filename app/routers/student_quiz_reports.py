@@ -316,6 +316,10 @@ class StudentQuizReportsRouter:
 
             # Helper to render v2 template
             def render_v2_report(report):
+                # Use top-level student_id for report_header.student_id
+                if "report_header" in report and "student_id" in report:
+                    report["report_header"]["student_id"] = report["student_id"]
+
                 use_print = (
                     format == "pdf" or request.query_params.get("print") == "true"
                 )
