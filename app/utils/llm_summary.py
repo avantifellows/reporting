@@ -9,10 +9,13 @@ logger = logging.getLogger(__name__)
 
 
 class LLMSummaryGenerator:
-    """Generate AI-powered summaries for form responses using OpenAI."""
+    """Generate AI-powered summaries for form responses using OpenRouter."""
 
     def __init__(self):
-        self.client = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+        self.client = AsyncOpenAI(
+            api_key=os.getenv("OPENROUTER_API_KEY"),
+            base_url="https://openrouter.ai/api/v1",
+        )
 
     async def generate_section_summary(
         self, theme: str, responses: List[Dict], user_id: Optional[str] = None
@@ -57,7 +60,7 @@ class LLMSummaryGenerator:
             prompt = self._create_summary_prompt(theme, response_data, user_id)
 
             response = await self.client.chat.completions.create(
-                model="gpt-4o-mini",
+                model="google/gemini-3-flash-preview",
                 messages=[{"role": "user", "content": prompt}],
                 max_tokens=100,
                 temperature=0.7,

@@ -67,7 +67,7 @@ jobs:
           FIRESTORE_CREDENTIALS: ${{ secrets.FIRESTORE_CREDENTIALS }}
           MONGO_AUTH_CREDENTIALS: ${{ secrets.MONGO_AUTH_CREDENTIALS }}
           BQ_CREDENTIALS_SECRET_NAME: ${{ secrets.BQ_CREDENTIALS_SECRET_NAME }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           HTML_TO_PDF_SERVER_URL: ${{ secrets.HTML_TO_PDF_SERVER_URL }}
         run: >
            sam deploy
@@ -86,5 +86,5 @@ jobs:
            FirestoreCredentials=$FIRESTORE_CREDENTIALS
            MongoAuthCredentials=$MONGO_AUTH_CREDENTIALS
            BqCredentialsSecretName=$BQ_CREDENTIALS_SECRET_NAME
-           OpenaiApiKey=$OPENAI_API_KEY
+           OpenrouterApiKey=$OPENROUTER_API_KEY
            HtmlToPdfUrl=$HTML_TO_PDF_SERVER_URL

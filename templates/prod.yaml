@@ -30,9 +30,9 @@ Parameters:
   DynamodbStudentReportsTableName:
     Type: String
     Description: Name of the DynamoDB table for student reports
-  OpenaiApiKey:
+  OpenrouterApiKey:
     Type: String
-    Description: OpenAI API key for AI features
+    Description: OpenRouter API key for AI features
 
 Resources:
   Function:
@@ -54,7 +54,7 @@ Resources:
           FIRESTORE_CREDENTIALS: !Ref FirestoreCredentials
           BQ_CREDENTIALS_SECRET_NAME: !Ref BqCredentialsSecretName
           DYNAMODB_STUDENT_REPORTS_TABLE_NAME: !Ref DynamodbStudentReportsTableName
-          OPENAI_API_KEY: !Ref OpenaiApiKey
+          OPENROUTER_API_KEY: !Ref OpenrouterApiKey
           HTML_TO_PDF_SERVER_URL: !Ref HtmlToPdfUrl
       Policies:
         - Statement:
