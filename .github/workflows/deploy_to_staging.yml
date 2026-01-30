@@ -63,9 +63,11 @@ jobs:
           DYNAMODB_REGION: ${{ secrets.DYNAMODB_REGION }}
           DYNAMODB_ACCESS_KEY: ${{ secrets.DYNAMODB_ACCESS_KEY }}
           DYNAMODB_SECRET_KEY: ${{ secrets.DYNAMODB_SECRET_KEY }}
+          DYNAMODB_STUDENT_REPORTS_TABLE_NAME: ${{ secrets.DYNAMODB_STUDENT_REPORTS_TABLE_NAME }}
           FIRESTORE_CREDENTIALS: ${{ secrets.FIRESTORE_CREDENTIALS }}
           MONGO_AUTH_CREDENTIALS: ${{ secrets.MONGO_AUTH_CREDENTIALS }}
           BQ_CREDENTIALS_SECRET_NAME: ${{ secrets.BQ_CREDENTIALS_SECRET_NAME }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           HTML_TO_PDF_SERVER_URL: ${{ secrets.HTML_TO_PDF_SERVER_URL }}
         run: >
            sam deploy
@@ -80,7 +82,9 @@ jobs:
            DynamodbRegion=$DYNAMODB_REGION
            DynamodbAccessKey=$DYNAMODB_ACCESS_KEY
            DynamodbSecretKey=$DYNAMODB_SECRET_KEY
+           DynamodbStudentReportsTableName=$DYNAMODB_STUDENT_REPORTS_TABLE_NAME
            FirestoreCredentials=$FIRESTORE_CREDENTIALS
            MongoAuthCredentials=$MONGO_AUTH_CREDENTIALS
            BqCredentialsSecretName=$BQ_CREDENTIALS_SECRET_NAME
+           OpenaiApiKey=$OPENAI_API_KEY
            HtmlToPdfUrl=$HTML_TO_PDF_SERVER_URL
