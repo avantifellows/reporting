@@ -232,9 +232,9 @@
                                 </thead>
                                 <tbody>
                                     {% set ordered_chapters = [] %}
-                                    {% for priority in ['High', 'Medium', 'Low', 'Unknown'] %}
+                                    {% for priority in ['high', 'medium', 'low', 'unknown'] %}
                                         {% for chapter in chapters|sort(attribute='chapter_name') %}
-                                            {% if chapter.priority == priority %}
+                                            {% if (chapter.priority or 'unknown')|lower == priority %}
                                                 {% set _ = ordered_chapters.append(chapter) %}
                                             {% endif %}
                                         {% endfor %}
@@ -244,9 +244,9 @@
                                     <tr class="border-t border-gray-100 hover:bg-gray-50">
                                         <td class="px-4 py-2 text-gray-800">{{ chapter.chapter_name or 'Unknown Chapter' }}</td>
                                         <td class="px-3 py-2 text-center">
-                                            {% if chapter.priority == 'High' %}
+                                            {% if (chapter.priority or '')|lower == 'high' %}
                                             <span class="inline-block px-2 py-0.5 text-xs font-medium bg-red-100 text-red-700 rounded">High</span>
-                                            {% elif chapter.priority == 'Medium' %}
+                                            {% elif (chapter.priority or '')|lower == 'medium' %}
                                             <span class="inline-block px-2 py-0.5 text-xs font-medium bg-yellow-100 text-yellow-700 rounded">Medium</span>
                                             {% else %}
                                             <span class="inline-block px-2 py-0.5 text-xs font-medium bg-green-100 text-green-700 rounded">Low</span>

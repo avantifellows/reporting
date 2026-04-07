@@ -619,10 +619,10 @@
                                 </thead>
                                 <tbody>
                                     {% set ordered_chapters = [] %} {% for
-                                    priority in ['High', 'Medium', 'Low',
-                                    'Unknown'] %} {% for chapter in
+                                    priority in ['high', 'medium', 'low',
+                                    'unknown'] %} {% for chapter in
                                     chapters|sort(attribute='chapter_name') %}
-                                    {% if chapter.priority == priority %} {% set
+                                    {% if (chapter.priority or 'unknown')|lower == priority %} {% set
                                     _ = ordered_chapters.append(chapter) %} {%
                                     endif %} {% endfor %} {% endfor %} {% for
                                     chapter in ordered_chapters %}
@@ -631,7 +631,7 @@
                                             {{ chapter.chapter_name or 'Unknown
                                             Chapter' }}
                                         </td>
-                                        <td>{{ chapter.priority or '-' }}</td>
+                                        <td>{{ (chapter.priority or '-')|capitalize }}</td>
                                         <td>
                                             {{ chapter.marks_scored|int }} / {{
                                             chapter.max_marks_possible|int }}
