@@ -236,23 +236,47 @@ class StudentQuizReportsRouter:
                 )
 
             print("Getting student reports for user ID: ", user_id)
-            data = self.__reports_db.get_student_reports(user_id)
-            print(data)
 
-            # Create a structured response with student reports
+            # Query both v1 and v2 tables
+            v1_data = self.__reports_db.get_student_reports(user_id)
+            v2_data = self.__reports_db.get_student_reports_v2(user_id)
+
+            # Track session IDs from v2 to avoid duplicates
+            v2_session_ids = {doc["session_id"] for doc in v2_data}
+
             student_reports = []
-            for doc in data:
+
+            # Add v1 reports (skip if session exists in v2)
+            for doc in v1_data:
                 if "overall" not in doc["user_id-section"]:
+                    continue
+                if doc["session_id"] in v2_session_ids:
                     continue
                 result = {
                     "test_name": doc["test_name"],
                     "test_session_id": doc["session_id"],
-                    "percentile": doc["percentile"] if "percentile" in doc else "",
-                    "rank": doc["rank"] if "rank" in doc else "",
+                    "percentile": doc.get("percentile", ""),
+                    "rank": doc.get("rank", ""),
                     "report_link": STUDENT_QUIZ_REPORT_URL.format(
                         session_id=doc["session_id"], user_id=user_id
                     ),
                     "start_date": doc["start_date"],
+                }
+                student_reports.append(result)
+
+            # Add v2 reports
+            for doc in v2_data:
+                header = doc.get("report_header", {})
+                overall = doc.get("overall_performance", {})
+                result = {
+                    "test_name": header.get("test_name", ""),
+                    "test_session_id": doc["session_id"],
+                    "percentile": overall.get("percentage", ""),
+                    "rank": overall.get("cms_rank", ""),
+                    "report_link": STUDENT_QUIZ_REPORT_URL.format(
+                        session_id=doc["session_id"], user_id=user_id
+                    ),
+                    "start_date": header.get("test_date", ""),
                 }
                 student_reports.append(result)
 
