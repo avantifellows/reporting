@@ -35,11 +35,11 @@
         </button>
     </div>
 
-    <main class="max-w-4xl mx-auto p-6 bg-white shadow-lg my-8 rounded-lg">
+    <main class="max-w-4xl mx-auto p-4 sm:p-6 bg-white shadow-lg my-4 sm:my-8 rounded-lg">
         <!-- Header -->
         <header class="w-full">
-            <h1 class="text-center text-3xl font-extrabold tracking-tight text-gray-900">AIET PERFORMANCE REPORT</h1>
-            <div class="mt-6 grid grid-cols-2 gap-6 text-sm text-gray-700">
+            <h1 class="text-center text-2xl sm:text-3xl font-extrabold tracking-tight text-gray-900">AIET PERFORMANCE REPORT</h1>
+            <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-6 text-sm text-gray-700">
                 <div class="flex flex-col gap-2">
                     <div class="flex items-center gap-2">
                         <span class="font-semibold text-gray-900">Student ID:</span>
@@ -104,28 +104,28 @@
         <section class="mt-8">
             <h2 class="text-xl font-semibold text-gray-900 tracking-tight">Overall Performance Summary</h2>
             <div class="mt-3 h-px bg-gray-200"></div>
-            <div class="mt-4 grid grid-cols-3 gap-4">
-                <div class="bg-green-50 border border-green-200 rounded-lg p-4 text-center">
-                    <div class="text-3xl font-bold text-green-600">{{ report.overall_performance.num_correct }}</div>
+            <div class="mt-4 grid grid-cols-3 gap-2 sm:gap-4">
+                <div class="bg-green-50 border border-green-200 rounded-lg p-3 sm:p-4 text-center">
+                    <div class="text-2xl sm:text-3xl font-bold text-green-600">{{ report.overall_performance.num_correct }}</div>
                     <div class="text-sm text-gray-600 mt-1">Correct</div>
                 </div>
-                <div class="bg-red-50 border border-red-200 rounded-lg p-4 text-center">
-                    <div class="text-3xl font-bold text-red-600">{{ report.overall_performance.num_wrong }}</div>
+                <div class="bg-red-50 border border-red-200 rounded-lg p-3 sm:p-4 text-center">
+                    <div class="text-2xl sm:text-3xl font-bold text-red-600">{{ report.overall_performance.num_wrong }}</div>
                     <div class="text-sm text-gray-600 mt-1">Wrong</div>
                 </div>
-                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 text-center">
-                    <div class="text-3xl font-bold text-gray-600">{{ report.overall_performance.num_skipped }}</div>
+                <div class="bg-gray-50 border border-gray-200 rounded-lg p-3 sm:p-4 text-center">
+                    <div class="text-2xl sm:text-3xl font-bold text-gray-600">{{ report.overall_performance.num_skipped }}</div>
                     <div class="text-sm text-gray-600 mt-1">Skipped</div>
                 </div>
             </div>
-            <div class="mt-4 grid grid-cols-2 gap-4">
-                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 flex justify-between items-center">
-                    <span class="text-gray-700 font-medium">Percentage</span>
-                    <span class="text-2xl font-bold text-blue-600">{{ "%.1f"|format(report.overall_performance.percentage) }}%</span>
+            <div class="mt-4 grid grid-cols-2 gap-2 sm:gap-4">
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4 flex justify-between items-center">
+                    <span class="text-gray-700 font-medium text-sm sm:text-base">Percentage</span>
+                    <span class="text-xl sm:text-2xl font-bold text-blue-600">{{ "%.1f"|format(report.overall_performance.percentage) }}%</span>
                 </div>
-                <div class="bg-purple-50 border border-purple-200 rounded-lg p-4 flex justify-between items-center">
-                    <span class="text-gray-700 font-medium">Accuracy</span>
-                    <span class="text-2xl font-bold text-purple-600">{{ "%.1f"|format(report.overall_performance.accuracy) }}%</span>
+                <div class="bg-purple-50 border border-purple-200 rounded-lg p-3 sm:p-4 flex justify-between items-center">
+                    <span class="text-gray-700 font-medium text-sm sm:text-base">Accuracy</span>
+                    <span class="text-xl sm:text-2xl font-bold text-purple-600">{{ "%.1f"|format(report.overall_performance.accuracy) }}%</span>
                 </div>
             </div>
         </section>
@@ -134,7 +134,7 @@
         <section class="mt-8">
             <h2 class="text-xl font-semibold text-gray-900 tracking-tight">Subject-wise Performance Analysis</h2>
             <div class="mt-3 h-px bg-gray-200"></div>
-            <div class="mt-4 grid grid-cols-3 gap-4">
+            <div class="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-4">
                 {% set subject_colors = {'Physics': 'blue', 'Chemistry': 'green', 'Biology': 'purple', 'Mathematics': 'orange', 'Maths': 'orange'} %}
                 {% set ordered_subjects = [] %}
                 {% if report.report_header.course == 'NEET' or report.report_header.stream == 'medical' %}
@@ -218,8 +218,8 @@
                     {% set chapters = chapter_subjects.get(subject_key, chapter_subjects.get('Mathematics', [])) %}
                     <div class="mt-6">
                         <h3 class="text-lg font-semibold text-{{ color }}-700 mb-3">{{ section_title }}</h3>
-                        <div class="overflow-hidden border border-gray-200 rounded-lg">
-                            <table class="w-full text-sm">
+                        <div class="overflow-x-auto border border-gray-200 rounded-lg">
+                            <table class="w-full text-sm min-w-[500px]">
                                 <thead class="bg-gray-50">
                                     <tr>
                                         <th class="px-4 py-3 text-left font-semibold text-gray-700">Chapter Name</th>
