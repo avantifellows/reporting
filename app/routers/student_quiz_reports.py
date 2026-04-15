@@ -236,23 +236,47 @@ class StudentQuizReportsRouter:
                 )
 
             print("Getting student reports for user ID: ", user_id)
-            data = self.__reports_db.get_student_reports(user_id)
-            print(data)
 
-            # Create a structured response with student reports
+            # Query both v1 and v2 tables
+            v1_data = self.__reports_db.get_student_reports(user_id)
+            v2_data = self.__reports_db.get_student_reports_v2(user_id)
+
+            # Track session IDs from v2 to avoid duplicates
+            v2_session_ids = {doc["session_id"] for doc in v2_data}
+
             student_reports = []
-            for doc in data:
+
+            # Add v1 reports (skip if session exists in v2)
+            for doc in v1_data:
                 if "overall" not in doc["user_id-section"]:
+                    continue
+                if doc["session_id"] in v2_session_ids:
                     continue
                 result = {
                     "test_name": doc["test_name"],
                     "test_session_id": doc["session_id"],
-                    "percentile": doc["percentile"] if "percentile" in doc else "",
-                    "rank": doc["rank"] if "rank" in doc else "",
+                    "percentile": doc.get("percentile", ""),
+                    "rank": doc.get("rank", ""),
                     "report_link": STUDENT_QUIZ_REPORT_URL.format(
                         session_id=doc["session_id"], user_id=user_id
                     ),
                     "start_date": doc["start_date"],
+                }
+                student_reports.append(result)
+
+            # Add v2 reports
+            for doc in v2_data:
+                header = doc.get("report_header", {})
+                overall = doc.get("overall_performance", {})
+                result = {
+                    "test_name": header.get("test_name", ""),
+                    "test_session_id": doc["session_id"],
+                    "percentile": overall.get("percentage", ""),
+                    "rank": overall.get("cms_rank", ""),
+                    "report_link": STUDENT_QUIZ_REPORT_URL.format(
+                        session_id=doc["session_id"], user_id=user_id
+                    ),
+                    "start_date": header.get("test_date", ""),
                 }
                 student_reports.append(result)
 
@@ -282,20 +306,26 @@ class StudentQuizReportsRouter:
         ):
             """
             Returns a student quiz report for a given session ID and user ID.
+            First checks v2 table, falls back to v1 template if not found.
+
+            For v2 reports:
+            - Default: Display version with colors (student_quiz_report_v2.html)
+            - ?print=true: Print-optimized version (student_quiz_report_v2_print.html)
+            - ?format=pdf: Generates PDF using print-optimized template
 
             Args:
                 request (Request): The request object.
                 session_id (str): The session ID.
                 user_id (str): The user ID.
-                format (str, optional): The format of the report. If "pdf", returns a PDF. Defaults to None.
-                debug (bool): If True and format is "pdf", returns the HTML that would be sent to PDF service.
+                format (str, optional): If "pdf", returns a PDF. Defaults to None.
+                debug (bool): If True and format is "pdf", returns HTML instead of PDF.
 
             Raises:
                 HTTPException: If session ID or user ID is not specified.
 
             Returns:
-                TemplateResponse: The student quiz report template response.
-                StreamingResponse: A PDF response if format=pdf.
+                TemplateResponse: HTML report (display or print version).
+                StreamingResponse: PDF response if format=pdf.
                 HTMLResponse: HTML content if format=pdf and debug=True.
             """
             if session_id is None or user_id is None:
@@ -307,13 +337,54 @@ class StudentQuizReportsRouter:
             # it's possible that the strings are URL encoded.
             session_id = unquote(session_id)
             user_id = unquote(user_id)
+
+            # Helper to render v2 template
+            def render_v2_report(report):
+                # Use top-level student_id for report_header.student_id
+                if "report_header" in report and "student_id" in report:
+                    report["report_header"]["student_id"] = report["student_id"]
+
+                use_print = (
+                    format == "pdf" or request.query_params.get("print") == "true"
+                )
+                template_name = (
+                    "student_quiz_report_v2_print.html"
+                    if use_print
+                    else "student_quiz_report_v2.html"
+                )
+                template_response = self._templates.TemplateResponse(
+                    template_name,
+                    {"request": request, "report": report},
+                )
+                if format == "pdf":
+                    return convert_template_to_pdf(template_response, debug=debug)
+                return template_response
+
+            # Step 1: Try v2 table with user_id (primary key lookup)
+            try:
+                v2_report = self.__reports_db.get_student_quiz_report_v2(
+                    user_id, session_id
+                )
+                if v2_report:
+                    return render_v2_report(v2_report)
+            except ValueError:
+                pass
+
+            # Step 2: Try v2 table by session_id GSI, match student_id or apaar_id
+            try:
+                v2_report = self.__reports_db.get_student_quiz_report_v2_by_alt_id(
+                    user_id, session_id
+                )
+                if v2_report:
+                    return render_v2_report(v2_report)
+            except ValueError:
+                pass
+
+            # Step 3: Fall back to v1 table
             try:
                 data = self.__reports_db.get_student_quiz_report(user_id, session_id)
-            except KeyError:
-                raise HTTPException(
-                    status_code=400,
-                    detail="No student_quiz_report found. Unknown error occurred.",
-                )
+            except (KeyError, ValueError):
+                data = []
 
             if len(data) == 0:
                 # no data
