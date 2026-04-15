@@ -19,126 +19,379 @@
   </div>
 </div>
 
+{% if request.query_params.get('format') != 'pdf' %}
 <div class="download_section">
   <a class="download_pdf_button" href="?format=pdf" target="_blank" data-track-button="download_pdf">
     Download PDF Report
   </a>
 </div>
+{% endif %}
 
-<section id="form_responses_section">
-  <div id="section_heading">Form Responses</div>
-
-  <table id="form_responses_table">
-    <thead>
-      <tr>
-        <th class="question_number_col">Question #</th>
-        <th class="theme_col">Theme</th>
-        <th class="question_text_col">Question</th>
-        <th class="response_col">Response</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for response in report_data["responses"] %}
-        {% if response["question_priority"] == "high" %}
-        <tr>
-          <td class="question_number">{{ response["question_number"] }}</td>
-          <td class="theme">{{ response["question_set_title"] }}</td>
-          <td class="question_text">{{ response["question_text"] }}</td>
-          <td class="user_response {% if response['user_response'] == 'None' %}unanswered{% endif %}">
-            {{ response["user_response"] }}
-          </td>
-        </tr>
-        {% endif %}
-      {% endfor %}
-    </tbody>
-  </table>
+<!-- Combined AI Summary Section for All Themes -->
+{% set themes_with_summaries = report_data["themed_responses"] | selectattr("ai_summary") | list %}
+{% if themes_with_summaries %}
+<section class="combined_summary_section">
+  <div class="summary_header">
+    <h2 class="summary_title">🤖 Summary</h2>
+  </div>
+  <div class="summary_content">
+    {% for theme_data in themes_with_summaries %}
+    <div class="theme_summary_subsection">
+      <h3 class="theme_summary_title">{{ theme_data["theme"] }}</h3>
+      <div class="theme_summary_text">
+        {{ theme_data["ai_summary"] }}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
 </section>
+{% endif %}
+
+{% for theme_data in report_data["themed_responses"] %}
+<section class="theme_section">
+  <div class="theme_header">
+    <h2 class="theme_title">📚 {{ theme_data["theme"] }}</h2>
+    <div class="theme_count">{{ theme_data["question_count"] }} questions</div>
+  </div>
+
+  <!-- High Priority Questions -->
+  <div class="high_priority_section">
+    <h3 class="priority_section_title">🔥 High Priority Questions</h3>
+    <div class="questions_container">
+      {% set high_priority_questions = theme_data["responses"] | selectattr("question_priority", "equalto", "high") | list %}
+      {% if high_priority_questions %}
+        {% for response in high_priority_questions %}
+          <div class="question_card {% if response['user_response'] == 'None' %}unanswered_card{% endif %}">
+            {% if response['user_response'] == 'None' %}
+            <div class="question_header">
+              <span class="priority_badge unanswered">Unanswered</span>
+            </div>
+            {% endif %}
+            <div class="question_and_response">
+              <span class="question_text">{{ response["question_text"] }}</span>
+              <span class="student_response {% if response['user_response'] == 'None' %}unanswered_text{% endif %}">
+                {{ response["user_response"] }}
+              </span>
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <div class="no_questions">No high priority questions in this theme</div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Low Priority Questions Accordion -->
+  {% set low_priority_responses = theme_data["responses"] | rejectattr("question_priority", "equalto", "high") | list %}
+
+  {% if low_priority_responses %}
+  <div class="accordion_section">
+    <button class="accordion_toggle {% if request.query_params.get('format') == 'pdf' %}active{% endif %}" onclick="toggleAccordion('{{ theme_data['theme']|replace(' ', '_') }}')">
+      <span class="accordion_title">📝 Other Questions ({{ low_priority_responses|length }})</span>
+      <span class="accordion_icon">{% if request.query_params.get('format') == 'pdf' %}▲{% else %}▼{% endif %}</span>
+    </button>
+    <div class="accordion_content {% if request.query_params.get('format') == 'pdf' %}active{% endif %}" id="accordion_{{ theme_data['theme']|replace(' ', '_') }}">
+      <div class="questions_container low_priority">
+        {% for response in low_priority_responses %}
+          <div class="question_card low_priority_card {% if response['user_response'] == 'None' %}unanswered_card{% endif %}">
+            {% if response['user_response'] == 'None' %}
+            <div class="question_header">
+              <span class="priority_badge unanswered">Unanswered</span>
+            </div>
+            {% endif %}
+            <div class="question_and_response">
+              <span class="question_text">{{ response["question_text"] }}</span>
+              <span class="student_response {% if response['user_response'] == 'None' %}unanswered_text{% endif %}">
+                {{ response["user_response"] }}
+              </span>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+  {% endif %}
+</section>
+{% endfor %}
 
 <style>
-  #form_responses_table {
-    width: 70%;
-    border-collapse: collapse;
-    margin: 30px auto;
-    background-color: white;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  /* Theme Section Styling */
+  .theme_section {
+    margin: 40px auto;
+    max-width: 900px;
+    padding: 0 20px;
   }
 
-  #form_responses_table th {
-    background-color: orange;
-    color: black;
-    font-weight: bold;
-    padding: 10px 8px;
+  .theme_header {
     text-align: center;
-    border: 1px solid #ddd;
-    font-size: 16pt;
+    margin-bottom: 25px;
+    padding: 20px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 12px;
+    border-left: 6px solid orange;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   }
 
-  #form_responses_table td {
-    padding: 10px 8px;
-    border: 1px solid #ddd;
-    vertical-align: top;
-    font-size: 16pt;
-  }
-
-  /* Alternating row colors like other Avanti tables */
-  #form_responses_table tr:nth-child(even) {
-    background-color: white;
-  }
-
-  #form_responses_table tr:nth-child(odd) {
-    background-color: #FEFBEB;
-  }
-
-  #form_responses_table tr:hover {
-    background-color: #ddd;
-  }
-
-  .question_number_col {
-    width: 10%;
-  }
-
-  .theme_col {
-    width: 20%;
-  }
-
-  .question_text_col {
-    width: 45%;
-  }
-
-  .response_col {
-    width: 25%;
-  }
-
-  .question_number {
-    text-align: center;
+  .theme_title {
+    font-size: 28px;
     font-weight: bold;
     color: #333;
+    margin: 0 0 8px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
   }
 
-  .theme {
-    font-weight: bold;
+  .theme_count {
+    font-size: 16px;
+    color: #666;
+    font-style: italic;
+  }
+
+  /* Questions Container */
+  .questions_container {
+    display: grid;
+    gap: 20px;
+    margin-bottom: 40px;
+  }
+
+  /* Question Card Styling */
+  .question_card {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    border: 1px solid #e9ecef;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .question_card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  }
+
+  .unanswered_card {
+    border-left: 4px solid #dc3545;
+    background-color: #fdf2f2;
+  }
+
+  /* Priority Section Title */
+  .priority_section_title {
+    font-size: 20px;
+    font-weight: 600;
     color: #333;
-    text-align: center;
-    word-wrap: break-word;
+    margin: 0 0 15px 0;
+    text-align: left;
+  }
+
+  /* Question Header */
+  .question_header {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+
+  .priority_badge {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 16px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .priority_badge.high {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeeba;
+  }
+
+  .priority_badge.unanswered {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+  }
+
+  .priority_badge.low {
+    background-color: #e2e3e5;
+    color: #495057;
+    border: 1px solid #d6d8db;
+  }
+
+  /* Question and Response Container */
+  .question_and_response {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    line-height: 1.5;
   }
 
   .question_text {
-    line-height: 1.4;
-    text-align: left;
-    word-wrap: break-word;
-    white-space: normal;
-  }
-
-  .user_response {
+    font-size: 16px;
+    color: #333;
     font-weight: 500;
-    text-align: left;
-    word-wrap: break-word;
-    white-space: normal;
+    flex: 1;
+    min-width: 0;
   }
 
-  .unanswered {
+  .student_response {
+    font-size: 16px;
+    color: #333;
+    font-weight: bold;
+    flex: 1;
+    min-width: 0;
+    word-wrap: break-word;
+  }
+
+  .unanswered_text {
+    color: #dc3545;
+    font-style: italic;
+    font-weight: 600;
+  }
+
+  /* Accordion Styles */
+  .accordion_section {
+    margin-top: 25px;
+  }
+
+  .accordion_toggle {
+    width: 100%;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 12px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    color: #495057;
+    transition: all 0.3s ease;
+  }
+
+  .accordion_toggle:hover {
+    background-color: #e9ecef;
+    border-color: #adb5bd;
+  }
+
+  .accordion_title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .accordion_icon {
+    font-size: 14px;
+    transition: transform 0.3s ease;
+  }
+
+  .accordion_toggle.active .accordion_icon {
+    transform: rotate(180deg);
+  }
+
+  .accordion_content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+  }
+
+  .accordion_content.active {
+    max-height: 1000px;
+    padding-top: 15px;
+  }
+
+  /* Low Priority Card Styles */
+  .low_priority_card {
+    background-color: #fafafa;
+    border-color: #e9ecef;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  }
+
+  .questions_container.low_priority {
+    gap: 12px;
+  }
+
+  .no_questions {
+    text-align: center;
     color: #6c757d;
     font-style: italic;
+    padding: 20px;
+  }
+
+  /* Combined Summary Section Styles */
+  .combined_summary_section {
+    margin: 40px auto;
+    max-width: 900px;
+    padding: 0 20px;
+  }
+
+  .summary_header {
+    text-align: center;
+    margin-bottom: 20px;
+    padding: 20px;
+    background: linear-gradient(135deg, #e8f5e8 0%, #f0f8ff 100%);
+    border-radius: 12px;
+    border-left: 6px solid #4caf50;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+
+  .summary_title {
+    font-size: 28px;
+    font-weight: bold;
+    color: #2e7d32;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .summary_content {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    border: 1px solid #e9ecef;
+  }
+
+  .theme_summary_subsection {
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #e9ecef;
+  }
+
+  .theme_summary_subsection:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+  }
+
+  .theme_summary_title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #4caf50;
+    margin: 0 0 8px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .theme_summary_title::before {
+    content: "📚";
+    font-size: 16px;
+  }
+
+  .theme_summary_text {
+    font-size: 14px;
+    color: #333;
+    line-height: 1.6;
+    background: rgba(232, 245, 232, 0.3);
+    padding: 12px;
+    border-radius: 6px;
+    border: 1px solid rgba(76, 175, 80, 0.2);
   }
 
   .form_summary {
@@ -186,34 +439,111 @@
     color: white;
   }
 
+  /* Mobile Responsiveness */
   @media (max-width: 768px) {
-    #form_responses_table {
-      width: 95%;
+    .theme_section {
+      padding: 0 15px;
+      margin: 20px auto;
+    }
+
+    .theme_header {
+      padding: 15px;
+    }
+
+    .theme_title {
+      font-size: 22px;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .theme_count {
       font-size: 14px;
     }
 
-    #form_responses_table th,
-    #form_responses_table td {
-      padding: 8px 4px;
-      font-size: 14pt;
+    .question_card {
+      padding: 18px;
+      margin-bottom: 15px;
     }
 
-    .question_number_col {
-      width: 8%;
+    .question_header {
+      justify-content: flex-end;
     }
 
-    .theme_col {
-      width: 18%;
+    .priority_section_title {
+      font-size: 18px;
     }
 
-    .question_text_col {
-      width: 47%;
+    .priority_badge {
+      font-size: 11px;
+      padding: 3px 10px;
     }
 
-    .response_col {
-      width: 27%;
+    .question_and_response {
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .question_text {
+      font-size: 15px;
+    }
+
+    .student_response {
+      font-size: 15px;
+      font-weight: bold;
+    }
+
+    /* Mobile Combined Summary */
+    .combined_summary_section {
+      padding: 0 15px;
+      margin: 20px auto;
+    }
+
+    .summary_header {
+      padding: 15px;
+    }
+
+    .summary_title {
+      font-size: 22px;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .summary_content {
+      padding: 18px;
+    }
+
+    .theme_summary_title {
+      font-size: 16px;
+    }
+
+    .theme_summary_text {
+      font-size: 13px;
+      padding: 10px;
+    }
+  }
+
+  /* PDF/Print Styles */
+  @media print {
+    .accordion_content {
+      max-height: none !important;
+      overflow: visible !important;
+      padding-top: 15px !important;
+    }
+
+    .accordion_toggle {
+      pointer-events: none;
     }
   }
 </style>
+
+<script>
+function toggleAccordion(themeId) {
+  const toggle = event.target.closest('.accordion_toggle');
+  const content = document.getElementById('accordion_' + themeId);
+
+  toggle.classList.toggle('active');
+  content.classList.toggle('active');
+}
+</script>
 
 {% endblock %}
