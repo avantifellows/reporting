@@ -84,24 +84,35 @@ class ReportsDB:
 
     def get_student_quiz_report_v2_by_alt_id(self, identifier, session_id):
         """
-        Returns a student quiz report from the v2 table by scanning with filters
-        for session_id and matching student_id or apaar_id.
+        Returns a student quiz report from the v2 table by querying the
+        session_id partition and filtering for matching student_id or apaar_id.
+        Empty apaar_id values are excluded from the apaar_id match since many
+        records have apaar_id="".
         params:
-            identifier: The student_id or apaar_id to match
+            identifier: The student_id or apaar_id to match (must be non-empty)
             session_id: The session ID
         Returns:
             The report item if found, None otherwise.
         """
+        if not identifier:
+            return None
         try:
             table = self.__db.Table("student_quiz_reports_v2")
-            response = table.scan(
-                FilterExpression="session_id = :sid AND (student_id = :id OR apaar_id = :id)",
-                ExpressionAttributeValues={
-                    ":sid": session_id,
-                    ":id": identifier,
-                },
+            kwargs = dict(
+                KeyConditionExpression=Key("session_id").eq(session_id),
+                FilterExpression=(
+                    "student_id = :id OR (apaar_id = :id AND apaar_id <> :empty)"
+                ),
+                ExpressionAttributeValues={":id": identifier, ":empty": ""},
             )
-            items = response.get("Items", [])
-            return items[0] if items else None
+            while True:
+                response = table.query(**kwargs)
+                items = response.get("Items", [])
+                if items:
+                    return items[0]
+                lek = response.get("LastEvaluatedKey")
+                if not lek:
+                    return None
+                kwargs["ExclusiveStartKey"] = lek
         except ClientError as e:
             raise ValueError(e.response["Error"]["Message"])
