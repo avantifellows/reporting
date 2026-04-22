@@ -3,278 +3,279 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AIET Performance Report</title>
+    <title>Performance Report</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#1f2937',
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        @media print {
-            @page { size: A4; margin: 10mm 12mm 8mm 12mm; }
-            .no-print { display: none !important; }
-            .print-page-break { break-before: page; page-break-before: always; }
-        }
-    </style>
 </head>
-<body class="bg-gray-100 min-h-screen">
-    <!-- Print Button -->
-    <div class="no-print fixed top-4 right-4 z-50">
-        <button onclick="window.print()" class="bg-gray-900 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-gray-800 transition flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-            </svg>
-            Print Report
-        </button>
-    </div>
-
-    <main class="max-w-4xl mx-auto p-4 sm:p-6 bg-white shadow-lg my-4 sm:my-8 rounded-lg">
+<body class="bg-gray-100 min-h-screen py-5 px-4">
+    <main class="max-w-md md:max-w-3xl lg:max-w-5xl mx-auto bg-white rounded-2xl shadow-lg overflow-hidden">
         <!-- Header -->
-        <header class="w-full">
-            <h1 class="text-center text-2xl sm:text-3xl font-extrabold tracking-tight text-gray-900">AIET PERFORMANCE REPORT</h1>
-            <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-6 text-sm text-gray-700">
-                <div class="flex flex-col gap-2">
-                    <div class="flex items-center gap-2">
-                        <span class="font-semibold text-gray-900">Student ID:</span>
-                        <span>{{ report.report_header.student_id or "—" }}</span>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <span class="font-semibold text-gray-900">Student Name:</span>
-                        <span>{{ report.report_header.student_name or "—" }}</span>
-                    </div>
-                </div>
-                <div class="flex flex-col gap-2">
-                    <div class="flex items-center gap-2">
-                        <span class="font-semibold text-gray-900">Test Name:</span>
-                        <span>{{ report.report_header.test_name or "—" }}</span>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <span class="font-semibold text-gray-900">Test Date:</span>
-                        <span>{{ report.report_header.test_date or "—" }}</span>
-                    </div>
-                </div>
+        <div class="bg-[#4a90e2] text-white p-5 md:p-6">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6 text-xs md:text-sm leading-snug">
+                <div><strong>Student ID:</strong><br class="md:hidden"> {{ report.report_header.student_id or "—" }}</div>
+                <div><strong>Student Name:</strong><br class="md:hidden"> {{ report.report_header.student_name or "—" }}</div>
+                <div><strong>Test Name:</strong><br class="md:hidden"> {{ report.report_header.test_name or "—" }}</div>
+                <div><strong>Test Date:</strong><br class="md:hidden"> {{ report.report_header.test_date or "—" }}</div>
             </div>
-        </header>
-
-        <div class="my-6 h-px bg-gray-300"></div>
-
-        <!-- Overall Score -->
-        <div class="bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg p-6 text-center shadow-md">
-            <div class="text-lg font-medium opacity-90">Overall Score</div>
-            <div class="text-4xl font-bold mt-2">{{ report.overall_performance.marks_scored|int }} / {{ report.overall_performance.max_marks_possible|int }}</div>
-            <div class="text-sm mt-2 opacity-80">{{ "%.1f"|format(report.overall_performance.percentage) }}% Score</div>
         </div>
 
-        <!-- Recommendation -->
-        <div class="mt-6 bg-amber-50 border border-amber-200 rounded-lg p-4">
-            <p class="text-center text-gray-800">
-                <span class="font-semibold">Recommendation:</span> {{ report.recommendation.message }}
-            </p>
-            {% if report.recommendation.recommended_chapters %}
-            <p class="text-center text-sm text-gray-600 mt-2">Based on your performance, focus on these chapters:</p>
-            <div class="mt-4 flex justify-center">
-                <table class="text-sm border-collapse">
+        <div class="p-5 md:p-8">
+            <!-- Overall Score -->
+            <div class="flex flex-col items-center justify-center py-8 bg-gray-50 rounded-2xl mb-4 md:mb-6">
+                <div class="text-[10px] md:text-xs text-gray-500 uppercase tracking-wider mb-2">Overall Score</div>
+                <div class="text-5xl md:text-6xl font-bold text-[#4a90e2] leading-none">
+                    {{ report.overall_performance.marks_scored|int }}
+                </div>
+            </div>
+
+            <!-- Recommendation -->
+            {% if report.recommendation and (report.recommendation.message or report.recommendation.recommended_chapters) %}
+            <div class="bg-gray-50 p-5 rounded-2xl mb-6 md:mb-8">
+                {% if report.recommendation.message %}
+                <div class="text-sm leading-relaxed mb-4 text-gray-800">
+                    {{ report.recommendation.message }}
+                </div>
+                {% endif %}
+                {% if report.recommendation.recommended_chapters %}
+                <table class="w-full border-collapse rounded-xl overflow-hidden shadow-sm">
                     <thead>
-                        <tr class="bg-amber-100">
-                            <th class="px-4 py-2 text-left font-semibold text-gray-700 border border-amber-200">Subject</th>
-                            <th class="px-4 py-2 text-left font-semibold text-gray-700 border border-amber-200">Recommended Chapter</th>
+                        <tr>
+                            <th class="bg-[#4a90e2] text-white px-3 py-2 text-left text-xs font-semibold">Subject</th>
+                            <th class="bg-[#4a90e2] text-white px-3 py-2 text-left text-xs font-semibold">Recommended Chapter</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for chapter in report.recommendation.recommended_chapters %}
                         <tr class="bg-white">
-                            <td class="px-4 py-2 font-medium text-gray-800 border border-amber-200">{{ chapter.subject }}</td>
-                            <td class="px-4 py-2 text-gray-700 border border-amber-200">{{ chapter.chapter_name }}</td>
+                            <td class="px-3 py-2 text-xs border-b border-gray-200">{{ chapter.subject }}</td>
+                            <td class="px-3 py-2 text-xs border-b border-gray-200">{{ chapter.chapter_name }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
+                {% endif %}
             </div>
             {% endif %}
-        </div>
 
-        <!-- Overall Performance Summary -->
-        <section class="mt-8">
-            <h2 class="text-xl font-semibold text-gray-900 tracking-tight">Overall Performance Summary</h2>
-            <div class="mt-3 h-px bg-gray-200"></div>
-            <div class="mt-4 grid grid-cols-3 gap-2 sm:gap-4">
-                <div class="bg-green-50 border border-green-200 rounded-lg p-3 sm:p-4 text-center">
-                    <div class="text-2xl sm:text-3xl font-bold text-green-600">{{ report.overall_performance.num_correct }}</div>
-                    <div class="text-sm text-gray-600 mt-1">Correct</div>
-                </div>
-                <div class="bg-red-50 border border-red-200 rounded-lg p-3 sm:p-4 text-center">
-                    <div class="text-2xl sm:text-3xl font-bold text-red-600">{{ report.overall_performance.num_wrong }}</div>
-                    <div class="text-sm text-gray-600 mt-1">Wrong</div>
-                </div>
-                <div class="bg-gray-50 border border-gray-200 rounded-lg p-3 sm:p-4 text-center">
-                    <div class="text-2xl sm:text-3xl font-bold text-gray-600">{{ report.overall_performance.num_skipped }}</div>
-                    <div class="text-sm text-gray-600 mt-1">Skipped</div>
+            <!-- Overall Performance Summary -->
+            <div class="mb-6 lg:mb-8">
+                <h3 class="text-lg sm:text-xl font-bold text-[#2c3e50] mb-4 pb-2 border-b-[3px] border-[#4a90e2]">
+                    Overall Performance Summary
+                </h3>
+                <div class="grid grid-cols-2 md:grid-cols-6 gap-3">
+                    {% set metrics = [
+                        (report.overall_performance.marks_scored|int, "Total Marks"),
+                        (report.overall_performance.num_correct, "Correct Answers"),
+                        ("%.2f"|format(report.overall_performance.percentage) ~ "%", "Percentage"),
+                        (report.overall_performance.num_skipped, "Questions Skipped"),
+                        (report.overall_performance.num_wrong, "Wrong Answers"),
+                        ("%.2f"|format(report.overall_performance.accuracy) ~ "%", "Accuracy")
+                    ] %}
+                    {% for value, label in metrics %}
+                    <div class="bg-white border-2 border-gray-200 rounded-xl p-4 text-center shadow-sm">
+                        <div class="text-xl sm:text-2xl font-bold text-[#4a90e2] leading-none mb-1">{{ value }}</div>
+                        <div class="text-[10px] text-gray-500 uppercase tracking-wider">{{ label }}</div>
+                    </div>
+                    {% endfor %}
                 </div>
             </div>
-            <div class="mt-4 grid grid-cols-2 gap-2 sm:gap-4">
-                <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4 flex justify-between items-center">
-                    <span class="text-gray-700 font-medium text-sm sm:text-base">Percentage</span>
-                    <span class="text-xl sm:text-2xl font-bold text-blue-600">{{ "%.1f"|format(report.overall_performance.percentage) }}%</span>
-                </div>
-                <div class="bg-purple-50 border border-purple-200 rounded-lg p-3 sm:p-4 flex justify-between items-center">
-                    <span class="text-gray-700 font-medium text-sm sm:text-base">Accuracy</span>
-                    <span class="text-xl sm:text-2xl font-bold text-purple-600">{{ "%.1f"|format(report.overall_performance.accuracy) }}%</span>
+
+            <!-- Subject-wise Performance -->
+            {% set subject_colors = {'Physics': '#007bff', 'Chemistry': '#28a745', 'Biology': '#8a2be2', 'Mathematics': '#dc3545', 'Maths': '#dc3545'} %}
+            {% if report.report_header.course == 'NEET' or report.report_header.stream == 'medical' %}
+                {% set subject_order = ['Physics', 'Chemistry', 'Biology'] %}
+            {% else %}
+                {% set subject_order = ['Physics', 'Chemistry', 'Mathematics', 'Maths'] %}
+            {% endif %}
+            {% set ordered_subjects = [] %}
+            {% for name in subject_order %}
+                {% for subject in report.subject_performance %}
+                    {% if subject.subject == name %}
+                        {% set _ = ordered_subjects.append(subject) %}
+                    {% endif %}
+                {% endfor %}
+            {% endfor %}
+            {% set subjects_to_render = ordered_subjects if ordered_subjects else report.subject_performance %}
+            <div class="mb-6 lg:mb-8">
+                <h3 class="text-lg sm:text-xl font-bold text-[#2c3e50] mb-4 pb-2 border-b-[3px] border-[#4a90e2]">
+                    Subject-wise Performance
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {% for subject in subjects_to_render %}
+                    {% set color = subject_colors.get(subject.subject, '#6c757d') %}
+                    <div class="bg-white border-2 border-gray-200 rounded-2xl p-5 shadow-sm" style="border-left: 6px solid {{ color }};">
+                        <h4 class="text-base font-bold mb-3 uppercase" style="color: {{ color }};">
+                            {% if subject.subject == 'Maths' %}Mathematics{% else %}{{ subject.subject }}{% endif %}
+                        </h4>
+                        <table class="w-full border-collapse">
+                            <tbody>
+                                <tr>
+                                    <td class="py-1.5 text-xs text-gray-500 font-medium">Marks</td>
+                                    <td class="py-1.5 text-sm font-bold text-[#2c3e50] text-right">{{ subject.marks_scored|int }}</td>
+                                    <td class="py-1.5 pl-4 text-xs text-gray-500 font-medium">Skipped</td>
+                                    <td class="py-1.5 text-sm font-bold text-[#2c3e50] text-right">{{ subject.num_skipped }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-1.5 text-xs text-gray-500 font-medium">Wrong</td>
+                                    <td class="py-1.5 text-sm font-bold text-[#2c3e50] text-right">{{ subject.num_wrong }}</td>
+                                    <td class="py-1.5 pl-4 text-xs text-gray-500 font-medium">Correct</td>
+                                    <td class="py-1.5 text-sm font-bold text-[#2c3e50] text-right">{{ subject.num_correct }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-1.5 text-xs text-gray-500 font-medium">Percentage</td>
+                                    <td class="py-1.5 text-sm font-bold text-[#2c3e50] text-right">{{ "%.0f"|format(subject.percentage) }}%</td>
+                                    <td class="py-1.5 pl-4 text-xs text-gray-500 font-medium">Accuracy</td>
+                                    <td class="py-1.5 text-sm font-bold text-[#2c3e50] text-right">{{ "%.2f"|format(subject.accuracy) }}%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    {% endfor %}
                 </div>
             </div>
-        </section>
 
-        <!-- Subject-wise Performance Analysis -->
-        <section class="mt-8">
-            <h2 class="text-xl font-semibold text-gray-900 tracking-tight">Subject-wise Performance Analysis</h2>
-            <div class="mt-3 h-px bg-gray-200"></div>
-            <div class="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-4">
-                {% set subject_colors = {'Physics': 'blue', 'Chemistry': 'green', 'Biology': 'purple', 'Mathematics': 'orange', 'Maths': 'orange'} %}
-                {% set ordered_subjects = [] %}
+            <!-- Chapter-wise Performance -->
+            <div class="mb-6">
+                <h3 class="text-lg sm:text-xl font-bold text-[#2c3e50] mb-4 pb-2 border-b-[3px] border-[#4a90e2]">
+                    Chapter-wise Performance
+                </h3>
+
+                {% set chapter_subjects = {} %}
+                {% for chapter in report.chapter_performance %}
+                    {% set key = 'Mathematics' if chapter.subject == 'Maths' else chapter.subject %}
+                    {% if key not in chapter_subjects %}{% set _ = chapter_subjects.update({key: []}) %}{% endif %}
+                    {% set _ = chapter_subjects[key].append(chapter) %}
+                {% endfor %}
+
                 {% if report.report_header.course == 'NEET' or report.report_header.stream == 'medical' %}
-                    {% set subject_names = ['Physics', 'Chemistry', 'Biology'] %}
+                    {% set tab_order = [('Physics', '#007bff'), ('Chemistry', '#28a745'), ('Biology', '#8a2be2')] %}
                 {% else %}
-                    {% set subject_names = ['Physics', 'Chemistry', 'Mathematics'] %}
+                    {% set tab_order = [('Physics', '#007bff'), ('Chemistry', '#28a745'), ('Mathematics', '#dc3545')] %}
                 {% endif %}
 
-                {% for subject_name in subject_names %}
-                    {% for subject in report.subject_performance %}
-                        {% if subject.subject == subject_name or (subject_name == 'Mathematics' and subject.subject in ['Maths', 'Mathematics']) %}
-                            {% set _ = ordered_subjects.append(subject) %}
+                <!-- Tabs -->
+                <div class="flex bg-gray-50 rounded-xl p-1 mb-4 gap-0.5">
+                    {% for tab_name, color in tab_order %}
+                    {% if tab_name in chapter_subjects %}
+                    <button type="button"
+                            data-tab="{{ tab_name|lower }}"
+                            data-color="{{ color }}"
+                            class="chapter-tab flex-1 border-0 px-3 py-2.5 rounded-lg text-xs sm:text-sm font-semibold cursor-pointer transition-all text-gray-500 bg-transparent">
+                        {{ tab_name }}
+                    </button>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+
+                <!-- Tab panels -->
+                {% for tab_name, color in tab_order %}
+                {% if tab_name in chapter_subjects %}
+                {% set chapters = chapter_subjects[tab_name] %}
+                {% set ordered_chapters = [] %}
+                {% for priority in ['high', 'medium', 'low', 'unknown'] %}
+                    {% for chapter in chapters|sort(attribute='chapter_name') %}
+                        {% if (chapter.priority or 'unknown')|lower == priority %}
+                            {% set _ = ordered_chapters.append(chapter) %}
                         {% endif %}
                     {% endfor %}
                 {% endfor %}
-
-                {% for subject in (ordered_subjects if ordered_subjects else report.subject_performance) %}
-                {% set color = subject_colors.get(subject.subject, 'gray') %}
-                <div class="border border-gray-200 rounded-lg overflow-hidden shadow-sm">
-                    <div class="bg-{{ color }}-600 text-white px-4 py-3">
-                        <h3 class="text-center font-semibold tracking-wide">
-                            {% if subject.subject == 'Maths' %}MATHEMATICS{% else %}{{ subject.subject.upper() }}{% endif %}
-                        </h3>
-                    </div>
-                    <div class="p-4 space-y-2">
-                        <div class="flex justify-between text-sm">
-                            <span class="text-gray-600">Marks</span>
-                            <span class="font-semibold text-gray-900">{{ subject.marks_scored|int }} / {{ subject.max_marks_possible|int }}</span>
-                        </div>
-                        <div class="flex justify-between text-sm">
-                            <span class="text-gray-600">Correct</span>
-                            <span class="font-semibold text-green-600">{{ subject.num_correct }}</span>
-                        </div>
-                        <div class="flex justify-between text-sm">
-                            <span class="text-gray-600">Wrong</span>
-                            <span class="font-semibold text-red-600">{{ subject.num_wrong }}</span>
-                        </div>
-                        <div class="flex justify-between text-sm">
-                            <span class="text-gray-600">Skipped</span>
-                            <span class="font-semibold text-gray-500">{{ subject.num_skipped }}</span>
-                        </div>
-                        <div class="pt-2 border-t border-gray-100">
-                            <div class="flex justify-between text-sm">
-                                <span class="text-gray-600">Percentage</span>
-                                <span class="font-semibold text-{{ color }}-600">{{ "%.0f"|format(subject.percentage) }}%</span>
-                            </div>
-                            <div class="flex justify-between text-sm mt-1">
-                                <span class="text-gray-600">Accuracy</span>
-                                <span class="font-semibold text-{{ color }}-600">{{ "%.1f"|format(subject.accuracy) }}%</span>
-                            </div>
-                        </div>
+                <div class="chapter-panel" data-panel="{{ tab_name|lower }}" style="display:none;">
+                    <div class="overflow-x-auto rounded-xl shadow-sm">
+                        <table class="w-full border-collapse bg-white min-w-[500px]">
+                            <thead>
+                                <tr>
+                                    <th class="bg-[#4a90e2] text-white px-2 py-2 text-left text-[10px] sm:text-xs font-semibold" style="width:40%">Chapter Name</th>
+                                    <th class="bg-[#4a90e2] text-white px-2 py-2 text-left text-[10px] sm:text-xs font-semibold" style="width:15%">Priority</th>
+                                    <th class="bg-[#4a90e2] text-white px-2 py-2 text-left text-[10px] sm:text-xs font-semibold" style="width:12%">Score</th>
+                                    <th class="bg-[#4a90e2] text-white px-2 py-2 text-center" style="width:10%" title="Correct">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" class="mx-auto block"><circle cx="12" cy="12" r="12" fill="#28a745"/><path d="M7 12l3 3 7-7" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                    </th>
+                                    <th class="bg-[#4a90e2] text-white px-2 py-2 text-center" style="width:10%" title="Wrong">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" class="mx-auto block"><circle cx="12" cy="12" r="12" fill="#dc3545"/><path d="M8 8l8 8M16 8l-8 8" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+                                    </th>
+                                    <th class="bg-[#4a90e2] text-white px-2 py-2 text-center" style="width:13%" title="Skipped">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" class="mx-auto block"><circle cx="12" cy="12" r="12" fill="#ffc107"/><rect x="7" y="11" width="10" height="2" rx="1" fill="#fff"/></svg>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for chapter in ordered_chapters %}
+                                <tr class="bg-white">
+                                    <td class="px-2 py-2 border-b border-gray-200 text-[11px] sm:text-xs font-medium break-words">{{ chapter.chapter_name or 'Unknown' }}</td>
+                                    <td class="px-2 py-2 border-b border-gray-200 text-[11px] sm:text-xs">
+                                        {% set p = (chapter.priority or '')|lower %}
+                                        {% if p == 'high' %}
+                                        <span class="px-1.5 py-0.5 rounded text-[9px] sm:text-[10px] font-semibold text-[#dc3545] bg-[#f8d7da]">High</span>
+                                        {% elif p == 'medium' %}
+                                        <span class="px-1.5 py-0.5 rounded text-[9px] sm:text-[10px] font-semibold text-[#fd7e14] bg-[#fff3cd]">Medium</span>
+                                        {% else %}
+                                        <span class="px-1.5 py-0.5 rounded text-[9px] sm:text-[10px] font-semibold text-gray-500 bg-gray-100">Low</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="px-2 py-2 border-b border-gray-200 text-[11px] sm:text-xs">
+                                        {% set s = chapter.marks_scored|int %}
+                                        {% if s > 0 %}
+                                        <span class="px-1.5 py-0.5 rounded font-semibold text-[#28a745] bg-[#d4edda]">{{ s }}</span>
+                                        {% elif s < 0 %}
+                                        <span class="px-1.5 py-0.5 rounded font-semibold text-[#dc3545] bg-[#f8d7da]">{{ s }}</span>
+                                        {% else %}
+                                        <span class="px-1.5 py-0.5 rounded font-semibold text-gray-500 bg-gray-100">{{ s }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="px-2 py-2 border-b border-gray-200 text-[11px] sm:text-xs text-center font-semibold text-[#2c3e50] tabular-nums">{{ chapter.num_correct or 0 }}</td>
+                                    <td class="px-2 py-2 border-b border-gray-200 text-[11px] sm:text-xs text-center font-semibold text-[#2c3e50] tabular-nums">{{ chapter.num_wrong or 0 }}</td>
+                                    <td class="px-2 py-2 border-b border-gray-200 text-[11px] sm:text-xs text-center font-semibold text-[#2c3e50] tabular-nums">{{ chapter.num_skipped or 0 }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
+                {% endif %}
                 {% endfor %}
             </div>
-        </section>
 
-        <div class="print-page-break"></div>
-
-        <!-- Chapter-wise Performance Analysis -->
-        <section class="mt-8">
-            <h2 class="text-xl font-semibold text-gray-900 tracking-tight">Chapter-wise Performance Analysis</h2>
-            <div class="mt-3 h-px bg-gray-200"></div>
-
-            {% set chapter_subjects = {} %}
-            {% for chapter in report.chapter_performance %}
-                {% if chapter.subject not in chapter_subjects %}
-                    {% set _ = chapter_subjects.update({chapter.subject: []}) %}
-                {% endif %}
-                {% set _ = chapter_subjects[chapter.subject].append(chapter) %}
-            {% endfor %}
-
-            {% if report.report_header.course == 'NEET' or report.report_header.stream == 'medical' %}
-                {% set subject_order = [('Physics', 'Physics Chapters', 'blue'), ('Chemistry', 'Chemistry Chapters', 'green'), ('Biology', 'Biology Chapters', 'purple')] %}
-            {% else %}
-                {% set subject_order = [('Physics', 'Physics Chapters', 'blue'), ('Chemistry', 'Chemistry Chapters', 'green'), ('Maths', 'Mathematics Chapters', 'orange')] %}
+            {% if report.metadata.test_incomplete %}
+            <div class="mt-6 bg-amber-100 border border-amber-400 rounded-lg p-4 text-center">
+                <p class="text-amber-800 font-medium text-sm">⚠️ Student did not click "End Test". Report may be incomplete.</p>
+            </div>
             {% endif %}
-
-            {% for subject_key, section_title, color in subject_order %}
-                {% if subject_key in chapter_subjects or (subject_key == 'Maths' and 'Mathematics' in chapter_subjects) %}
-                    {% set chapters = chapter_subjects.get(subject_key, chapter_subjects.get('Mathematics', [])) %}
-                    <div class="mt-6">
-                        <h3 class="text-lg font-semibold text-{{ color }}-700 mb-3">{{ section_title }}</h3>
-                        <div class="overflow-x-auto border border-gray-200 rounded-lg">
-                            <table class="w-full text-sm min-w-[500px]">
-                                <thead class="bg-gray-50">
-                                    <tr>
-                                        <th class="px-4 py-3 text-left font-semibold text-gray-700">Chapter Name</th>
-                                        <th class="px-3 py-3 text-center font-semibold text-gray-700">Priority</th>
-                                        <th class="px-3 py-3 text-center font-semibold text-gray-700">Score</th>
-                                        <th class="px-3 py-3 text-center font-semibold text-gray-700">Correct</th>
-                                        <th class="px-3 py-3 text-center font-semibold text-gray-700">Wrong</th>
-                                        <th class="px-3 py-3 text-center font-semibold text-gray-700">Skipped</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% set ordered_chapters = [] %}
-                                    {% for priority in ['high', 'medium', 'low', 'unknown'] %}
-                                        {% for chapter in chapters|sort(attribute='chapter_name') %}
-                                            {% if (chapter.priority or 'unknown')|lower == priority %}
-                                                {% set _ = ordered_chapters.append(chapter) %}
-                                            {% endif %}
-                                        {% endfor %}
-                                    {% endfor %}
-
-                                    {% for chapter in ordered_chapters %}
-                                    <tr class="border-t border-gray-100 hover:bg-gray-50">
-                                        <td class="px-4 py-2 text-gray-800">{{ chapter.chapter_name or 'Unknown Chapter' }}</td>
-                                        <td class="px-3 py-2 text-center">
-                                            {% if (chapter.priority or '')|lower == 'high' %}
-                                            <span class="inline-block px-2 py-0.5 text-xs font-medium bg-red-100 text-red-700 rounded">High</span>
-                                            {% elif (chapter.priority or '')|lower == 'medium' %}
-                                            <span class="inline-block px-2 py-0.5 text-xs font-medium bg-yellow-100 text-yellow-700 rounded">Medium</span>
-                                            {% else %}
-                                            <span class="inline-block px-2 py-0.5 text-xs font-medium bg-green-100 text-green-700 rounded">Low</span>
-                                            {% endif %}
-                                        </td>
-                                        <td class="px-3 py-2 text-center font-medium text-gray-900">{{ chapter.marks_scored|int }} / {{ chapter.max_marks_possible|int }}</td>
-                                        <td class="px-3 py-2 text-center text-green-600 font-medium">{{ chapter.num_correct or 0 }}</td>
-                                        <td class="px-3 py-2 text-center text-red-600 font-medium">{{ chapter.num_wrong or 0 }}</td>
-                                        <td class="px-3 py-2 text-center text-gray-500">{{ chapter.num_skipped or 0 }}</td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                {% endif %}
-            {% endfor %}
-        </section>
-
-        {% if report.metadata.test_incomplete %}
-        <div class="mt-6 bg-amber-100 border border-amber-400 rounded-lg p-4 text-center">
-            <p class="text-amber-800 font-medium">⚠️ Student did not click "End Test". Report may be incomplete.</p>
         </div>
-        {% endif %}
 
-        <footer class="mt-10 pt-4 border-t border-gray-200 text-center text-sm text-gray-500">
-            <p>This report is generated by Avanti Fellows to improve your testprep strategy. For detailed guidance, consult your teacher.</p>
-        </footer>
+        <!-- Footer -->
+        <div class="bg-gray-50 px-5 py-4 text-center text-[11px] text-gray-500 leading-snug">
+            This report is generated by Avanti Fellows to improve your testprep strategy. For detailed guidance, consult your teacher.
+        </div>
     </main>
+
+    <script>
+        (function() {
+            const tabs = document.querySelectorAll('.chapter-tab');
+            const panels = document.querySelectorAll('.chapter-panel');
+
+            function activate(tabName) {
+                tabs.forEach(function(t) {
+                    const isActive = t.dataset.tab === tabName;
+                    if (isActive) {
+                        t.style.background = t.dataset.color;
+                        t.style.color = 'white';
+                        t.style.boxShadow = '0 2px 8px ' + t.dataset.color + '30';
+                    } else {
+                        t.style.background = 'transparent';
+                        t.style.color = '#6c757d';
+                        t.style.boxShadow = 'none';
+                    }
+                });
+                panels.forEach(function(p) {
+                    p.style.display = p.dataset.panel === tabName ? 'block' : 'none';
+                });
+            }
+
+            tabs.forEach(function(t) {
+                t.addEventListener('click', function() { activate(t.dataset.tab); });
+            });
+
+            if (tabs.length > 0) activate(tabs[0].dataset.tab);
+        })();
+    </script>
 </body>
 </html>
