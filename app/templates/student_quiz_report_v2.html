@@ -23,7 +23,7 @@
             <div class="flex flex-col items-center justify-center py-8 bg-gray-50 rounded-2xl mb-4 md:mb-6">
                 <div class="text-[10px] md:text-xs text-gray-500 uppercase tracking-wider mb-2">Overall Score</div>
                 <div class="text-5xl md:text-6xl font-bold text-[#4a90e2] leading-none">
-                    {{ report.overall_performance.marks_scored|int }}
+                    {{ (report.overall_performance.marks_scored or 0)|int }}
                 </div>
             </div>
 
@@ -63,12 +63,12 @@
                 </h3>
                 <div class="grid grid-cols-2 md:grid-cols-6 gap-3">
                     {% set metrics = [
-                        (report.overall_performance.marks_scored|int, "Total Marks"),
-                        (report.overall_performance.num_correct, "Correct Answers"),
-                        ("%.2f"|format(report.overall_performance.percentage) ~ "%", "Percentage"),
-                        (report.overall_performance.num_skipped, "Questions Skipped"),
-                        (report.overall_performance.num_wrong, "Wrong Answers"),
-                        ("%.2f"|format(report.overall_performance.accuracy) ~ "%", "Accuracy")
+                        ((report.overall_performance.marks_scored or 0)|int, "Total Marks"),
+                        (report.overall_performance.num_correct or 0, "Correct Answers"),
+                        ("%.2f"|format(report.overall_performance.percentage or 0) ~ "%", "Percentage"),
+                        (report.overall_performance.num_skipped or 0, "Questions Skipped"),
+                        (report.overall_performance.num_wrong or 0, "Wrong Answers"),
+                        ("%.2f"|format(report.overall_performance.accuracy or 0) ~ "%", "Accuracy")
                     ] %}
                     {% for value, label in metrics %}
                     <div class="bg-white border-2 border-gray-200 rounded-xl p-4 text-center shadow-sm">
@@ -110,21 +110,21 @@
                             <tbody>
                                 <tr>
                                     <td class="py-1.5 text-xs text-gray-500 font-medium">Marks</td>
-                                    <td class="py-1.5 text-sm font-bold text-[#2c3e50] text-right">{{ subject.marks_scored|int }}</td>
+                                    <td class="py-1.5 text-sm font-bold text-[#2c3e50] text-right">{{ (subject.marks_scored or 0)|int }}</td>
                                     <td class="py-1.5 pl-4 text-xs text-gray-500 font-medium">Skipped</td>
-                                    <td class="py-1.5 text-sm font-bold text-[#2c3e50] text-right">{{ subject.num_skipped }}</td>
+                                    <td class="py-1.5 text-sm font-bold text-[#2c3e50] text-right">{{ subject.num_skipped or 0 }}</td>
                                 </tr>
                                 <tr>
                                     <td class="py-1.5 text-xs text-gray-500 font-medium">Wrong</td>
-                                    <td class="py-1.5 text-sm font-bold text-[#2c3e50] text-right">{{ subject.num_wrong }}</td>
+                                    <td class="py-1.5 text-sm font-bold text-[#2c3e50] text-right">{{ subject.num_wrong or 0 }}</td>
                                     <td class="py-1.5 pl-4 text-xs text-gray-500 font-medium">Correct</td>
-                                    <td class="py-1.5 text-sm font-bold text-[#2c3e50] text-right">{{ subject.num_correct }}</td>
+                                    <td class="py-1.5 text-sm font-bold text-[#2c3e50] text-right">{{ subject.num_correct or 0 }}</td>
                                 </tr>
                                 <tr>
                                     <td class="py-1.5 text-xs text-gray-500 font-medium">Percentage</td>
-                                    <td class="py-1.5 text-sm font-bold text-[#2c3e50] text-right">{{ "%.0f"|format(subject.percentage) }}%</td>
+                                    <td class="py-1.5 text-sm font-bold text-[#2c3e50] text-right">{{ "%.0f"|format(subject.percentage or 0) }}%</td>
                                     <td class="py-1.5 pl-4 text-xs text-gray-500 font-medium">Accuracy</td>
-                                    <td class="py-1.5 text-sm font-bold text-[#2c3e50] text-right">{{ "%.2f"|format(subject.accuracy) }}%</td>
+                                    <td class="py-1.5 text-sm font-bold text-[#2c3e50] text-right">{{ "%.2f"|format(subject.accuracy or 0) }}%</td>
                                 </tr>
                             </tbody>
                         </table>
