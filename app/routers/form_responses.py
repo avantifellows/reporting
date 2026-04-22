@@ -2,6 +2,7 @@ from fastapi import APIRouter, Request, HTTPException
 from fastapi.templating import Jinja2Templates
 from typing import Optional
 import asyncio
+from auth import verify_launch_token
 from db.form_responses_db import FormResponsesDB
 from utils.pdf_converter import convert_template_to_pdf
 from utils.llm_summary import generate_theme_summary
@@ -19,6 +20,38 @@ class FormResponsesRouter:
     @property
     def router(self):
         api_router = APIRouter(prefix="/reports", tags=["form_responses"])
+
+        def _resolve_report_user_id(
+            user_id: Optional[str], launch_token: Optional[str]
+        ) -> str:
+            if user_id:
+                return user_id
+
+            payload = verify_launch_token(launch_token, expected_audience="report")
+            token_data = payload.get("data", {})
+            canonical_user_id = token_data.get("user_id") or payload.get("id")
+
+            if not canonical_user_id:
+                raise HTTPException(status_code=401, detail="Missing user in launch token")
+
+            return str(canonical_user_id)
+
+        @api_router.get("/form_responses/{session_id}")
+        async def get_form_responses_with_token(
+            request: Request,
+            session_id: str,
+            launchToken: str,
+            format: Optional[str] = None,
+            debug: bool = False,
+        ):
+            resolved_user_id = _resolve_report_user_id(None, launchToken)
+            return await get_form_responses(
+                request=request,
+                session_id=session_id,
+                user_id=resolved_user_id,
+                format=format,
+                debug=debug,
+            )
 
         @api_router.get("/form_responses/{session_id}/{user_id}")
         async def get_form_responses(

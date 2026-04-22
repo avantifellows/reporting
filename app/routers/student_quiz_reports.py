@@ -1,14 +1,17 @@
+import json
+import os
+from collections import OrderedDict
+from typing import Union, Optional
+from urllib.parse import unquote
+
 from fastapi import APIRouter, Request
 from fastapi.templating import Jinja2Templates
 from fastapi import HTTPException, Depends
-from collections import OrderedDict
-from urllib.parse import unquote
-from typing import Union, Optional
+from auth import verify_launch_token
 from db.reports_db import ReportsDB
 from db.bq_db import BigQueryDB
 from fastapi.security.api_key import APIKeyHeader
 from utils.pdf_converter import convert_template_to_pdf
-import json
 
 ROW_NAMES = OrderedDict()
 ROW_NAMES = {
@@ -35,13 +38,14 @@ CHAPTER_WISE_ROW_NAMES = {
     "chapter_code": "Chapter Code",
 }
 
-QUIZ_URL = (
-    "https://quiz.avantifellows.org/quiz/{quiz_id}?userId={user_id}&apiKey={api_key}"
-)
+PORTAL_FRONTEND_URL = (
+    os.getenv("AF_PORTAL_FRONTEND_URL")
+    or os.getenv("PORTAL_FRONTEND_URL")
+    or "https://auth.avantifellows.org"
+).rstrip("/")
+QUIZ_URL = f"{PORTAL_FRONTEND_URL}/?sessionId={{session_id}}"
 # https://reports.avantifellows.org/reports/student_quiz_report/Homework_Quiz_2022-08-03_62ea813210de4e9677c8ce2d/1403899102
 STUDENT_QUIZ_REPORT_URL = "https://reports.avantifellows.org/reports/student_quiz_report/{session_id}/{user_id}"
-
-AF_API_KEY = "6qOO8UdF1EGxLgzwIbQN"
 
 api_key_header = APIKeyHeader(name="Authorization", auto_error=False)
 
@@ -202,6 +206,21 @@ class StudentQuizReportsRouter:
 
             return "", ""  # selected chapter name, chapter link
 
+        def _resolve_report_user_id(
+            user_id: Optional[str], launch_token: Optional[str]
+        ) -> str:
+            if user_id:
+                return unquote(user_id)
+
+            payload = verify_launch_token(launch_token, expected_audience="report")
+            token_data = payload.get("data", {})
+            canonical_user_id = token_data.get("user_id") or payload.get("id")
+
+            if not canonical_user_id:
+                raise HTTPException(status_code=401, detail="Missing user in launch token")
+
+            return str(canonical_user_id)
+
         @api_router.get("/student_reports/{user_id}")
         def get_student_reports(
             request: Request,
@@ -236,47 +255,23 @@ class StudentQuizReportsRouter:
                 )
 
             print("Getting student reports for user ID: ", user_id)
+            data = self.__reports_db.get_student_reports(user_id)
+            print(data)
 
-            # Query both v1 and v2 tables
-            v1_data = self.__reports_db.get_student_reports(user_id)
-            v2_data = self.__reports_db.get_student_reports_v2(user_id)
-
-            # Track session IDs from v2 to avoid duplicates
-            v2_session_ids = {doc["session_id"] for doc in v2_data}
-
+            # Create a structured response with student reports
             student_reports = []
-
-            # Add v1 reports (skip if session exists in v2)
-            for doc in v1_data:
+            for doc in data:
                 if "overall" not in doc["user_id-section"]:
-                    continue
-                if doc["session_id"] in v2_session_ids:
                     continue
                 result = {
                     "test_name": doc["test_name"],
                     "test_session_id": doc["session_id"],
-                    "percentile": doc.get("percentile", ""),
-                    "rank": doc.get("rank", ""),
+                    "percentile": doc["percentile"] if "percentile" in doc else "",
+                    "rank": doc["rank"] if "rank" in doc else "",
                     "report_link": STUDENT_QUIZ_REPORT_URL.format(
                         session_id=doc["session_id"], user_id=user_id
                     ),
                     "start_date": doc["start_date"],
-                }
-                student_reports.append(result)
-
-            # Add v2 reports
-            for doc in v2_data:
-                header = doc.get("report_header", {})
-                overall = doc.get("overall_performance", {})
-                result = {
-                    "test_name": header.get("test_name", ""),
-                    "test_session_id": doc["session_id"],
-                    "percentile": overall.get("percentage", ""),
-                    "rank": overall.get("cms_rank", ""),
-                    "report_link": STUDENT_QUIZ_REPORT_URL.format(
-                        session_id=doc["session_id"], user_id=user_id
-                    ),
-                    "start_date": header.get("test_date", ""),
                 }
                 student_reports.append(result)
 
@@ -295,6 +290,23 @@ class StudentQuizReportsRouter:
                 return convert_template_to_pdf(template_response, debug=debug)
 
             return template_response
+
+        @api_router.get("/student_quiz_report/{session_id}")
+        def student_quiz_report_with_token(
+            request: Request,
+            session_id: str,
+            launchToken: str,
+            format: Optional[str] = None,
+            debug: bool = False,
+        ):
+            resolved_user_id = _resolve_report_user_id(None, launchToken)
+            return student_quiz_report(
+                request=request,
+                session_id=session_id,
+                user_id=resolved_user_id,
+                format=format,
+                debug=debug,
+            )
 
         @api_router.get("/student_quiz_report/{session_id}/{user_id}")
         def student_quiz_report(
@@ -408,9 +420,7 @@ class StudentQuizReportsRouter:
 
             report_data["student_id"] = user_id
             if "platform" in data[0] and data[0]["platform"] == "quizengine":
-                report_data["test_link"] = QUIZ_URL.format(
-                    quiz_id=test_id, user_id=user_id, api_key=AF_API_KEY
-                )
+                report_data["test_link"] = QUIZ_URL.format(session_id=session_id)
 
             section_reports = []
             overall_performance = {}
@@ -436,6 +446,23 @@ class StudentQuizReportsRouter:
             if format == "pdf":
                 return convert_template_to_pdf(template_response, debug=debug)
             return template_response
+
+        @api_router.get("/student_quiz_report/v3/{session_id}")
+        def student_quiz_report_v3_with_token(
+            request: Request,
+            session_id: str,
+            launchToken: str,
+            format: Optional[str] = None,
+            debug: bool = False,
+        ):
+            resolved_user_id = _resolve_report_user_id(None, launchToken)
+            return student_quiz_report_v3(
+                request=request,
+                session_id=session_id,
+                user_id=resolved_user_id,
+                format=format,
+                debug=debug,
+            )
 
         @api_router.get("/student_quiz_report/v3/{session_id}/{user_id}")
         def student_quiz_report_v3(
@@ -499,9 +526,7 @@ class StudentQuizReportsRouter:
 
             report_data["student_id"] = user_id
             if "platform" in data[0] and data[0]["platform"] == "quizengine":
-                report_data["test_link"] = QUIZ_URL.format(
-                    quiz_id=test_id, user_id=user_id, api_key=AF_API_KEY
-                )
+                report_data["test_link"] = QUIZ_URL.format(session_id=session_id)
 
             # bigquery
             student_al_data = self.__bq_db.get_student_qualification_data(
