@@ -64,20 +64,6 @@
         </header>
 
         <div class="my-6 h-px bg-gray-300"></div>
-
-        {% if report.review_quiz_link %}
-        <div class="no-print flex justify-center mb-6">
-            <a
-                href="{{ report.review_quiz_link }}"
-                target="_blank"
-                data-track-button="review_quiz"
-                class="inline-flex items-center gap-2 rounded-lg bg-gray-900 px-5 py-3 text-sm font-semibold text-white shadow-lg transition hover:bg-gray-800"
-            >
-                Click here to review your answers
-            </a>
-        </div>
-        {% endif %}
-
         <!-- Overall Score -->
         <div class="bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg p-6 text-center shadow-md">
             <div class="text-lg font-medium opacity-90">Overall Score</div>

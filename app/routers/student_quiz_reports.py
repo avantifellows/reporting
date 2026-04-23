@@ -379,13 +379,6 @@ class StudentQuizReportsRouter:
                 # Use top-level student_id for report_header.student_id
                 if "report_header" in report and "student_id" in report:
                     report["report_header"]["student_id"] = report["student_id"]
-                if "test_id" in report:
-                    review_quiz_link = _build_quiz_review_link(
-                        request=request,
-                        quiz_id=report["test_id"],
-                    )
-                    if review_quiz_link:
-                        report["review_quiz_link"] = review_quiz_link
 
                 use_print = (
                     format == "pdf" or request.query_params.get("print") == "true"
