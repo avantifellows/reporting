@@ -1,18 +1,20 @@
-import json
-import os
 from collections import OrderedDict
 from typing import Union, Optional
-from urllib.parse import unquote, urlencode, quote
+from urllib.parse import unquote, quote
 
 from fastapi import APIRouter, Request
 from fastapi.templating import Jinja2Templates
 from fastapi import HTTPException, Depends
-from fastapi.responses import RedirectResponse
-from auth import verify_launch_token
 from db.reports_db import ReportsDB
 from db.bq_db import BigQueryDB
 from fastapi.security.api_key import APIKeyHeader
 from utils.pdf_converter import convert_template_to_pdf
+from utils.report_launch import (
+    get_report_launch_token,
+    redirect_with_launch_cookie,
+    resolve_report_user_id,
+    set_request_launch_token,
+)
 
 ROW_NAMES = OrderedDict()
 ROW_NAMES = {
@@ -39,26 +41,16 @@ CHAPTER_WISE_ROW_NAMES = {
     "chapter_code": "Chapter Code",
 }
 
-PORTAL_FRONTEND_URL = (
-    os.getenv("AF_PORTAL_FRONTEND_URL")
-    or os.getenv("PORTAL_FRONTEND_URL")
-    or "https://auth.avantifellows.org"
-).rstrip("/")
-QUIZ_FRONTEND_URL = (
-    os.getenv("AF_QUIZ_FRONTEND_URL")
-    or os.getenv("QUIZ_FRONTEND_URL")
-    or ""
-).rstrip("/")
-QUIZ_API_KEY = (
-    os.getenv("AF_QUIZ_API_KEY")
-    or os.getenv("QUIZ_API_KEY")
-    or "6qOO8UdF1EGxLgzwIbQN"
+QUIZ_REVIEW_URL = (
+    "https://quiz.avantifellows.org/quiz/{quiz_id}"
+    "?apiKey={api_key}&launchToken={launch_token}"
 )
+QUIZ_AF_API_KEY = "6qOO8UdF1EGxLgzwIbQN"
+
 # https://reports.avantifellows.org/reports/student_quiz_report/Homework_Quiz_2022-08-03_62ea813210de4e9677c8ce2d/1403899102
 STUDENT_QUIZ_REPORT_URL = "https://reports.avantifellows.org/reports/student_quiz_report/{session_id}/{user_id}"
 
 api_key_header = APIKeyHeader(name="Authorization", auto_error=False)
-REPORT_LAUNCH_COOKIE_MAX_AGE = 15 * 60
 
 
 class StudentQuizReportsRouter:
@@ -217,95 +209,6 @@ class StudentQuizReportsRouter:
 
             return "", ""  # selected chapter name, chapter link
 
-        def _resolve_report_user_id(
-            user_id: Optional[str], launch_token: Optional[str]
-        ) -> str:
-            if user_id:
-                return unquote(user_id)
-
-            payload = verify_launch_token(launch_token, expected_audience="report")
-            token_data = payload.get("data", {})
-            canonical_user_id = token_data.get("user_id") or payload.get("id")
-
-            if not canonical_user_id:
-                raise HTTPException(status_code=401, detail="Missing user in launch token")
-
-            return str(canonical_user_id)
-
-        def _get_launch_cookie_name(prefix: str, session_id: str) -> str:
-            safe_session_id = "".join(
-                char if char.isalnum() else "_" for char in session_id
-            )
-            return f"{prefix}_{safe_session_id}"
-
-        def _set_launch_cookie(response, request: Request, cookie_name: str, token: str, path: str):
-            response.set_cookie(
-                key=cookie_name,
-                value=token,
-                max_age=REPORT_LAUNCH_COOKIE_MAX_AGE,
-                httponly=True,
-                secure=request.url.scheme == "https",
-                samesite="lax",
-                path=path,
-            )
-
-        def _clean_query_params(request: Request) -> str:
-            params = [
-                (key, value)
-                for key, value in request.query_params.multi_items()
-                if key != "launchToken"
-            ]
-            return urlencode(params, doseq=True)
-
-        def _redirect_with_launch_cookie(
-            request: Request,
-            session_id: str,
-            launch_token: str,
-            cookie_prefix: str,
-            clean_path: str,
-        ) -> RedirectResponse:
-            verify_launch_token(launch_token, expected_audience="report")
-            redirect_url = clean_path
-            query_string = _clean_query_params(request)
-            if query_string:
-                redirect_url = f"{redirect_url}?{query_string}"
-
-            response = RedirectResponse(url=redirect_url, status_code=302)
-            cookie_name = _get_launch_cookie_name(cookie_prefix, session_id)
-            _set_launch_cookie(response, request, cookie_name, launch_token, clean_path)
-            return response
-
-        def _get_report_launch_token(
-            request: Request,
-            session_id: str,
-            launch_token: Optional[str],
-            cookie_prefix: str,
-        ) -> str:
-            if launch_token:
-                return launch_token
-
-            cookie_name = _get_launch_cookie_name(cookie_prefix, session_id)
-            token = request.cookies.get(cookie_name)
-            if not token:
-                raise HTTPException(status_code=401, detail="Missing launch token")
-            return token
-
-        def _set_request_launch_token(request: Request, launch_token: Optional[str]) -> None:
-            request.state.report_launch_token = launch_token
-
-        def _resolve_quiz_frontend_url(request: Request) -> str:
-            if QUIZ_FRONTEND_URL:
-                return QUIZ_FRONTEND_URL
-
-            host = request.url.hostname or ""
-            if "staging" in host:
-                return "https://staging-quiz.avantifellows.org"
-
-            if host.startswith("localhost") or host.startswith("127.0.0.1"):
-                return "http://localhost:8081"
-
-            return "https://quiz.avantifellows.org"
-
         def _build_quiz_review_link(
             request: Request,
             quiz_id: str,
@@ -314,13 +217,12 @@ class StudentQuizReportsRouter:
             if not launch_token:
                 return None
 
-            quiz_frontend_url = _resolve_quiz_frontend_url(request)
             # Direct report -> quiz review handoff reuses the verified report token.
             # Quiz resolves canonical identity from the token and strips it from the URL after boot.
-            return (
-                f"{quiz_frontend_url}/quiz/{quote(str(quiz_id), safe='')}"
-                f"?apiKey={quote(QUIZ_API_KEY, safe='')}"
-                f"&launchToken={quote(launch_token, safe='')}"
+            return QUIZ_REVIEW_URL.format(
+                quiz_id=quote(str(quiz_id), safe=""),
+                api_key=quote(QUIZ_AF_API_KEY, safe=""),
+                launch_token=quote(launch_token, safe=""),
             )
 
         @api_router.get("/student_reports/{user_id}")
@@ -402,7 +304,7 @@ class StudentQuizReportsRouter:
             debug: bool = False,
         ):
             if launchToken:
-                return _redirect_with_launch_cookie(
+                return redirect_with_launch_cookie(
                     request=request,
                     session_id=session_id,
                     launch_token=launchToken,
@@ -410,7 +312,7 @@ class StudentQuizReportsRouter:
                     clean_path=f"/reports/student_quiz_report/{session_id}",
                 )
 
-            request_launch_token = _get_report_launch_token(
+            request_launch_token = get_report_launch_token(
                 request=request,
                 session_id=session_id,
                 launch_token=launchToken,
@@ -418,7 +320,7 @@ class StudentQuizReportsRouter:
             )
             _set_request_launch_token(request, request_launch_token)
 
-            resolved_user_id = _resolve_report_user_id(
+            resolved_user_id = resolve_report_user_id(
                 None,
                 request_launch_token,
             )
@@ -590,7 +492,7 @@ class StudentQuizReportsRouter:
             debug: bool = False,
         ):
             if launchToken:
-                return _redirect_with_launch_cookie(
+                return redirect_with_launch_cookie(
                     request=request,
                     session_id=session_id,
                     launch_token=launchToken,
@@ -598,7 +500,7 @@ class StudentQuizReportsRouter:
                     clean_path=f"/reports/student_quiz_report/v3/{session_id}",
                 )
 
-            request_launch_token = _get_report_launch_token(
+            request_launch_token = get_report_launch_token(
                 request=request,
                 session_id=session_id,
                 launch_token=launchToken,
@@ -606,7 +508,7 @@ class StudentQuizReportsRouter:
             )
             _set_request_launch_token(request, request_launch_token)
 
-            resolved_user_id = _resolve_report_user_id(
+            resolved_user_id = resolve_report_user_id(
                 None,
                 request_launch_token,
             )
