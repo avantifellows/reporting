@@ -1,14 +1,20 @@
+from collections import OrderedDict
+from typing import Union, Optional
+from urllib.parse import unquote, quote
+
 from fastapi import APIRouter, Request
 from fastapi.templating import Jinja2Templates
 from fastapi import HTTPException, Depends
-from collections import OrderedDict
-from urllib.parse import unquote
-from typing import Union, Optional
 from db.reports_db import ReportsDB
 from db.bq_db import BigQueryDB
 from fastapi.security.api_key import APIKeyHeader
 from utils.pdf_converter import convert_template_to_pdf
-import json
+from utils.report_launch import (
+    get_report_launch_token,
+    redirect_with_launch_cookie,
+    resolve_report_user_id,
+    set_request_launch_token,
+)
 
 ROW_NAMES = OrderedDict()
 ROW_NAMES = {
@@ -35,13 +41,14 @@ CHAPTER_WISE_ROW_NAMES = {
     "chapter_code": "Chapter Code",
 }
 
-QUIZ_URL = (
-    "https://quiz.avantifellows.org/quiz/{quiz_id}?userId={user_id}&apiKey={api_key}"
+QUIZ_REVIEW_URL = (
+    "https://quiz.avantifellows.org/quiz/{quiz_id}"
+    "?apiKey={api_key}&launchToken={launch_token}"
 )
+QUIZ_AF_API_KEY = "6qOO8UdF1EGxLgzwIbQN"
+
 # https://reports.avantifellows.org/reports/student_quiz_report/Homework_Quiz_2022-08-03_62ea813210de4e9677c8ce2d/1403899102
 STUDENT_QUIZ_REPORT_URL = "https://reports.avantifellows.org/reports/student_quiz_report/{session_id}/{user_id}"
-
-AF_API_KEY = "6qOO8UdF1EGxLgzwIbQN"
 
 api_key_header = APIKeyHeader(name="Authorization", auto_error=False)
 
@@ -202,6 +209,22 @@ class StudentQuizReportsRouter:
 
             return "", ""  # selected chapter name, chapter link
 
+        def _build_quiz_review_link(
+            request: Request,
+            quiz_id: str,
+        ) -> Optional[str]:
+            launch_token = getattr(request.state, "report_launch_token", None)
+            if not launch_token:
+                return None
+
+            # Direct report -> quiz review handoff reuses the verified report token.
+            # Quiz resolves canonical identity from the token and strips it from the URL after boot.
+            return QUIZ_REVIEW_URL.format(
+                quiz_id=quote(str(quiz_id), safe=""),
+                api_key=quote(QUIZ_AF_API_KEY, safe=""),
+                launch_token=quote(launch_token, safe=""),
+            )
+
         @api_router.get("/student_reports/{user_id}")
         def get_student_reports(
             request: Request,
@@ -236,47 +259,23 @@ class StudentQuizReportsRouter:
                 )
 
             print("Getting student reports for user ID: ", user_id)
+            data = self.__reports_db.get_student_reports(user_id)
+            print(data)
 
-            # Query both v1 and v2 tables
-            v1_data = self.__reports_db.get_student_reports(user_id)
-            v2_data = self.__reports_db.get_student_reports_v2(user_id)
-
-            # Track session IDs from v2 to avoid duplicates
-            v2_session_ids = {doc["session_id"] for doc in v2_data}
-
+            # Create a structured response with student reports
             student_reports = []
-
-            # Add v1 reports (skip if session exists in v2)
-            for doc in v1_data:
+            for doc in data:
                 if "overall" not in doc["user_id-section"]:
-                    continue
-                if doc["session_id"] in v2_session_ids:
                     continue
                 result = {
                     "test_name": doc["test_name"],
                     "test_session_id": doc["session_id"],
-                    "percentile": doc.get("percentile", ""),
-                    "rank": doc.get("rank", ""),
+                    "percentile": doc["percentile"] if "percentile" in doc else "",
+                    "rank": doc["rank"] if "rank" in doc else "",
                     "report_link": STUDENT_QUIZ_REPORT_URL.format(
                         session_id=doc["session_id"], user_id=user_id
                     ),
                     "start_date": doc["start_date"],
-                }
-                student_reports.append(result)
-
-            # Add v2 reports
-            for doc in v2_data:
-                header = doc.get("report_header", {})
-                overall = doc.get("overall_performance", {})
-                result = {
-                    "test_name": header.get("test_name", ""),
-                    "test_session_id": doc["session_id"],
-                    "percentile": overall.get("percentage", ""),
-                    "rank": overall.get("cms_rank", ""),
-                    "report_link": STUDENT_QUIZ_REPORT_URL.format(
-                        session_id=doc["session_id"], user_id=user_id
-                    ),
-                    "start_date": header.get("test_date", ""),
                 }
                 student_reports.append(result)
 
@@ -295,6 +294,43 @@ class StudentQuizReportsRouter:
                 return convert_template_to_pdf(template_response, debug=debug)
 
             return template_response
+
+        @api_router.get("/student_quiz_report/{session_id}")
+        def student_quiz_report_with_token(
+            request: Request,
+            session_id: str,
+            launchToken: Optional[str] = None,
+            format: Optional[str] = None,
+            debug: bool = False,
+        ):
+            if launchToken:
+                return redirect_with_launch_cookie(
+                    request=request,
+                    session_id=session_id,
+                    launch_token=launchToken,
+                    cookie_prefix="student_quiz_report_launch",
+                    clean_path=f"/reports/student_quiz_report/{session_id}",
+                )
+
+            request_launch_token = get_report_launch_token(
+                request=request,
+                session_id=session_id,
+                launch_token=launchToken,
+                cookie_prefix="student_quiz_report_launch",
+            )
+            _set_request_launch_token(request, request_launch_token)
+
+            resolved_user_id = resolve_report_user_id(
+                None,
+                request_launch_token,
+            )
+            return student_quiz_report(
+                request=request,
+                session_id=session_id,
+                user_id=resolved_user_id,
+                format=format,
+                debug=debug,
+            )
 
         @api_router.get("/student_quiz_report/{session_id}/{user_id}")
         def student_quiz_report(
@@ -408,9 +444,12 @@ class StudentQuizReportsRouter:
 
             report_data["student_id"] = user_id
             if "platform" in data[0] and data[0]["platform"] == "quizengine":
-                report_data["test_link"] = QUIZ_URL.format(
-                    quiz_id=test_id, user_id=user_id, api_key=AF_API_KEY
+                review_quiz_link = _build_quiz_review_link(
+                    request=request,
+                    quiz_id=test_id,
                 )
+                if review_quiz_link:
+                    report_data["test_link"] = review_quiz_link
 
             section_reports = []
             overall_performance = {}
@@ -436,6 +475,43 @@ class StudentQuizReportsRouter:
             if format == "pdf":
                 return convert_template_to_pdf(template_response, debug=debug)
             return template_response
+
+        @api_router.get("/student_quiz_report/v3/{session_id}")
+        def student_quiz_report_v3_with_token(
+            request: Request,
+            session_id: str,
+            launchToken: Optional[str] = None,
+            format: Optional[str] = None,
+            debug: bool = False,
+        ):
+            if launchToken:
+                return redirect_with_launch_cookie(
+                    request=request,
+                    session_id=session_id,
+                    launch_token=launchToken,
+                    cookie_prefix="student_quiz_report_v3_launch",
+                    clean_path=f"/reports/student_quiz_report/v3/{session_id}",
+                )
+
+            request_launch_token = get_report_launch_token(
+                request=request,
+                session_id=session_id,
+                launch_token=launchToken,
+                cookie_prefix="student_quiz_report_v3_launch",
+            )
+            _set_request_launch_token(request, request_launch_token)
+
+            resolved_user_id = resolve_report_user_id(
+                None,
+                request_launch_token,
+            )
+            return student_quiz_report_v3(
+                request=request,
+                session_id=session_id,
+                user_id=resolved_user_id,
+                format=format,
+                debug=debug,
+            )
 
         @api_router.get("/student_quiz_report/v3/{session_id}/{user_id}")
         def student_quiz_report_v3(
@@ -499,9 +575,12 @@ class StudentQuizReportsRouter:
 
             report_data["student_id"] = user_id
             if "platform" in data[0] and data[0]["platform"] == "quizengine":
-                report_data["test_link"] = QUIZ_URL.format(
-                    quiz_id=test_id, user_id=user_id, api_key=AF_API_KEY
+                review_quiz_link = _build_quiz_review_link(
+                    request=request,
+                    quiz_id=test_id,
                 )
+                if review_quiz_link:
+                    report_data["test_link"] = review_quiz_link
 
             # bigquery
             student_al_data = self.__bq_db.get_student_qualification_data(
