@@ -2,7 +2,7 @@ import json
 import os
 from collections import OrderedDict
 from typing import Union, Optional
-from urllib.parse import unquote, urlencode
+from urllib.parse import unquote, urlencode, quote
 
 from fastapi import APIRouter, Request
 from fastapi.templating import Jinja2Templates
@@ -44,7 +44,16 @@ PORTAL_FRONTEND_URL = (
     or os.getenv("PORTAL_FRONTEND_URL")
     or "https://auth.avantifellows.org"
 ).rstrip("/")
-QUIZ_URL = f"{PORTAL_FRONTEND_URL}/?sessionId={{session_id}}"
+QUIZ_FRONTEND_URL = (
+    os.getenv("AF_QUIZ_FRONTEND_URL")
+    or os.getenv("QUIZ_FRONTEND_URL")
+    or ""
+).rstrip("/")
+QUIZ_API_KEY = (
+    os.getenv("AF_QUIZ_API_KEY")
+    or os.getenv("QUIZ_API_KEY")
+    or "6qOO8UdF1EGxLgzwIbQN"
+)
 # https://reports.avantifellows.org/reports/student_quiz_report/Homework_Quiz_2022-08-03_62ea813210de4e9677c8ce2d/1403899102
 STUDENT_QUIZ_REPORT_URL = "https://reports.avantifellows.org/reports/student_quiz_report/{session_id}/{user_id}"
 
@@ -281,6 +290,39 @@ class StudentQuizReportsRouter:
                 raise HTTPException(status_code=401, detail="Missing launch token")
             return token
 
+        def _set_request_launch_token(request: Request, launch_token: Optional[str]) -> None:
+            request.state.report_launch_token = launch_token
+
+        def _resolve_quiz_frontend_url(request: Request) -> str:
+            if QUIZ_FRONTEND_URL:
+                return QUIZ_FRONTEND_URL
+
+            host = request.url.hostname or ""
+            if "staging" in host:
+                return "https://staging-quiz.avantifellows.org"
+
+            if host.startswith("localhost") or host.startswith("127.0.0.1"):
+                return "http://localhost:8081"
+
+            return "https://quiz.avantifellows.org"
+
+        def _build_quiz_review_link(
+            request: Request,
+            quiz_id: str,
+        ) -> Optional[str]:
+            launch_token = getattr(request.state, "report_launch_token", None)
+            if not launch_token:
+                return None
+
+            quiz_frontend_url = _resolve_quiz_frontend_url(request)
+            # Direct report -> quiz review handoff reuses the verified report token.
+            # Quiz resolves canonical identity from the token and strips it from the URL after boot.
+            return (
+                f"{quiz_frontend_url}/quiz/{quote(str(quiz_id), safe='')}"
+                f"?apiKey={quote(QUIZ_API_KEY, safe='')}"
+                f"&launchToken={quote(launch_token, safe='')}"
+            )
+
         @api_router.get("/student_reports/{user_id}")
         def get_student_reports(
             request: Request,
@@ -368,14 +410,17 @@ class StudentQuizReportsRouter:
                     clean_path=f"/reports/student_quiz_report/{session_id}",
                 )
 
+            request_launch_token = _get_report_launch_token(
+                request=request,
+                session_id=session_id,
+                launch_token=launchToken,
+                cookie_prefix="student_quiz_report_launch",
+            )
+            _set_request_launch_token(request, request_launch_token)
+
             resolved_user_id = _resolve_report_user_id(
                 None,
-                _get_report_launch_token(
-                    request=request,
-                    session_id=session_id,
-                    launch_token=launchToken,
-                    cookie_prefix="student_quiz_report_launch",
-                ),
+                request_launch_token,
             )
             return student_quiz_report(
                 request=request,
@@ -432,6 +477,13 @@ class StudentQuizReportsRouter:
                 # Use top-level student_id for report_header.student_id
                 if "report_header" in report and "student_id" in report:
                     report["report_header"]["student_id"] = report["student_id"]
+                if "test_id" in report:
+                    review_quiz_link = _build_quiz_review_link(
+                        request=request,
+                        quiz_id=report["test_id"],
+                    )
+                    if review_quiz_link:
+                        report["review_quiz_link"] = review_quiz_link
 
                 use_print = (
                     format == "pdf" or request.query_params.get("print") == "true"
@@ -497,7 +549,12 @@ class StudentQuizReportsRouter:
 
             report_data["student_id"] = user_id
             if "platform" in data[0] and data[0]["platform"] == "quizengine":
-                report_data["test_link"] = QUIZ_URL.format(session_id=session_id)
+                review_quiz_link = _build_quiz_review_link(
+                    request=request,
+                    quiz_id=test_id,
+                )
+                if review_quiz_link:
+                    report_data["test_link"] = review_quiz_link
 
             section_reports = []
             overall_performance = {}
@@ -541,14 +598,17 @@ class StudentQuizReportsRouter:
                     clean_path=f"/reports/student_quiz_report/v3/{session_id}",
                 )
 
+            request_launch_token = _get_report_launch_token(
+                request=request,
+                session_id=session_id,
+                launch_token=launchToken,
+                cookie_prefix="student_quiz_report_v3_launch",
+            )
+            _set_request_launch_token(request, request_launch_token)
+
             resolved_user_id = _resolve_report_user_id(
                 None,
-                _get_report_launch_token(
-                    request=request,
-                    session_id=session_id,
-                    launch_token=launchToken,
-                    cookie_prefix="student_quiz_report_v3_launch",
-                ),
+                request_launch_token,
             )
             return student_quiz_report_v3(
                 request=request,
@@ -620,7 +680,12 @@ class StudentQuizReportsRouter:
 
             report_data["student_id"] = user_id
             if "platform" in data[0] and data[0]["platform"] == "quizengine":
-                report_data["test_link"] = QUIZ_URL.format(session_id=session_id)
+                review_quiz_link = _build_quiz_review_link(
+                    request=request,
+                    quiz_id=test_id,
+                )
+                if review_quiz_link:
+                    report_data["test_link"] = review_quiz_link
 
             # bigquery
             student_al_data = self.__bq_db.get_student_qualification_data(
