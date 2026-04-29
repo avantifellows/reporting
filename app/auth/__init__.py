@@ -1,5 +1,3 @@
-import os
-
 import httpx
 from fastapi import Request, HTTPException, status
 
@@ -29,7 +27,7 @@ def _verify_token_value(token: str) -> dict:
     return json_response
 
 
-async def verify_token(request: Request) -> bool:
+async def verify_token(request: Request) -> str:
     auth_header = request.headers.get("Authorization")
     bearer_prefix = "Bearer "
 
