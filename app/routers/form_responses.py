@@ -5,6 +5,11 @@ import asyncio
 from db.form_responses_db import FormResponsesDB
 from utils.pdf_converter import convert_template_to_pdf
 from utils.llm_summary import generate_theme_summary
+from utils.report_launch import (
+    get_report_launch_token,
+    redirect_with_launch_cookie,
+    resolve_report_user_id,
+)
 
 
 class FormResponsesRouter:
@@ -19,6 +24,40 @@ class FormResponsesRouter:
     @property
     def router(self):
         api_router = APIRouter(prefix="/reports", tags=["form_responses"])
+
+        @api_router.get("/form_responses/{session_id}")
+        async def get_form_responses_with_token(
+            request: Request,
+            session_id: str,
+            launchToken: Optional[str] = None,
+            format: Optional[str] = None,
+            debug: bool = False,
+        ):
+            if launchToken:
+                return redirect_with_launch_cookie(
+                    request=request,
+                    session_id=session_id,
+                    launch_token=launchToken,
+                    cookie_prefix="form_responses_launch",
+                    clean_path=f"/reports/form_responses/{session_id}",
+                )
+
+            resolved_user_id = resolve_report_user_id(
+                None,
+                get_report_launch_token(
+                    request=request,
+                    session_id=session_id,
+                    launch_token=launchToken,
+                    cookie_prefix="form_responses_launch",
+                ),
+            )
+            return await get_form_responses(
+                request=request,
+                session_id=session_id,
+                user_id=resolved_user_id,
+                format=format,
+                debug=debug,
+            )
 
         @api_router.get("/form_responses/{session_id}/{user_id}")
         async def get_form_responses(
