@@ -1,7 +1,9 @@
+import os
+
 import httpx
 from fastapi import Request, HTTPException, status
 
-PORTAL_BACKEND_BASE_URL = "https://b93ddkdz0g.execute-api.ap-south-1.amazonaws.com"
+PORTAL_BACKEND_BASE_URL = os.environ["PORTAL_BACKEND_URL"].rstrip("/")
 VERIFICATION_URL = f"{PORTAL_BACKEND_BASE_URL}/auth/verify"
 
 
