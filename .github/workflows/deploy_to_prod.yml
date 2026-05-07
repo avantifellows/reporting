@@ -67,6 +67,7 @@ jobs:
           BQ_CREDENTIALS_SECRET_NAME: ${{ secrets.BQ_CREDENTIALS_SECRET_NAME }}
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           HTML_TO_PDF_SERVER_URL: ${{ secrets.HTML_TO_PDF_SERVER_URL }}
+          PORTAL_BACKEND_URL: ${{ secrets.PORTAL_BACKEND_URL }}
         run: >
           sam deploy
           --stack-name ReportingProduction
@@ -86,3 +87,4 @@ jobs:
           BqCredentialsSecretName=$BQ_CREDENTIALS_SECRET_NAME
           OpenrouterApiKey=$OPENROUTER_API_KEY
           HtmlToPdfUrl=$HTML_TO_PDF_SERVER_URL
+          PortalBackendUrl=$PORTAL_BACKEND_URL
