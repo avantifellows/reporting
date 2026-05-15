@@ -33,6 +33,9 @@ Parameters:
   OpenrouterApiKey:
     Type: String
     Description: OpenRouter API key for AI features
+  PortalBackendUrl:
+    Type: String
+    Description: Portal backend URL for token verification
 
 Resources:
   Function:
@@ -56,6 +59,7 @@ Resources:
           DYNAMODB_STUDENT_REPORTS_TABLE_NAME: !Ref DynamodbStudentReportsTableName
           OPENROUTER_API_KEY: !Ref OpenrouterApiKey
           HTML_TO_PDF_SERVER_URL: !Ref HtmlToPdfUrl
+          PORTAL_BACKEND_URL: !Ref PortalBackendUrl
       Policies:
         - Statement:
             - Effect: Allow
