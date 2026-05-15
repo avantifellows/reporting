@@ -34,6 +34,15 @@
                 </div>
             </div>
 
+            {% if report.test_link %}
+            <div class="flex justify-center mb-6 md:mb-8">
+                <a href="{{ report.test_link }}" target="_blank" data-track-button="review_quiz"
+                   class="inline-flex items-center justify-center rounded-lg bg-[#29973E] px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#2AAF4A]">
+                    Review Quiz
+                </a>
+            </div>
+            {% endif %}
+
             <!-- Recommendation -->
             {% if report.recommendation and (report.recommendation.message or report.recommendation.recommended_chapters) %}
             <div class="bg-gray-50 p-5 rounded-2xl mb-6 md:mb-8">

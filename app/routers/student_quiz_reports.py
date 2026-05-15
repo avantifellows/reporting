@@ -399,6 +399,20 @@ class StudentQuizReportsRouter:
                 if "report_header" in report and "student_id" in report:
                     report["report_header"]["student_id"] = report["student_id"]
 
+                quiz_id = (
+                    report.get("quiz_id")
+                    or report.get("test_id")
+                    or report.get("report_header", {}).get("quiz_id")
+                    or report.get("report_header", {}).get("test_id")
+                )
+                if quiz_id:
+                    review_quiz_link = _build_quiz_review_link(
+                        request=request,
+                        quiz_id=quiz_id,
+                    )
+                    if review_quiz_link:
+                        report["test_link"] = review_quiz_link
+
                 use_print = (
                     format == "pdf" or request.query_params.get("print") == "true"
                 )
