@@ -19,11 +19,18 @@
         </div>
 
         <div class="p-5 md:p-8">
+            {% set overall_marks_scored = (report.overall_performance.marks_scored or 0)|int %}
+            {% set overall_max_marks = (report.overall_performance.max_marks_possible or 0)|int %}
+            {% set overall_score_display = overall_marks_scored ~ " / " ~ overall_max_marks if overall_max_marks else overall_marks_scored %}
+
             <!-- Overall Score -->
             <div class="flex flex-col items-center justify-center py-8 bg-gray-50 rounded-2xl mb-4 md:mb-6">
                 <div class="text-[10px] md:text-xs text-gray-500 uppercase tracking-wider mb-2">Overall Score</div>
                 <div class="text-5xl md:text-6xl font-bold text-[#4a90e2] leading-none">
-                    {{ (report.overall_performance.marks_scored or 0)|int }}
+                    {{ overall_marks_scored }}
+                    {% if overall_max_marks %}
+                    <span class="text-2xl md:text-3xl text-gray-500 font-semibold">/ {{ overall_max_marks }}</span>
+                    {% endif %}
                 </div>
             </div>
 
@@ -63,7 +70,7 @@
                 </h3>
                 <div class="grid grid-cols-2 md:grid-cols-6 gap-3">
                     {% set metrics = [
-                        ((report.overall_performance.marks_scored or 0)|int, "Total Marks"),
+                        (overall_score_display, "Total Marks"),
                         (report.overall_performance.num_correct or 0, "Correct Answers"),
                         ("%.2f"|format(report.overall_performance.percentage or 0) ~ "%", "Percentage"),
                         (report.overall_performance.num_skipped or 0, "Questions Skipped"),
