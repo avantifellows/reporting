@@ -113,28 +113,32 @@
                         <h4 class="text-base font-bold mb-3 uppercase" style="color: {{ color }};">
                             {% if subject.subject == 'Maths' %}Mathematics{% else %}{{ subject.subject }}{% endif %}
                         </h4>
-                        <table class="w-full border-collapse">
-                            <tbody>
-                                <tr>
-                                    <td class="py-1.5 text-xs text-gray-500 font-medium">Marks</td>
-                                    <td class="py-1.5 text-sm font-bold text-[#2c3e50] text-right">{{ (subject.marks_scored or 0)|int }}</td>
-                                    <td class="py-1.5 pl-4 text-xs text-gray-500 font-medium">Skipped</td>
-                                    <td class="py-1.5 text-sm font-bold text-[#2c3e50] text-right">{{ subject.num_skipped or 0 }}</td>
-                                </tr>
-                                <tr>
-                                    <td class="py-1.5 text-xs text-gray-500 font-medium">Wrong</td>
-                                    <td class="py-1.5 text-sm font-bold text-[#2c3e50] text-right">{{ subject.num_wrong or 0 }}</td>
-                                    <td class="py-1.5 pl-4 text-xs text-gray-500 font-medium">Correct</td>
-                                    <td class="py-1.5 text-sm font-bold text-[#2c3e50] text-right">{{ subject.num_correct or 0 }}</td>
-                                </tr>
-                                <tr>
-                                    <td class="py-1.5 text-xs text-gray-500 font-medium">Percentage</td>
-                                    <td class="py-1.5 text-sm font-bold text-[#2c3e50] text-right">{{ "%.0f"|format(subject.percentage or 0) }}%</td>
-                                    <td class="py-1.5 pl-4 text-xs text-gray-500 font-medium">Accuracy</td>
-                                    <td class="py-1.5 text-sm font-bold text-[#2c3e50] text-right">{{ "%.2f"|format(subject.accuracy or 0) }}%</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                        <div class="grid grid-cols-2 gap-x-4 gap-y-3">
+                            <div class="flex min-w-0 items-baseline justify-between gap-2">
+                                <span class="text-xs text-gray-500 font-medium">Marks</span>
+                                <span class="shrink-0 text-sm font-bold text-[#2c3e50]">{{ (subject.marks_scored or 0)|int }}</span>
+                            </div>
+                            <div class="flex min-w-0 items-baseline justify-between gap-2">
+                                <span class="text-xs text-gray-500 font-medium">Skipped</span>
+                                <span class="shrink-0 text-sm font-bold text-[#2c3e50]">{{ subject.num_skipped or 0 }}</span>
+                            </div>
+                            <div class="flex min-w-0 items-baseline justify-between gap-2">
+                                <span class="text-xs text-gray-500 font-medium">Wrong</span>
+                                <span class="shrink-0 text-sm font-bold text-[#2c3e50]">{{ subject.num_wrong or 0 }}</span>
+                            </div>
+                            <div class="flex min-w-0 items-baseline justify-between gap-2">
+                                <span class="text-xs text-gray-500 font-medium">Correct</span>
+                                <span class="shrink-0 text-sm font-bold text-[#2c3e50]">{{ subject.num_correct or 0 }}</span>
+                            </div>
+                            <div class="flex min-w-0 items-baseline justify-between gap-2">
+                                <span class="text-xs text-gray-500 font-medium">Percentage</span>
+                                <span class="shrink-0 text-sm font-bold text-[#2c3e50]">{{ "%.0f"|format(subject.percentage or 0) }}%</span>
+                            </div>
+                            <div class="flex min-w-0 items-baseline justify-between gap-2">
+                                <span class="text-xs text-gray-500 font-medium">Accuracy</span>
+                                <span class="shrink-0 text-sm font-bold text-[#2c3e50]">{{ "%.2f"|format(subject.accuracy or 0) }}%</span>
+                            </div>
+                        </div>
                     </div>
                     {% endfor %}
                 </div>
