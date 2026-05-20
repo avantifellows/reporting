@@ -494,13 +494,13 @@
                             <td class="font-medium">Percentage</td>
                             <td>
                                 {{
-                                "%.2f"|format(report.overall_performance.percentage)
+                                "%.2f"|format(report.overall_performance.percentage or 0)
                                 }}%
                             </td>
                             <td class="font-medium">Accuracy</td>
                             <td>
                                 {{
-                                "%.2f"|format(report.overall_performance.accuracy)
+                                "%.2f"|format(report.overall_performance.accuracy or 0)
                                 }}%
                             </td>
                         </tr>
@@ -558,13 +558,13 @@
                         <div class="subject-card-line">
                             <span class="subject-card-label">Percentage</span>
                             <span class="subject-card-value"
-                                >{{ "%.0f"|format(subject.percentage) }}%</span
+                                >{{ "%.0f"|format(subject.percentage or 0) }}%</span
                             >
                         </div>
                         <div class="subject-card-line">
                             <span class="subject-card-label">Accuracy</span>
                             <span class="subject-card-value"
-                                >{{ "%.2f"|format(subject.accuracy) }}%</span
+                                >{{ "%.2f"|format(subject.accuracy or 0) }}%</span
                             >
                         </div>
                     </div>
