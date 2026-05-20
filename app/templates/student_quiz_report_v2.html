@@ -69,7 +69,7 @@
         <div class="bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg p-6 text-center shadow-md">
             <div class="text-lg font-medium opacity-90">Overall Score</div>
             <div class="text-4xl font-bold mt-2">{{ report.overall_performance.marks_scored|int }} / {{ report.overall_performance.max_marks_possible|int }}</div>
-            <div class="text-sm mt-2 opacity-80">{{ "%.1f"|format(report.overall_performance.percentage) }}% Score</div>
+            <div class="text-sm mt-2 opacity-80">{{ "%.1f"|format(report.overall_performance.percentage or 0) }}% Score</div>
         </div>
 
         <!-- Recommendation -->
@@ -121,11 +121,11 @@
             <div class="mt-4 grid grid-cols-2 gap-2 sm:gap-4">
                 <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4 flex justify-between items-center">
                     <span class="text-gray-700 font-medium text-sm sm:text-base">Percentage</span>
-                    <span class="text-xl sm:text-2xl font-bold text-blue-600">{{ "%.1f"|format(report.overall_performance.percentage) }}%</span>
+                    <span class="text-xl sm:text-2xl font-bold text-blue-600">{{ "%.1f"|format(report.overall_performance.percentage or 0) }}%</span>
                 </div>
                 <div class="bg-purple-50 border border-purple-200 rounded-lg p-3 sm:p-4 flex justify-between items-center">
                     <span class="text-gray-700 font-medium text-sm sm:text-base">Accuracy</span>
-                    <span class="text-xl sm:text-2xl font-bold text-purple-600">{{ "%.1f"|format(report.overall_performance.accuracy) }}%</span>
+                    <span class="text-xl sm:text-2xl font-bold text-purple-600">{{ "%.1f"|format(report.overall_performance.accuracy or 0) }}%</span>
                 </div>
             </div>
         </section>
@@ -179,11 +179,11 @@
                         <div class="pt-2 border-t border-gray-100">
                             <div class="flex justify-between text-sm">
                                 <span class="text-gray-600">Percentage</span>
-                                <span class="font-semibold text-{{ color }}-600">{{ "%.0f"|format(subject.percentage) }}%</span>
+                                <span class="font-semibold text-{{ color }}-600">{{ "%.0f"|format(subject.percentage or 0) }}%</span>
                             </div>
                             <div class="flex justify-between text-sm mt-1">
                                 <span class="text-gray-600">Accuracy</span>
-                                <span class="font-semibold text-{{ color }}-600">{{ "%.1f"|format(subject.accuracy) }}%</span>
+                                <span class="font-semibold text-{{ color }}-600">{{ "%.1f"|format(subject.accuracy or 0) }}%</span>
                             </div>
                         </div>
                     </div>
