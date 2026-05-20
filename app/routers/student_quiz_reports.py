@@ -1,3 +1,4 @@
+import json
 from collections import OrderedDict
 from typing import Union, Optional
 from urllib.parse import unquote, quote
@@ -398,6 +399,20 @@ class StudentQuizReportsRouter:
                 # Use top-level student_id for report_header.student_id
                 if "report_header" in report and "student_id" in report:
                     report["report_header"]["student_id"] = report["student_id"]
+
+                # Upstream stores accuracy as DynamoDB NULL when a subject is fully skipped (0/0 undefined); templates `%.Nf|format` would crash on None.
+                _NUMERIC_FIELDS = ("percentage", "accuracy")
+                if isinstance(report.get("overall_performance"), dict):
+                    for f in _NUMERIC_FIELDS:
+                        if report["overall_performance"].get(f) is None:
+                            report["overall_performance"][f] = 0
+                if isinstance(report.get("subject_performance"), list):
+                    for subject in report["subject_performance"]:
+                        if not isinstance(subject, dict):
+                            continue
+                        for f in _NUMERIC_FIELDS:
+                            if subject.get(f) is None:
+                                subject[f] = 0
 
                 quiz_id = (
                     report.get("quiz_id")
