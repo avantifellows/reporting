@@ -420,6 +420,8 @@ class StudentQuizReportsRouter:
                     or report.get("report_header", {}).get("quiz_id")
                     or report.get("report_header", {}).get("test_id")
                 )
+                if not quiz_id and "_" in session_id:
+                    quiz_id = session_id.rsplit("_", 1)[-1]
                 if quiz_id:
                     review_quiz_link = _build_quiz_review_link(
                         request=request,
