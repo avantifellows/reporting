@@ -3,7 +3,31 @@ from google.cloud import firestore
 import os
 import json
 import base64
+import boto3
 from google.cloud.firestore_v1.base_query import FieldFilter
+
+
+def _load_firestore_encoded_key():
+    """Return the base64-encoded Firestore service-account JSON.
+
+    Prefer a raw FIRESTORE_CREDENTIALS env var (local dev / .env.local). In
+    deployed Lambdas the creds live in Secrets Manager (named by
+    FIRESTORE_CREDENTIALS_SECRET_NAME) instead of an env var — the full JSON is
+    ~3KB and was pushing the function's env over Lambda's 4KB limit. Mirrors how
+    BigQuery creds are loaded (BQ_CREDENTIALS_SECRET_NAME)."""
+    if "FIRESTORE_CREDENTIALS" not in os.environ:
+        load_dotenv("../../.env.local")
+    encoded_key = os.getenv("FIRESTORE_CREDENTIALS")
+    if encoded_key:
+        return encoded_key
+    secret_name = os.getenv("FIRESTORE_CREDENTIALS_SECRET_NAME")
+    if secret_name:
+        client = boto3.client("secretsmanager")
+        return client.get_secret_value(SecretId=secret_name)["SecretString"]
+    raise RuntimeError(
+        "Firestore credentials not configured: set FIRESTORE_CREDENTIALS "
+        "or FIRESTORE_CREDENTIALS_SECRET_NAME"
+    )
 
 
 class SessionsDB:
@@ -13,10 +37,7 @@ class SessionsDB:
     """
 
     def __init__(self) -> None:
-        # Import the environment variables (not needed for prod as it will be in GH secrets)
-        if "FIRESTORE_CREDENTIALS" not in os.environ:
-            load_dotenv("../../.env.local")
-        encoded_key = os.getenv("FIRESTORE_CREDENTIALS")
+        encoded_key = _load_firestore_encoded_key()
         SERVICE_ACCOUNT_JSON = json.loads(base64.b64decode(encoded_key).decode("utf-8"))
         self.__db = firestore.Client.from_service_account_info(SERVICE_ACCOUNT_JSON)
 

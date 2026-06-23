@@ -15,9 +15,13 @@ Parameters:
   DynamodbSecretKey:
     Type: String
     Description: Secret key credentials of Dynamodb instance
-  FirestoreCredentials:
+  FirestoreCredentialsSecretName:
     Type: String
-    Description: Credentials of Firestore
+    Description: >-
+      Secrets Manager secret holding the base64 Firestore service-account JSON.
+      The deploy workflow syncs the FIRESTORE_CREDENTIALS GH secret into it; the
+      function reads it at runtime. Moved out of the Lambda env (the ~3KB JSON
+      was breaching the 4KB env limit), mirroring BqCredentialsSecretName.
   MongoAuthCredentials:
     Type: String
     Description: Credentials of Mongo DB
@@ -88,7 +92,7 @@ Resources:
           DYNAMODB_ACCESS_KEY: !Ref DynamodbAccessKey
           DYNAMODB_SECRET_KEY: !Ref DynamodbSecretKey
           MONGO_AUTH_CREDENTIALS: !Ref MongoAuthCredentials
-          FIRESTORE_CREDENTIALS: !Ref FirestoreCredentials
+          FIRESTORE_CREDENTIALS_SECRET_NAME: !Ref FirestoreCredentialsSecretName
           BQ_CREDENTIALS_SECRET_NAME: !Ref BqCredentialsSecretName
           DYNAMODB_STUDENT_REPORTS_TABLE_NAME: !Ref DynamodbStudentReportsTableName
           OPENROUTER_API_KEY: !Ref OpenrouterApiKey
@@ -103,7 +107,9 @@ Resources:
             - Effect: Allow
               Action:
                 - secretsmanager:GetSecretValue
-              Resource: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${BqCredentialsSecretName}*"
+              Resource:
+                - !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${BqCredentialsSecretName}*"
+                - !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${FirestoreCredentialsSecretName}*"
         - Statement:
             - Effect: Allow
               Action:
