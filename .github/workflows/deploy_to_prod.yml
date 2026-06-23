@@ -68,6 +68,7 @@ jobs:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           HTML_TO_PDF_SERVER_URL: ${{ secrets.HTML_TO_PDF_SERVER_URL }}
           PORTAL_BACKEND_URL: ${{ secrets.PORTAL_BACKEND_URL }}
+          REPORTING_SERVICE_API_KEY: ${{ secrets.REPORTING_SERVICE_API_KEY }}
         run: >
           sam deploy
           --stack-name ReportingProduction
@@ -88,3 +89,5 @@ jobs:
           OpenrouterApiKey=$OPENROUTER_API_KEY
           HtmlToPdfUrl=$HTML_TO_PDF_SERVER_URL
           PortalBackendUrl=$PORTAL_BACKEND_URL
+          ReportingServiceApiKey=$REPORTING_SERVICE_API_KEY
+          ReportsBucketName=avantifellows-combined-reports
