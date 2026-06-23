@@ -10,8 +10,10 @@ from internal.db import initialize_quiz_db, initialize_reports_db, initialize_bi
 
 from db.reports_db import ReportsDB
 from db.form_responses_db import FormResponsesDB
+from db.report_jobs_db import ReportJobsDB
 from routers.student_quiz_reports import StudentQuizReportsRouter
 from routers.form_responses import FormResponsesRouter
+from routers.combined_reports import CombinedReportsRouter
 
 from fastapi.staticfiles import StaticFiles
 
@@ -40,6 +42,7 @@ app.add_middleware(
 
 student_quiz_reports_db = ReportsDB(reports_db)
 form_responses_db = FormResponsesDB(reports_db)
+report_jobs_db = ReportJobsDB(reports_db)
 quiz_db = QuizDB(quiz_db)
 bq_db = BigQueryDB(bq_db)
 sessions_db = SessionsDB()
@@ -49,10 +52,12 @@ student_quiz_reports_router = StudentQuizReportsRouter(
 )
 form_responses_router = FormResponsesRouter(form_responses_db=form_responses_db)
 quiz_reports_router = SessionQuizReportsRouter(quiz_db=quiz_db, sessions_db=sessions_db)
+combined_reports_router = CombinedReportsRouter(jobs_db=report_jobs_db)
 
 app.include_router(student_quiz_reports_router.router)
 app.include_router(form_responses_router.router)
 app.include_router(quiz_reports_router.router)
+app.include_router(combined_reports_router.router)
 
 
 @app.get("/")

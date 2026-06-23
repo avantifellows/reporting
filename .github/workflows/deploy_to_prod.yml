@@ -55,6 +55,19 @@ jobs:
       - name: Build with SAM
         run: sam build --use-container -t templates/prod.yaml --debug
 
+      # The Firestore service-account JSON (~3KB) no longer fits in the Lambda
+      # env (4KB cap). Sync the GH secret into Secrets Manager; SAM passes only
+      # the secret name. Idempotent: create on first run, update thereafter.
+      - name: Sync Firestore creds to Secrets Manager
+        env:
+          FIRESTORE_CREDENTIALS: ${{ secrets.FIRESTORE_CREDENTIALS }}
+        run: |
+          SECRET_NAME=reporting-firestore-creds-prod
+          aws secretsmanager create-secret --name "$SECRET_NAME" \
+            --secret-string "$FIRESTORE_CREDENTIALS" --region ap-south-1 \
+          || aws secretsmanager put-secret-value --secret-id "$SECRET_NAME" \
+            --secret-string "$FIRESTORE_CREDENTIALS" --region ap-south-1
+
       - name: Deploy
         env:
           DYNAMODB_URL: ${{ secrets.DYNAMODB_URL }}
@@ -62,12 +75,12 @@ jobs:
           DYNAMODB_ACCESS_KEY: ${{ secrets.DYNAMODB_ACCESS_KEY }}
           DYNAMODB_SECRET_KEY: ${{ secrets.DYNAMODB_SECRET_KEY }}
           DYNAMODB_STUDENT_REPORTS_TABLE_NAME: ${{ secrets.DYNAMODB_STUDENT_REPORTS_TABLE_NAME }}
-          FIRESTORE_CREDENTIALS: ${{ secrets.FIRESTORE_CREDENTIALS }}
           MONGO_AUTH_CREDENTIALS: ${{ secrets.MONGO_AUTH_CREDENTIALS }}
           BQ_CREDENTIALS_SECRET_NAME: ${{ secrets.BQ_CREDENTIALS_SECRET_NAME }}
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           HTML_TO_PDF_SERVER_URL: ${{ secrets.HTML_TO_PDF_SERVER_URL }}
           PORTAL_BACKEND_URL: ${{ secrets.PORTAL_BACKEND_URL }}
+          REPORTING_SERVICE_API_KEY: ${{ secrets.REPORTING_SERVICE_API_KEY }}
         run: >
           sam deploy
           --stack-name ReportingProduction
@@ -82,9 +95,11 @@ jobs:
           DynamodbAccessKey=$DYNAMODB_ACCESS_KEY
           DynamodbSecretKey=$DYNAMODB_SECRET_KEY
           DynamodbStudentReportsTableName=$DYNAMODB_STUDENT_REPORTS_TABLE_NAME
-          FirestoreCredentials=$FIRESTORE_CREDENTIALS
+          FirestoreCredentialsSecretName=reporting-firestore-creds-prod
           MongoAuthCredentials=$MONGO_AUTH_CREDENTIALS
           BqCredentialsSecretName=$BQ_CREDENTIALS_SECRET_NAME
           OpenrouterApiKey=$OPENROUTER_API_KEY
           HtmlToPdfUrl=$HTML_TO_PDF_SERVER_URL
           PortalBackendUrl=$PORTAL_BACKEND_URL
+          ReportingServiceApiKey=$REPORTING_SERVICE_API_KEY
+          ReportsBucketName=avantifellows-combined-reports
