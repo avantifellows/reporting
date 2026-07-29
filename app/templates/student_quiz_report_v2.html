@@ -48,10 +48,14 @@
             <div class="bg-gray-50 p-5 rounded-2xl mb-6 md:mb-8">
                 {% if report.recommendation.message %}
                 <div class="text-sm leading-relaxed mb-4 text-gray-800">
+                    <span class="font-semibold">Recommendation:</span>
                     {{ report.recommendation.message }}
                 </div>
                 {% endif %}
                 {% if report.recommendation.recommended_chapters %}
+                <div class="text-sm leading-relaxed mb-4 text-gray-800">
+                    Based on your performance, we recommend that you focus on the following chapters:
+                </div>
                 <table class="w-full border-collapse rounded-xl overflow-hidden shadow-sm">
                     <thead>
                         <tr>
