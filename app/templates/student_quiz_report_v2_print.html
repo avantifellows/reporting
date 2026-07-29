@@ -419,11 +419,15 @@
             </div>
 
             <!-- Recommendation -->
+            {% if report.recommendation and (report.recommendation.message or
+            report.recommendation.recommended_chapters) %}
             <div class="recommendation">
+                {% if report.recommendation.message %}
                 <p>
                     <span class="font-semibold">Recommendation:</span> {{
                     report.recommendation.message }}
                 </p>
+                {% endif %}
                 {% if report.recommendation.recommended_chapters %}
                 <p>
                     Based on your performance, we recommend that you focus on
@@ -454,6 +458,7 @@
                 </div>
                 {% endif %}
             </div>
+            {% endif %}
 
             <!-- Overall Performance Summary -->
             <h2 class="section-header">Overall Performance Summary</h2>
