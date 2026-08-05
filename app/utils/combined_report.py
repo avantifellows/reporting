@@ -172,17 +172,38 @@ def build_combined_pdf(matched_docs):
 
     Returns (pdf_bytes, rendered_count). Renders are sequential to stay gentle on
     the single shared Chromium behind html_to_pdf.
+
+    Every student's report starts on a fresh sheet so ops can print the combined
+    file double-sided without one student's last page landing on the back of
+    another's first. In duplex, sheet N carries pages 2N-1 and 2N, so a report
+    must begin on an odd page — which means each report has to occupy an even
+    page count. A report that renders to an odd number of pages therefore gets
+    one trailing blank page. (Today's template runs 3 pages per student, so in
+    practice almost every student gets one; the padding is computed per student
+    rather than assumed, since chapter-table length varies the count.)
     """
     writer = PdfWriter()
     rendered = 0
+    padded = 0
     for doc in sorted(matched_docs, key=_student_sort_key):
         html = render_student_html(doc)
         pdf_bytes = html_to_pdf_bytes(html)
         reader = PdfReader(io.BytesIO(pdf_bytes))
         for page in reader.pages:
             writer.add_page(page)
+        if len(reader.pages) % 2:
+            # Match the report's own page box so the blank feeds identically.
+            last = reader.pages[-1]
+            writer.add_blank_page(
+                width=last.mediabox.width, height=last.mediabox.height
+            )
+            padded += 1
         rendered += 1
 
+    print(
+        f"[combined] {rendered} students, {len(writer.pages)} pages "
+        f"({padded} blank separator page(s) added for duplex printing)"
+    )
     out = io.BytesIO()
     writer.write(out)
     return out.getvalue(), rendered
