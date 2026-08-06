@@ -82,6 +82,31 @@ class ReportsDB:
         except ClientError as e:
             raise ValueError(e.response["Error"]["Message"])
 
+    def get_all_session_reports_v2(self, session_id):
+        """
+        Returns every v2 student report for a session (the whole session_id
+        partition, one consolidated AIET v2.0 doc per student), paging through
+        LastEvaluatedKey. Used by the combined-report worker to fetch a centre's
+        reports in one pass, then filter to the school roster in Python.
+        params:
+            session_id: The session ID
+        Returns:
+            A list of report items (possibly empty).
+        """
+        try:
+            table = self.__db.Table("student_quiz_reports_v2")
+            items = []
+            kwargs = dict(KeyConditionExpression=Key("session_id").eq(session_id))
+            while True:
+                response = table.query(**kwargs)
+                items.extend(response.get("Items", []))
+                lek = response.get("LastEvaluatedKey")
+                if not lek:
+                    return items
+                kwargs["ExclusiveStartKey"] = lek
+        except ClientError as e:
+            raise ValueError(e.response["Error"]["Message"])
+
     def get_student_quiz_report_v2_by_alt_id(self, identifier, session_id):
         """
         Returns a student quiz report from the v2 table by querying the

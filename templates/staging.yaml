@@ -15,9 +15,13 @@ Parameters:
   DynamodbSecretKey:
     Type: String
     Description: Secret key credentials of Dynamodb instance
-  FirestoreCredentials:
+  FirestoreCredentialsSecretName:
     Type: String
-    Description: Credentials of Firestore
+    Description: >-
+      Secrets Manager secret holding the base64 Firestore service-account JSON.
+      The deploy workflow syncs the FIRESTORE_CREDENTIALS GH secret into it; the
+      function reads it at runtime. Moved out of the Lambda env (the ~3KB JSON
+      was breaching the 4KB env limit), mirroring BqCredentialsSecretName.
   MongoAuthCredentials:
     Type: String
     Description: Credentials of Mongo DB
@@ -36,8 +40,42 @@ Parameters:
   PortalBackendUrl:
     Type: String
     Description: Portal backend URL for token verification
+  ReportJobsTableName:
+    Type: String
+    Default: report_jobs
+    Description: >-
+      DynamoDB table tracking combined-report jobs. Must already exist in the
+      SAME DynamoDB instance as the student-reports tables (the explicit-cred
+      instance at DynamodbUrl), NOT created here. Keys: PK job_id (S); GSI
+      session_school_index PK session_school (S) SK created_at (S). Staging
+      reads the same prod data, so it shares the prod report_jobs table.
+  ReportsBucketName:
+    Type: String
+    Description: >-
+      S3 bucket name for combined-report PDFs. Created/managed OUTSIDE this
+      stack (via CLI) so a stack teardown never chokes on a non-empty bucket;
+      the functions are only granted access to it by name.
+  ReportingServiceApiKey:
+    Type: String
+    NoEcho: true
+    Description: Shared service key af_lms sends as X-Api-Key to submit jobs
 
 Resources:
+  ReportJobsDLQ:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: reporting-combined-jobs-dlq-staging
+      MessageRetentionPeriod: 1209600 # 14 days
+
+  ReportJobsQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: reporting-combined-jobs-staging
+      VisibilityTimeout: 960
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt ReportJobsDLQ.Arn
+        maxReceiveCount: 3
+
   Function:
     Type: AWS::Serverless::Function
     Properties:
@@ -54,23 +92,74 @@ Resources:
           DYNAMODB_ACCESS_KEY: !Ref DynamodbAccessKey
           DYNAMODB_SECRET_KEY: !Ref DynamodbSecretKey
           MONGO_AUTH_CREDENTIALS: !Ref MongoAuthCredentials
-          FIRESTORE_CREDENTIALS: !Ref FirestoreCredentials
+          FIRESTORE_CREDENTIALS_SECRET_NAME: !Ref FirestoreCredentialsSecretName
           BQ_CREDENTIALS_SECRET_NAME: !Ref BqCredentialsSecretName
           DYNAMODB_STUDENT_REPORTS_TABLE_NAME: !Ref DynamodbStudentReportsTableName
           OPENROUTER_API_KEY: !Ref OpenrouterApiKey
           HTML_TO_PDF_SERVER_URL: !Ref HtmlToPdfUrl
           PORTAL_BACKEND_URL: !Ref PortalBackendUrl
+          REPORT_JOBS_TABLE_NAME: !Ref ReportJobsTableName
+          REPORTS_S3_BUCKET: !Ref ReportsBucketName
+          REPORT_JOBS_QUEUE_URL: !Ref ReportJobsQueue
+          REPORTING_SERVICE_API_KEY: !Ref ReportingServiceApiKey
       Policies:
         - Statement:
             - Effect: Allow
               Action:
                 - secretsmanager:GetSecretValue
-              Resource: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${BqCredentialsSecretName}*"
+              Resource:
+                - !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${BqCredentialsSecretName}*"
+                - !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${FirestoreCredentialsSecretName}*"
+        - Statement:
+            - Effect: Allow
+              Action:
+                - sqs:SendMessage
+              Resource: !GetAtt ReportJobsQueue.Arn
+        - Statement:
+            - Effect: Allow
+              Action:
+                - s3:GetObject
+              Resource: !Sub "arn:aws:s3:::${ReportsBucketName}/*"
       Events:
         Api:
           Type: HttpApi
           Properties:
             ApiId: !Ref Api
+    Metadata:
+      BuildMethod: python3.13
+      BuildArchitecture: x86_64
+
+  WorkerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: "ReportingCombinedWorkerStaging"
+      CodeUri: ../app
+      Handler: worker.lambda_handler
+      Runtime: python3.13
+      Timeout: 900
+      MemorySize: 2048
+      ReservedConcurrentExecutions: 2
+      Environment:
+        Variables:
+          DYNAMODB_URL: !Ref DynamodbUrl
+          DYNAMODB_REGION: !Ref DynamodbRegion
+          DYNAMODB_ACCESS_KEY: !Ref DynamodbAccessKey
+          DYNAMODB_SECRET_KEY: !Ref DynamodbSecretKey
+          HTML_TO_PDF_SERVER_URL: !Ref HtmlToPdfUrl
+          REPORT_JOBS_TABLE_NAME: !Ref ReportJobsTableName
+          REPORTS_S3_BUCKET: !Ref ReportsBucketName
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - s3:PutObject
+              Resource: !Sub "arn:aws:s3:::${ReportsBucketName}/*"
+      Events:
+        JobQueue:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt ReportJobsQueue.Arn
+            BatchSize: 1
     Metadata:
       BuildMethod: python3.13
       BuildArchitecture: x86_64
@@ -83,3 +172,6 @@ Outputs:
     Description: URL of your API
     Value:
       Fn::Sub: "https://${Api}.execute-api.${AWS::Region}.${AWS::URLSuffix}/"
+  ReportJobsQueueUrl:
+    Description: SQS queue URL for combined-report jobs
+    Value: !Ref ReportJobsQueue
