@@ -231,8 +231,10 @@
                                         <span class="px-1.5 py-0.5 rounded text-[9px] sm:text-[10px] font-semibold text-[#dc3545] bg-[#f8d7da]">High</span>
                                         {% elif p == 'medium' %}
                                         <span class="px-1.5 py-0.5 rounded text-[9px] sm:text-[10px] font-semibold text-[#fd7e14] bg-[#fff3cd]">Medium</span>
-                                        {% else %}
+                                        {% elif p == 'low' %}
                                         <span class="px-1.5 py-0.5 rounded text-[9px] sm:text-[10px] font-semibold text-gray-500 bg-gray-100">Low</span>
+                                        {% else %}
+                                        <span class="text-gray-400">&mdash;</span>
                                         {% endif %}
                                     </td>
                                     <td class="px-2 py-2 border-b border-gray-200 text-[11px] sm:text-xs">
