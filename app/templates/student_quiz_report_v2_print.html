@@ -495,6 +495,14 @@
                             <td class="font-medium">Wrong Answers</td>
                             <td>{{ report.overall_performance.num_wrong }}</td>
                         </tr>
+                        {% if report.overall_performance.num_partially_correct %}
+                        <tr>
+                            <td class="font-medium">Partially Correct</td>
+                            <td>{{ report.overall_performance.num_partially_correct }}</td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        {% endif %}
                         <tr>
                             <td class="font-medium">Percentage</td>
                             <td>
@@ -619,6 +627,8 @@
                                         <th>SCORE</th>
                                         <th>#CORRECT</th>
                                         <th>#WRONG</th>
+                                        {% set has_partial = chapters|selectattr('num_partially_correct')|list|length > 0 %}
+                                        {% if has_partial %}<th>#PARTIAL</th>{% endif %}
                                         <th>#SKIPPED</th>
                                     </tr>
                                 </thead>
@@ -643,6 +653,7 @@
                                         </td>
                                         <td>{{ chapter.num_correct or 0 }}</td>
                                         <td>{{ chapter.num_wrong or 0 }}</td>
+                                        {% if has_partial %}<td>{{ chapter.num_partially_correct or 0 }}</td>{% endif %}
                                         <td>{{ chapter.num_skipped or 0 }}</td>
                                     </tr>
                                     {% endfor %}
