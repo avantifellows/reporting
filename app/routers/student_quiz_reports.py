@@ -54,6 +54,14 @@ STUDENT_QUIZ_REPORT_URL = "https://reports.avantifellows.org/reports/student_qui
 api_key_header = APIKeyHeader(name="Authorization", auto_error=False)
 
 
+def _attempt_was_submitted(report: dict) -> bool:
+    """False only for an unfinished attempt. Older docs lack the field -> True."""
+    overall = report.get("overall_performance")
+    if not isinstance(overall, dict):
+        return True
+    return overall.get("has_quiz_ended") is not False
+
+
 class StudentQuizReportsRouter:
     """
     Router class for handling Student Reports related endpoints.
@@ -285,6 +293,9 @@ class StudentQuizReportsRouter:
                 student_reports.append(result)
 
             for doc in v2_data:
+                # Its marks are only what was saved at sync time.
+                if not _attempt_was_submitted(doc):
+                    continue
                 header = doc.get("report_header", {})
                 overall = doc.get("overall_performance", {})
                 result = {
@@ -396,6 +407,26 @@ class StudentQuizReportsRouter:
 
             # Helper to render v2 template
             def render_v2_report(report):
+                # The list hides these, but the URL is still reachable.
+                if not _attempt_was_submitted(report):
+                    error_data = {
+                        "session_id": session_id,
+                        "user_id": user_id,
+                        "error_message": (
+                            "This test was not submitted, so there is no report for it. "
+                            "If you finished the test, please contact your teacher."
+                        ),
+                        "status_code": 404,
+                    }
+                    unsubmitted_response = self._templates.TemplateResponse(
+                        "error.html", {"request": request, "error_data": error_data}
+                    )
+                    if format == "pdf":
+                        return convert_template_to_pdf(
+                            unsubmitted_response, debug=debug
+                        )
+                    return unsubmitted_response
+
                 # Use top-level student_id for report_header.student_id
                 if "report_header" in report and "student_id" in report:
                     report["report_header"]["student_id"] = report["student_id"]
