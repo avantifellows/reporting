@@ -10,6 +10,7 @@ from db.reports_db import ReportsDB
 from db.bq_db import BigQueryDB
 from fastapi.security.api_key import APIKeyHeader
 from utils.pdf_converter import convert_template_to_pdf
+from utils.formatting import format_duration
 from utils.report_launch import (
     get_report_launch_token,
     redirect_with_launch_cookie,
@@ -71,6 +72,7 @@ class StudentQuizReportsRouter:
         self.__reports_db = reports_db
         self.__bq_db = bq_db
         self._templates = Jinja2Templates(directory="templates")
+        self._templates.env.filters["duration"] = format_duration
 
     @property
     def router(self):
