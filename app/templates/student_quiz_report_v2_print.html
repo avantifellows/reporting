@@ -517,6 +517,14 @@
                                 }}%
                             </td>
                         </tr>
+                        {% if report.overall_performance.total_time_spent %}
+                        <tr>
+                            <td class="font-medium">Time Spent</td>
+                            <td>{{ report.overall_performance.total_time_spent|duration }}</td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        {% endif %}
                     </tbody>
                 </table>
             </div>
@@ -580,6 +588,14 @@
                                 >{{ "%.2f"|format(subject.accuracy or 0) }}%</span
                             >
                         </div>
+                        {% if subject.total_time_spent %}
+                        <div class="subject-card-line">
+                            <span class="subject-card-label">Time Spent</span>
+                            <span class="subject-card-value"
+                                >{{ subject.total_time_spent|duration }}</span
+                            >
+                        </div>
+                        {% endif %}
                     </div>
                 </div>
                 {% endfor %}

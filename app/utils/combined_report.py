@@ -27,6 +27,8 @@ import requests
 from jinja2 import Environment, FileSystemLoader
 from pypdf import PdfReader, PdfWriter
 
+from utils.formatting import format_duration
+
 TEMPLATE_DIR = "templates"
 TEMPLATE_NAME = "student_quiz_report_v2_print.html"
 
@@ -51,6 +53,7 @@ def _finalize(value):
 
 _env = Environment(loader=FileSystemLoader(TEMPLATE_DIR), finalize=_finalize)
 _env.filters["format"] = _safe_format
+_env.filters["duration"] = format_duration
 
 
 def _decimalize(obj):

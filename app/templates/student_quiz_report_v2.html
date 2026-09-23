@@ -95,6 +95,10 @@
                     {% if report.overall_performance.num_partially_correct %}
                     {% set _ = metrics.append((report.overall_performance.num_partially_correct, "Partially Correct")) %}
                     {% endif %}
+                    {# Time spent is only present on reports generated after the ETL started emitting it. #}
+                    {% if report.overall_performance.total_time_spent %}
+                    {% set _ = metrics.append((report.overall_performance.total_time_spent|duration, "Time Spent")) %}
+                    {% endif %}
                     {% for value, label in metrics %}
                     <div class="bg-white border-2 border-gray-200 rounded-xl p-4 text-center shadow-sm">
                         <div class="text-xl sm:text-2xl font-bold text-[#4a90e2] leading-none mb-1">{{ value }}</div>
@@ -156,6 +160,12 @@
                                 <span class="text-xs text-gray-500 font-medium">Accuracy</span>
                                 <span class="shrink-0 text-sm font-bold text-[#2c3e50]">{{ "%.2f"|format(subject.accuracy or 0) }}%</span>
                             </div>
+                            {% if subject.total_time_spent %}
+                            <div class="flex min-w-0 items-baseline justify-between gap-2">
+                                <span class="text-xs text-gray-500 font-medium">Time Spent</span>
+                                <span class="shrink-0 text-sm font-bold text-[#2c3e50]">{{ subject.total_time_spent|duration }}</span>
+                            </div>
+                            {% endif %}
                         </div>
                     </div>
                     {% endfor %}
