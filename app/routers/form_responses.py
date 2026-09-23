@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Request, HTTPException
 from fastapi.templating import Jinja2Templates
+from utils.formatting import current_year
 from typing import Optional
 import asyncio
 from db.form_responses_db import FormResponsesDB
@@ -20,6 +21,7 @@ class FormResponsesRouter:
     def __init__(self, form_responses_db: FormResponsesDB) -> None:
         self.__form_responses_db = form_responses_db
         self._templates = Jinja2Templates(directory="templates")
+        self._templates.env.globals["current_year"] = current_year
 
     @property
     def router(self):

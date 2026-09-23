@@ -10,7 +10,7 @@ from db.reports_db import ReportsDB
 from db.bq_db import BigQueryDB
 from fastapi.security.api_key import APIKeyHeader
 from utils.pdf_converter import convert_template_to_pdf
-from utils.formatting import format_duration
+from utils.formatting import format_duration, current_year
 from utils.report_launch import (
     get_report_launch_token,
     redirect_with_launch_cookie,
@@ -73,6 +73,7 @@ class StudentQuizReportsRouter:
         self.__bq_db = bq_db
         self._templates = Jinja2Templates(directory="templates")
         self._templates.env.filters["duration"] = format_duration
+        self._templates.env.globals["current_year"] = current_year
 
     @property
     def router(self):
@@ -414,6 +415,8 @@ class StudentQuizReportsRouter:
                     error_data = {
                         "session_id": session_id,
                         "user_id": user_id,
+                        # The id students actually recognise; user_id is internal.
+                        "student_id": report.get("student_id"),
                         "error_message": (
                             "This test was not submitted, so there is no report for it. "
                             "If you finished the test, please contact your teacher."

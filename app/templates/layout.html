@@ -22,7 +22,7 @@
 <div id="footer">
 <center>
  {% block footer %}
- &copy; Copyright 2022 by <a href="https://avantifellows.org">Avanti Fellows</a>.
+ &copy; Copyright {{ current_year() if current_year is defined else 2022 }} by <a href="https://avantifellows.org">Avanti Fellows</a>.
  {% endblock %}
 </center>
 </div>

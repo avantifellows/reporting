@@ -1,5 +1,6 @@
 from fastapi import APIRouter, HTTPException, Request
 from fastapi.templating import Jinja2Templates
+from utils.formatting import current_year
 from db.sessions_db import SessionsDB
 from db.quiz_db import QuizDB
 from typing import Optional
@@ -15,11 +16,13 @@ class SessionQuizReportsRouter:
         self.__quiz_db = quiz_db
         self.__sessions_db = sessions_db
         self._templates = Jinja2Templates(directory="templates")
+        self._templates.env.globals["current_year"] = current_year
 
     @property
     def router(self):
         api_router = APIRouter(prefix="/reports", tags=["reports"])
         self._templates = Jinja2Templates(directory="templates")
+        self._templates.env.globals["current_year"] = current_year
 
         @api_router.get("/live_session_report/{session_id}")
         def get_live_session_report(
