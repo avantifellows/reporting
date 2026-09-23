@@ -81,7 +81,8 @@
                 <h3 class="text-lg sm:text-xl font-bold text-[#2c3e50] mb-4 pb-2 border-b-[3px] border-[#4a90e2]">
                     Overall Performance Summary
                 </h3>
-                <div class="grid grid-cols-2 md:grid-cols-6 gap-3">
+                {# flex-wrap keeps an odd tile count (7 with time, 8 with partial marking) centered instead of orphaned on the last row #}
+                <div class="flex flex-wrap justify-center gap-3">
                     {% set metrics = [
                         (overall_score_display, "Total Marks"),
                         (report.overall_performance.num_correct or 0, "Correct Answers"),
@@ -100,7 +101,7 @@
                     {% set _ = metrics.append((report.overall_performance.total_time_spent|duration, "Time Spent")) %}
                     {% endif %}
                     {% for value, label in metrics %}
-                    <div class="bg-white border-2 border-gray-200 rounded-xl p-4 text-center shadow-sm">
+                    <div class="bg-white border-2 border-gray-200 rounded-xl p-4 text-center shadow-sm flex-1 basis-[45%] md:basis-36 md:max-w-56">
                         <div class="text-xl sm:text-2xl font-bold text-[#4a90e2] leading-none mb-1">{{ value }}</div>
                         <div class="text-[10px] text-gray-500 uppercase tracking-wider">{{ label }}</div>
                     </div>
@@ -161,8 +162,8 @@
                                 <span class="shrink-0 text-sm font-bold text-[#2c3e50]">{{ "%.2f"|format(subject.accuracy or 0) }}%</span>
                             </div>
                             {% if subject.total_time_spent %}
-                            <div class="flex min-w-0 items-baseline justify-between gap-2">
-                                <span class="text-xs text-gray-500 font-medium">Time Spent</span>
+                            <div class="col-span-2 flex min-w-0 items-baseline justify-between gap-2">
+                                <span class="text-xs text-gray-500 font-medium whitespace-nowrap">Time Spent</span>
                                 <span class="shrink-0 text-sm font-bold text-[#2c3e50]">{{ subject.total_time_spent|duration }}</span>
                             </div>
                             {% endif %}
