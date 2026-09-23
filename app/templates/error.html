@@ -5,9 +5,12 @@
 
 <section id="error_page">
     <div id="section_heading">{{ error_data["error_message"] }}</div>
+    {# Never show internal user_id to students - only the student id they know. #}
+    {% if error_data.get("student_id") %}
     <div id="name_card">
-        <p>Student ID: {{error_data["user_id"]}}
+        <p>Student ID: {{ error_data["student_id"] }}
     </div>
+    {% endif %}
 </section>
 
 {% endblock %}

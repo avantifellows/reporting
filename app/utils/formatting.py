@@ -1,3 +1,11 @@
+from datetime import date
+
+
+def current_year() -> int:
+    """Jinja global for footer copyright years."""
+    return date.today().year
+
+
 def format_duration(seconds) -> str:
     """Render a duration in seconds as a compact human string.
 
