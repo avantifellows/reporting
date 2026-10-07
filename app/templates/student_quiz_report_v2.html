@@ -47,14 +47,17 @@
             {% if report.recommendation and (report.recommendation.message or report.recommendation.recommended_chapters) %}
             <div class="bg-gray-50 p-5 rounded-2xl mb-6 md:mb-8">
                 {% if report.recommendation.message %}
-                <div class="text-sm leading-relaxed mb-4 text-gray-800">
-                    <span class="font-semibold">Recommendation:</span>
-                    {{ report.recommendation.message }}
-                </div>
+                <p class="text-center text-[14px] leading-relaxed text-gray-800">{{ report.recommendation.message }}</p>
+                {% endif %}
+                {% if report.recommendation.next_target %}
+                <p class="text-center text-[17px] font-bold leading-snug text-gray-900 mt-3 pt-3 border-t border-gray-200">{{ report.recommendation.next_target }}</p>
+                {% endif %}
+                {% if report.recommendation.note %}
+                <p class="text-center text-xs text-gray-500 mt-2">{{ report.recommendation.note }}</p>
                 {% endif %}
                 {% if report.recommendation.recommended_chapters %}
-                <div class="text-sm leading-relaxed mb-4 text-gray-800">
-                    Based on your performance, we recommend that you focus on the following chapters:
+                <div class="text-center text-[14px] leading-relaxed mb-3 text-gray-800{% if report.recommendation.message %} mt-4 pt-4 border-t border-gray-200{% endif %}">
+                    We recommend that you focus on the following chapters:
                 </div>
                 <table class="w-full border-collapse rounded-xl overflow-hidden shadow-sm">
                     <thead>

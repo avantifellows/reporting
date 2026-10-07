@@ -157,16 +157,30 @@
             }
             .recommendation {
                 margin-top: 20px;
-                padding: 8px 16px;
+                padding: 10px 16px 12px;
             }
             .recommendation p {
                 text-align: center;
-                font-size: 13px;
+                font-size: 12px;
                 color: var(--gray-900);
                 margin: 0;
             }
-            .recommendation p:first-child {
-                margin-bottom: 4px;
+            .recommendation p.reco-target {
+                font-size: 15px;
+                font-weight: 700;
+                margin-top: 8px;
+                padding-top: 8px;
+                border-top: 1px solid var(--gray-300);
+            }
+            .recommendation p.reco-note {
+                font-size: 10px;
+                color: var(--gray-600);
+                margin-top: 4px;
+            }
+            .recommendation .reco-chapters:not(:first-child) {
+                margin-top: 10px;
+                padding-top: 10px;
+                border-top: 1px solid var(--gray-300);
             }
 
             /* Tables - Base */
@@ -218,9 +232,7 @@
                 justify-content: center;
             }
             .recommended-chapters-container .table-container {
-                width: auto;
-                min-width: 60%;
-                max-width: 90%;
+                width: 100%;
             }
             .recommended-chapters-container th,
             .recommended-chapters-container td {
@@ -423,16 +435,17 @@
             report.recommendation.recommended_chapters) %}
             <div class="recommendation">
                 {% if report.recommendation.message %}
-                <p>
-                    <span class="font-semibold">Recommendation:</span> {{
-                    report.recommendation.message }}
-                </p>
+                <p>{{ report.recommendation.message }}</p>
+                {% endif %}
+                {% if report.recommendation.next_target %}
+                <p class="reco-target">{{ report.recommendation.next_target }}</p>
+                {% endif %}
+                {% if report.recommendation.note %}
+                <p class="reco-note">{{ report.recommendation.note }}</p>
                 {% endif %}
                 {% if report.recommendation.recommended_chapters %}
-                <p>
-                    Based on your performance, we recommend that you focus on
-                    the following chapters:
-                </p>
+                <div class="reco-chapters">
+                <p>We recommend that you focus on the following chapters:</p>
                 <div class="recommended-chapters-container">
                     <div class="table-container">
                         <table>
@@ -455,6 +468,7 @@
                             </tbody>
                         </table>
                     </div>
+                </div>
                 </div>
                 {% endif %}
             </div>
