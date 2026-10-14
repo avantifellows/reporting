@@ -557,8 +557,10 @@
                 subject_name or (subject_name == 'Mathematics' and
                 subject.subject in ['Maths', 'Mathematics']) %} {% set _ =
                 ordered_subjects.append(subject) %} {% endif %} {% endfor %} {%
-                endfor %} {% for subject in (ordered_subjects if
-                ordered_subjects else report.subject_performance) %}
+                endfor %} {% for subject in report.subject_performance %} {% if
+                subject not in ordered_subjects %} {% set _ =
+                ordered_subjects.append(subject) %} {% endif %} {% endfor %} {%
+                for subject in ordered_subjects %}
                 <div class="subject-card">
                     <h3 class="subject-card-title">
                         {% if subject.subject == 'Maths' %}MATHEMATICS{% else
@@ -632,7 +634,12 @@
                 Chapters'), ('Biology', 'Biology Chapters')] %} {% else %} {%
                 set subject_order = [('Physics', 'Physics Chapters'),
                 ('Chemistry', 'Chemistry Chapters'), ('Maths', 'Mathematics
-                Chapters')] %} {% endif %} {% for subject_key, section_title in
+                Chapters')] %} {% endif %} {% set covered =
+                subject_order|map('first')|list %} {% if 'Maths' in covered %}
+                {% set _ = covered.append('Mathematics') %} {% endif %} {% for key in
+                chapter_subjects %} {% if key not in covered %} {% set _ =
+                subject_order.append((key, key ~ ' Chapters')) %} {% endif %}
+                {% endfor %} {% for subject_key, section_title in
                 subject_order %} {% if subject_key in chapter_subjects or
                 (subject_key == 'Maths' and 'Mathematics' in chapter_subjects)
                 %} {% set chapters = chapter_subjects.get(subject_key,
