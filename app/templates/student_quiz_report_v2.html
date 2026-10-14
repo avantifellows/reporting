@@ -127,7 +127,11 @@
                     {% endif %}
                 {% endfor %}
             {% endfor %}
-            {% set subjects_to_render = ordered_subjects if ordered_subjects else report.subject_performance %}
+            {# Subjects outside the PCM/PCB order (CLAT, CA, defence, aptitude...) follow in report order #}
+            {% for subject in report.subject_performance %}
+                {% if subject not in ordered_subjects %}{% set _ = ordered_subjects.append(subject) %}{% endif %}
+            {% endfor %}
+            {% set subjects_to_render = ordered_subjects %}
             <div class="mb-6 lg:mb-8">
                 <h3 class="text-lg sm:text-xl font-bold text-[#2c3e50] mb-4 pb-2 border-b-[3px] border-[#4a90e2]">
                     Subject-wise Performance
@@ -194,9 +198,14 @@
                 {% else %}
                     {% set tab_order = [('Physics', '#007bff'), ('Chemistry', '#28a745'), ('Mathematics', '#dc3545')] %}
                 {% endif %}
+                {# Any other subject gets a tab too, after the standard ones #}
+                {% set standard_tabs = tab_order|map('first')|list %}
+                {% for key in chapter_subjects %}
+                    {% if key not in standard_tabs %}{% set _ = tab_order.append((key, '#6c757d')) %}{% endif %}
+                {% endfor %}
 
                 <!-- Tabs -->
-                <div class="flex bg-gray-50 rounded-xl p-1 mb-4 gap-0.5">
+                <div class="flex flex-wrap bg-gray-50 rounded-xl p-1 mb-4 gap-0.5">
                     {% for tab_name, color in tab_order %}
                     {% if tab_name in chapter_subjects %}
                     <button type="button"
