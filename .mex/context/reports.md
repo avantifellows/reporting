@@ -16,7 +16,7 @@ edges:
     condition: when the report is accessed via launch token
   - target: patterns/add-report-endpoint.md
     condition: when adding or modifying a report endpoint
-last_updated: 2026-07-09
+last_updated: 2026-10-21
 ---
 
 # Report Schemas & Lookup
@@ -57,3 +57,4 @@ The student reports listing (`/reports/student_reports/{user_id}`) merges both t
 - v1 wrapper methods raise `ValueError` (wrapping `ClientError`) on single-report lookups but return `[]` from listing methods — routers rely on both behaviors.
 - Table names are hard-coded in `ReportsDB`; there is no staging DynamoDB table (staging points at prod data unless overridden).
 - `QUIZ_AF_API_KEY` in `app/routers/student_quiz_reports.py` is a hard-coded, publicly visible key for quiz.avantifellows.org handoff links.
+- **Form responses (`form_question_responses`)**: the viewer skips rows with `was_displayed` False (a conditional follow-up the student was not shown) before numbering, counting `total_questions` and building the AI-summary input, and shows `Other: <other_text>` for a single-choice-other answer. Rows without those fields render as before. As of 2026-10-21 nothing writes this table (the quiz ETL's DynamoDB upload was disabled in etl-data-flow `46e7610`; zero writes since 2026-05-31), so new forms show "No report found"; whoever re-enables the writer must store `was_displayed` (BOOL) and `other_text`.

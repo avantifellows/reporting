@@ -13,6 +13,14 @@ from utils.report_launch import (
 )
 
 
+def _was_hidden(response: dict) -> bool:
+    """True for a conditional follow-up question the student was not shown
+    (was_displayed is False). Rows without was_displayed, written before forms had
+    conditional questions, count as shown."""
+    was_displayed = response.get("was_displayed")
+    return was_displayed is False or str(was_displayed).strip().lower() == "false"
+
+
 class FormResponsesRouter:
     """
     Router class for handling Form Responses related endpoints.
@@ -108,6 +116,11 @@ class FormResponsesRouter:
                 overall_question_number = 0
 
                 for idx, response in enumerate(form_responses):
+                    # A conditional follow-up the student was not shown is not a
+                    # question for this student: leave it out of the numbering, the
+                    # counts and the AI summary. Rows without the flag count as shown.
+                    if _was_hidden(response):
+                        continue
                     overall_question_number += 1
                     theme = response.get("question_set_title", "Unknown Theme")
                     question_text = response.get("question_text", "")
@@ -121,6 +134,15 @@ class FormResponsesRouter:
                         if is_answered and user_response_labels
                         else "None"
                     )
+                    # single-choice-other: the label is just "Other"; add what the
+                    # student typed
+                    other_text = response.get("other_text")
+                    if (
+                        is_answered
+                        and isinstance(other_text, str)
+                        and other_text.strip()
+                    ):
+                        display_response = f"{display_response}: {other_text.strip()}"
 
                     if theme not in responses_by_theme:
                         responses_by_theme[theme] = []
@@ -192,7 +214,8 @@ class FormResponsesRouter:
                     "test_name": first_response.get("test_name", "Form Response"),
                     "start_date": first_response.get("start_date", ""),
                     "themed_responses": themed_responses,
-                    "total_questions": len(form_responses),
+                    # questions the student was shown
+                    "total_questions": overall_question_number,
                 }
 
                 template_response = self._templates.TemplateResponse(
