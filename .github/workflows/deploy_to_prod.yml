@@ -9,6 +9,10 @@ name: Deploy to production
 jobs:
   build_and_deploy:
     name: Deploy
+    # id-token lets the job log in to AWS as a role (OIDC) instead of using stored keys.
+    permissions:
+      contents: read
+      id-token: write
     environment:
       name: Production
 
@@ -34,10 +38,9 @@ jobs:
         uses: aws-actions/setup-sam@v1
 
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          role-to-assume: arn:aws:iam::111766607077:role/reporting-prod-deploy
           aws-region: ap-south-1
 
       - name: Generate requirements for SAM
@@ -84,6 +87,7 @@ jobs:
         run: >
           sam deploy
           --stack-name ReportingProduction
+          --role-arn arn:aws:iam::111766607077:role/cfn-exec-reporting-prod
           --s3-bucket reporting-engine-production
           --no-confirm-changeset
           --no-fail-on-empty-changeset
