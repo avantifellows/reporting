@@ -60,6 +60,13 @@ Parameters:
     NoEcho: true
     Description: Shared service key af_lms sends as X-Api-Key to submit jobs
 
+# Every Lambda role this stack creates gets this ceiling, so a template change
+# can't give a function more access than listed in the policy (managed outside
+# this repo, in IAM).
+Globals:
+  Function:
+    PermissionsBoundary: !Sub "arn:aws:iam::${AWS::AccountId}:policy/reporting-staging-lambda-boundary"
+
 Resources:
   ReportJobsDLQ:
     Type: AWS::SQS::Queue
