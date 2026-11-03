@@ -16,7 +16,7 @@ edges:
     condition: when the report is accessed via launch token
   - target: patterns/add-report-endpoint.md
     condition: when adding or modifying a report endpoint
-last_updated: 2026-10-21
+last_updated: 2026-11-03
 ---
 
 # Report Schemas & Lookup
@@ -49,6 +49,15 @@ The student reports listing (`/reports/student_reports/{user_id}`) merges both t
 - Stream detection from item `stream` field: `engineering→JEE`, `medical→NEET`, `ca→CA`, `clat→CLAT` (default JEE). "Advanced" in the test name switches JEE → JEE Advanced messaging; CA/CLAT get no motivational messages.
 - Chapters are priority-ordered (High > Medium > Low) using `app/static/chapter_to_links.json`, keyed by chapter code (text before `-` in `chapter_name`), with `Priority_J`/`Priority_N` and `Link_J`/`Link_N` per stream.
 - Rendered by `app/templates/student_quiz_report_v3.html`.
+
+## Cumulative report (GET `/reports/cumulative_report/{user_id}`)
+
+- Built only from the student's v2 docs (`get_student_reports_v2`, paginated). Logic in `app/utils/cumulative_report.py`; template `student_cumulative_report.html` (one template for screen, print and PDF; CSS is the approved "AIAT student report" design, JEE and NEET variants).
+- Test pick: last 3 (min 2) with `test_format` in major/full_syllabus/mock/part, `has_quiz_ended` not False, name without "baseline"/"advance", the G11/G12 in the name equal to the student's grade, same stream as the latest big test; a repeated test name keeps the later sitting. Fewer than 2 -> `error.html`.
+- Question counts are right + wrong + partial + skipped: v2 subject `total_questions` holds the whole paper's count (75 JEE / 180 NEET). Root cause: the quiz ETL Lambda stamps the quiz's question count on every row; fixed in etl-next `stg_test_results` (branch `fix/subject-total-questions`, 2026-11-03), but existing v2 docs keep the old value until re-emitted, so keep summing.
+- Chapters are summed across tests by (subject, name). Old-system names ("12C20 - Electrochemistry") have the code prefix stripped so exact-name matches merge and take the current priority; other old chapters have no priority and drop out of the High-only tables. Tables cap at 8 rows (rest folded into "N other chapters") so page 2 fits A4.
+- Launch-token cookie prefix `cumulative_report_launch`, cookie path `/reports/cumulative_report`. PDF calls `convert_template_to_pdf(..., default_css=False)` so the converter's fallback CSS doesn't override the template.
+- Not built: NEET AF ranks and mentor names from the spec; Gurukul button (its `launchPath.ts` only knows per-test report paths).
 
 ## Gotchas
 

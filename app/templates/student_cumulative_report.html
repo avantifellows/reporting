@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ r.student_name }} · Report on {{ r.num_tests }} tests</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@600;700&family=Figtree:wght@400;600;700;800&display=swap">
+<style>
+{% if r.is_neet %}
+[hidden]{display:none!important}body{margin:0}@page{size:A4;margin:11mm}@media print{.sheet,.sheet.p2{zoom:.83;width:calc(188mm/.83);height:calc(274mm/.83);min-height:0;max-height:none;overflow:visible;break-after:page;break-inside:avoid}.sheet:last-child{break-after:auto}}
+{% endif %}
+/* Printed handout, two A4 pages: a deliberate single light "paper" look. */
+:root{
+  color-scheme:light;
+  --paper:#FFFFFF; --ground:#F4F1EA; --ink:#141413; --body:#3C3C3C; --muted:#7A7263;
+  --accent:#E2750F; --accent-2:#F2B477; --track:#F3EEE3; --rule:#DDD5C4; --tint:#F7F2E7;
+  --right:#2E7D32; --wrong:#B5412F; --skip:#B7AE9A;
+  --serif:"Lora",Georgia,"Times New Roman",serif;
+  --sans:"Figtree",-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+*{box-sizing:border-box}
+body{background:var(--ground);color:var(--body);font-family:var(--sans);font-size:13.5px;line-height:1.5;padding-block:24px;padding-inline:16px;}
+.sheet{max-width:794px;margin:0 auto 24px;background:var(--paper);padding:30px 36px 20px;box-shadow:0 1px 3px rgba(20,20,19,.08);display:flex;flex-direction:column;}
+.num{font-variant-numeric:tabular-nums;}
+
+header{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;border-bottom:2px solid var(--ink);padding-bottom:8px;}
+h1{font-family:var(--serif);color:var(--ink);font-size:26px;line-height:1.1;margin:0;}
+.meta{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600;text-align:right;}
+.meta b{color:var(--ink);}
+.mentor{font-size:12.5px;color:var(--ink);margin-top:4px;}
+.mentor b{font-weight:800;}
+
+.part{margin-top:20px;}
+.part-tag{font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:800;color:var(--accent);}
+h2{font-family:var(--serif);color:var(--ink);font-size:20px;margin:2px 0 4px;line-height:1.2;}
+.intro{margin:0 0 10px;max-width:70ch;font-size:13.5px;}
+.intro b{color:var(--ink);}
+
+/* "How to read" key box */
+.how{display:flex;flex-wrap:wrap;gap:6px 22px;align-items:center;background:var(--tint);border-radius:6px;padding:8px 12px;margin:0 0 12px;font-size:12.5px;}
+.how .t{font-weight:800;color:var(--ink);text-transform:uppercase;letter-spacing:.06em;font-size:11px;}
+.how span{display:inline-flex;align-items:center;gap:6px;}
+
+/* ---- bar charts ---- */
+.bars{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+.bc{border:1px solid var(--rule);border-radius:6px;padding:10px 10px 8px;display:flex;flex-direction:column;}
+.bc.total{border:1.5px solid var(--ink);}
+.bc-head{display:flex;justify-content:space-between;align-items:baseline;gap:6px;}
+.bc-name{font-family:var(--serif);font-weight:700;color:var(--ink);font-size:16px;}
+.bc-out{font-size:11px;color:var(--muted);font-weight:600;white-space:nowrap;}
+.plot{display:flex;justify-content:space-around;align-items:flex-end;gap:8px;height:130px;margin-top:8px;}
+.col{flex:1;display:flex;flex-direction:column;align-items:center;height:100%;}
+.val{font-weight:800;color:var(--ink);font-size:15px;line-height:1;margin-bottom:3px;font-variant-numeric:tabular-nums;}
+.col.last .val{font-size:19px;}
+.absent{font-size:11px;font-weight:700;color:var(--muted);margin-bottom:3px;line-height:1;}
+.track{flex:1;width:100%;max-width:34px;background:var(--track);border-radius:3px 3px 0 0;display:flex;align-items:flex-end;overflow:hidden;}
+.fill{width:100%;background:var(--accent-2);}
+.col.last .fill{background:var(--accent);}
+.tl{font-size:11px;font-weight:700;color:var(--body);margin-top:4px;border-top:1.5px solid var(--ink);width:100%;text-align:center;padding-top:3px;}
+.chg{margin-top:8px;border-top:1px dashed var(--rule);padding-top:6px;text-align:center;font-size:11px;color:var(--muted);line-height:1.3;}
+.chg b{display:block;font-size:14px;font-variant-numeric:tabular-nums;}
+.chg.up b{color:var(--right);} .chg.down b{color:var(--wrong);}
+
+/* ---- question boxes (JEE) ---- */
+.q{display:inline-block;width:12px;height:12px;border-radius:2px;margin:0 2px 2px 0;vertical-align:middle;position:relative;}
+.q.r{background:var(--right);}
+.q.w{border:1.5px solid var(--wrong);background:#fff;}
+.q.w::before,.q.w::after{content:"";position:absolute;left:50%;top:50%;width:11px;height:1.6px;background:var(--wrong);}
+.q.w::before{transform:translate(-50%,-50%) rotate(45deg);} .q.w::after{transform:translate(-50%,-50%) rotate(-45deg);}
+.q.s{border:1.5px solid var(--skip);background:#fff;}
+.strip{white-space:nowrap;line-height:0;}
+
+.subj{display:grid;grid-template-columns:92px 1fr;gap:4px 12px;align-items:start;padding:8px 0;border-top:1px solid var(--rule);}
+.subj:first-of-type{border-top:0;}
+.subj h3{font-family:var(--serif);color:var(--ink);font-size:16px;margin:0;line-height:1.3;}
+.rowline{display:grid;grid-template-columns:52px auto 1fr;gap:10px;align-items:center;padding:2px 0;}
+.rowline .tn{font-size:11.5px;font-weight:700;color:var(--body);}
+.rowline .ct{font-size:12px;color:var(--body);font-variant-numeric:tabular-nums;}
+.rowline .ct b{color:var(--ink);}
+.rowline .ab,.qrow .ab{font-size:12px;color:var(--muted);font-style:italic;}
+.say{grid-column:2;font-size:12.5px;margin:4px 0 0;color:var(--ink);}
+
+/* ---- chapter tables (page 2) ---- */
+table{border-collapse:collapse;width:100%;font-size:12.5px;}
+caption{text-align:left;font-family:var(--serif);font-weight:700;color:var(--ink);font-size:16px;padding:0 0 4px;}
+th{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:700;text-align:right;padding:4px 6px;border-bottom:1px solid var(--ink);}
+th.l,td.l{text-align:left;}
+td{padding:3px 6px;border-bottom:1px solid var(--rule);text-align:right;font-variant-numeric:tabular-nums;vertical-align:middle;}
+td.ch{text-align:left;color:var(--ink);font-weight:600;padding-left:0;}
+td.pc{text-align:left;} td.pc.High{font-weight:800;color:var(--ink);}
+th:first-child{padding-left:0;}
+tr.total td{font-weight:800;color:var(--ink);background:var(--tint);border-bottom:0;}
+tr.total td:first-child{padding-left:6px;}
+.tblwrap{overflow-x:auto;margin-bottom:10px;}
+.tblwrap table{min-width:560px;}
+
+.todo{border:1.5px solid var(--ink);border-radius:6px;padding:12px 16px;margin-top:6px;}
+.todo h2{font-size:18px;margin:0 0 6px;}
+.todo ol{margin:0;padding-left:20px;display:grid;gap:6px;}
+.todo li b{color:var(--ink);}
+
+.spacer{flex:1;}
+footer{margin-top:14px;padding-top:8px;border-top:1px solid var(--rule);font-size:10.5px;color:var(--muted);display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;}
+footer p{margin:0;max-width:64ch;}
+
+@media (max-width:640px){
+  .sheet{padding:20px 16px;}
+  .bars{grid-template-columns:repeat(2,1fr);}
+  .subj{grid-template-columns:1fr;}
+  .say{grid-column:1;}
+  .meta{text-align:left;}
+}
+@page{size:A4;margin:11mm;}
+@media print{
+  body{background:#fff;padding:0;}
+  .sheet{box-shadow:none;padding:0;max-width:none;margin:0;min-height:274mm;break-after:page;}
+  .sheet:last-child{break-after:auto;min-height:0;}
+  td{padding:2px 6px;}
+  .tblwrap{margin-bottom:6px;}
+  .todo{padding:8px 14px;}
+  .bars{grid-template-columns:repeat(4,1fr);}
+  .subj{grid-template-columns:92px 1fr;}
+  .say{grid-column:2;}
+  .part,.bc,.subj,table,.todo{break-inside:avoid;}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+}
+{% if r.is_neet %}
+/* ---- NEET additions ---- */
+.plot{height:120px;}
+/* stacked question bars: the track is 90 questions wide, so every subject uses the same scale */
+.qrow{display:grid;grid-template-columns:52px 1fr;gap:10px;align-items:center;padding:3px 0;}
+.qrow .tn{font-size:11.5px;font-weight:700;}
+.stack{display:flex;height:22px;border:1.5px solid var(--ink);border-radius:3px;overflow:hidden;box-sizing:border-box;}
+.seg{display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;}
+.seg.r{background:#2B2B2B;color:#fff;}
+.seg.w{background:repeating-linear-gradient(45deg,#fff 0 3px,#8a8a8a 3px 4.5px);color:var(--ink);}
+.seg.w span{background:#fff;padding:0 3px;border-radius:2px;}
+.seg.s{background:#fff;color:var(--muted);}
+.seg+.seg{border-left:1.5px solid var(--ink);}
+.qcount{font-size:12px;color:var(--body);font-variant-numeric:tabular-nums;white-space:nowrap;}
+.qline{display:grid;grid-template-columns:minmax(0,1fr) 138px;gap:10px;align-items:center;min-width:0;}
+.qtrack{min-width:0;}
+.key-r,.key-w,.key-s{display:inline-block;width:18px;height:12px;border:1.5px solid var(--ink);border-radius:2px;vertical-align:middle;}
+.key-r{background:#2B2B2B;} .key-w{background:repeating-linear-gradient(45deg,#fff 0 3px,#8a8a8a 3px 4.5px);} .key-s{background:#fff;}
+.subj{grid-template-columns:86px minmax(0,1fr);}
+.subj>div{min-width:0;}
+.sheet{box-sizing:border-box;}
+@media print{ .p2 td{padding:1px 6px;font-size:12px;} .p2 td.ch{padding-left:0;} .p2 caption{font-size:14.5px;padding-bottom:2px;} .p2 .tblwrap{margin-bottom:4px;} .p2 .todo{padding:7px 14px;} .p2 .todo ol{gap:3px;} .p2 .part{margin-top:12px;} }
+{% else %}
+[hidden]{display:none!important}body{margin:0}@media print{.plot{height:112px}.part{margin-top:14px}.subj{padding:6px 0}.intro{margin-bottom:8px}.sheet,.sheet.p2{height:274mm;min-height:0;break-after:page;break-inside:avoid}.sheet:last-child{break-after:auto}}
+@media print{ .p2 td{padding:1px 6px;font-size:12px;} .p2 td.ch{padding-left:0;} .p2 caption{font-size:14.5px;padding-bottom:2px;} .p2 .tblwrap{margin-bottom:4px;} .p2 .todo{padding:7px 14px;} .p2 .todo ol{gap:3px;} .p2 .part{margin-top:12px;} }
+{% endif %}
+/* same column widths in every chapter table */
+.tblwrap th.n{width:12%;}
+/* ---- screen only: download button, small phones ---- */
+.actions{max-width:794px;margin:0 auto 12px;display:flex;justify-content:flex-end;}
+.dl{font-family:var(--sans);font-weight:700;font-size:13px;color:#fff;background:var(--ink);border-radius:6px;padding:8px 14px;text-decoration:none;}
+@media (max-width:640px){
+  body{padding-inline:8px;}
+  .q{width:9px;height:9px;margin-right:1.5px;}
+  .q.w::before,.q.w::after{width:8px;}
+  .rowline{grid-template-columns:44px auto;}
+  .rowline .ct{grid-column:2;}
+  .tblwrap table{min-width:0;}
+  .tblwrap th,.tblwrap td{padding-left:3px;padding-right:3px;}
+  .tblwrap th{letter-spacing:0;font-size:9px;}
+  .tblwrap th.n{width:15%;}
+}
+@media print{ .actions{display:none;} }
+</style>
+</head>
+<body>
+{% if not pdf %}
+<div class="actions"><a class="dl" href="?format=pdf">Download PDF</a></div>
+{% endif %}
+
+{% macro page_header() %}
+<header>
+  <div><h1>{{ r.student_name }}</h1></div>
+  <div class="meta">
+    {% if r.school %}{{ r.school }} · {% endif %}{% if r.grade %}Grade {{ r.grade }} · {% endif %}<b>{{ r.exam }}</b><br>
+    Report on {{ r.num_tests }} tests · {{ r.months }}
+  </div>
+</header>
+{% endmacro %}
+
+<!-- ============ Page 1 ============ -->
+<div class="sheet">
+  {{ page_header() }}
+
+  <div class="part" style="margin-top:14px">
+    <p class="intro">This report is about your last {{ r.num_tests }} tests.<br>
+      {% for t in r.tests %}<b>{{ t.label }}</b> = {{ t.name }}{% if t.date %} ({{ t.date }}){% endif %}.{% if not loop.last %} {% endif %}{% endfor %}
+    </p>
+  </div>
+
+  <div class="part">
+    <div class="part-tag">Part 1 of 3</div>
+    <h2>Your marks</h2>
+    <p class="intro">{{ r.paper_line }}<br>Right answer = <b>+4</b>, Wrong answer = <b>−1</b> &amp; Skipped question = <b>0</b></p>
+    <div class="bars">
+      {% for c in r.charts %}
+      <div class="bc{% if c.total %} total{% endif %}">
+        <div class="bc-head"><span class="bc-name">{{ c.name }}</span><span class="bc-out">out of {{ c.out_of }}</span></div>
+        <div class="plot">
+          {% for col in c.cols %}
+          <div class="col{% if col.last %} last{% endif %}">
+            {% if col.marks is none %}
+            <div class="absent">—</div><div class="track"></div>
+            {% else %}
+            <div class="val">{{ col.marks }}</div><div class="track"><div class="fill" style="height:{{ col.pct }}%"></div></div>
+            {% endif %}
+            <div class="tl">{{ col.label }}</div>
+          </div>
+          {% endfor %}
+        </div>
+        <div class="chg {{ c.change_cls }}">{{ c.change_from }}<b>{{ c.change_text }}</b></div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="part">
+    <div class="part-tag">Part 2 of 3</div>
+    <h2>Why your marks went up or down</h2>
+    <p class="intro">Your marks depend on <b>two things</b>: how many questions you <b>try</b>, and how many of those you get <b>right</b>.
+      {% if r.use_boxes %}Each small box below is <b>one question</b>, so each row has {{ r.part2[0].rows[-1].n }} boxes.
+      {% else %}Each bar below is one test paper for that subject. It is split into right, wrong and skipped questions. The number inside each part is how many questions.{% endif %}
+    </p>
+    <div class="how">
+      <span class="t">How to read</span>
+      {% if r.use_boxes %}
+      <span><i class="q r"></i> Right (+4)</span><span><i class="q w"></i> Wrong (−1)</span><span><i class="q s"></i> Skipped (0)</span>
+      {% else %}
+      <span><i class="key-r"></i> Right (+4)</span><span><i class="key-w"></i> Wrong (−1)</span><span><i class="key-s"></i> Skipped (0)</span>
+      {% endif %}
+    </div>
+    {% for s in r.part2 %}
+    <div class="subj">
+      <h3>{{ s.name }}</h3>
+      <div>
+        {% for row in s.rows %}
+        {% if r.use_boxes %}
+        <div class="rowline"><span class="tn">{{ row.label }}</span>
+          {% if row.missing %}<span class="ab">Not in this test</span>
+          {% else %}<span class="strip">{% for b in row.boxes %}<i class="q {{ b }}"></i>{% endfor %}</span>
+          <span class="ct">Tried <b>{{ row.tried }}</b> of {{ row.n }} · Right <b>{{ row.r }}</b></span>{% endif %}
+        </div>
+        {% else %}
+        <div class="qrow"><span class="tn">{{ row.label }}</span>
+          {% if row.missing %}<span class="ab">Not in this test</span>
+          {% else %}<div class="qline"><div class="qtrack">
+            <div class="stack" style="width:{{ row.width }}%">
+              {% if row.r %}<div class="seg r" style="width:{{ row.pr }}%">{{ row.r }}</div>{% endif %}
+              {% if row.w %}<div class="seg w" style="width:{{ row.pw }}%"><span>{{ row.w }}</span></div>{% endif %}
+              {% if row.s %}<div class="seg s" style="width:{{ row.ps }}%">{{ row.s }}</div>{% endif %}
+            </div></div>
+            <span class="qcount">Tried <b>{{ row.tried }}</b> of {{ row.n }} · Right <b>{{ row.r }}</b></span></div>{% endif %}
+        </div>
+        {% endif %}
+        {% endfor %}
+      </div>
+      <p class="say">{{ s.comment }}</p>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="spacer"></div>
+  <footer><p>{{ r.student_name }} · {{ "NEET" if r.is_neet else "JEE" }} report</p><p>Page 1 of 2 · turn over for chapters →</p></footer>
+</div>
+
+<!-- ============ Page 2 ============ -->
+<div class="sheet p2">
+  {{ page_header() }}
+
+  <div class="part">
+    <div class="part-tag">Part 3 of 3</div>
+    {% if r.show_all_chapters %}
+    <h2>Chapters in your tests</h2>
+    <p class="intro">Every chapter from your {{ r.num_tests }} tests. The numbers are all {{ r.num_tests }} tests added together. <b>High</b> priority chapters are listed first.</p>
+    {% else %}
+    <h2>Important chapters</h2>
+    <p class="intro">Your teachers marked these chapters as <b>High priority</b> for {{ r.exam }}. The tables show every question from these chapters in all {{ r.num_tests }} tests, added together.</p>
+    {% endif %}
+
+    {% for t in r.chapter_tables %}
+    <div class="tblwrap">
+      <table>
+        <caption>{{ t.subject }}</caption>
+        <thead><tr>
+          <th class="l">Chapter</th>
+          {% if r.show_all_chapters %}<th class="l">Priority</th>{% endif %}
+          <th class="n">Questions</th><th class="n">Right</th><th class="n">Wrong</th><th class="n">Skipped</th>
+        </tr></thead>
+        <tbody>
+          {% for c in t.shown %}
+          <tr>
+            <td class="ch"{% if c.other %} style="font-weight:400;color:var(--muted)"{% endif %}>{{ c.name }}</td>
+            {% if r.show_all_chapters %}<td class="pc {{ c.priority or '' }}">{{ "" if c.other else (c.priority or "—") }}</td>{% endif %}
+            <td>{{ c.q }}</td><td>{{ c.r }}</td><td>{{ c.w }}</td><td>{{ c.s }}</td>
+          </tr>
+          {% else %}
+          <tr><td class="ch" colspan="{{ 6 if r.show_all_chapters else 5 }}" style="font-weight:400;color:var(--muted)">No High priority chapters from this subject in these tests.</td></tr>
+          {% endfor %}
+          {% if t.rows %}
+          <tr class="total">
+            <td class="l">Total</td>{% if r.show_all_chapters %}<td></td>{% endif %}
+            <td>{{ t.total.q }}</td><td>{{ t.total.r }}</td><td>{{ t.total.w }}</td><td>{{ t.total.s }}</td>
+          </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="todo">
+    <h2>What to do next</h2>
+    <ol>
+      {% for item in r.todo %}<li>{{ item }}</li>{% endfor %}
+    </ol>
+  </div>
+
+  <div class="spacer"></div>
+  <footer><p>Source: Avanti Fellows test data · as of {{ r.as_of }}</p><p>Page 2 of 2</p></footer>
+</div>
+</body>
+</html>
