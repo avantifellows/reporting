@@ -292,6 +292,11 @@ class StudentQuizReportsRouter:
                         session_id=doc["session_id"], user_id=user_id
                     ),
                     "start_date": doc["start_date"],
+                    # Marks, for clients that compare a score against something
+                    # (Gurukul's cutoffs screen). v1 keeps them flat on the
+                    # overall section row. None when the row predates them.
+                    "marks_scored": doc.get("marks_scored"),
+                    "max_marks_possible": doc.get("max_marks_possible"),
                 }
                 student_reports.append(result)
 
@@ -310,6 +315,10 @@ class StudentQuizReportsRouter:
                         session_id=doc["session_id"], user_id=user_id
                     ),
                     "start_date": header.get("test_date", ""),
+                    # Same two fields as v1 above, nested under
+                    # overall_performance in the v2 shape.
+                    "marks_scored": overall.get("marks_scored"),
+                    "max_marks_possible": overall.get("max_marks_possible"),
                 }
                 student_reports.append(result)
 

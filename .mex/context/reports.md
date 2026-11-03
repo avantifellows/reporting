@@ -16,7 +16,7 @@ edges:
     condition: when the report is accessed via launch token
   - target: patterns/add-report-endpoint.md
     condition: when adding or modifying a report endpoint
-last_updated: 2026-10-21
+last_updated: 2026-11-03
 ---
 
 # Report Schemas & Lookup
@@ -41,7 +41,7 @@ last_updated: 2026-10-21
 3. v1 section query
 4. `error.html` with 404 message
 
-The student reports listing (`/reports/student_reports/{user_id}`) merges both tables — v1 items filtered to `overall` sections, skipping any session_id also present in v2.
+The student reports listing (`/reports/student_reports/{user_id}`) merges both tables — v1 items filtered to `overall` sections, skipping any session_id also present in v2. Each entry carries `test_name`, `test_session_id`, `percentile`, `rank`, `report_link`, `start_date`, plus `marks_scored` / `max_marks_possible` (flat on the v1 overall row, under `overall_performance` in v2; `None` on rows predating them). Gurukul's cutoffs screen reads the marks to place a score against the JEE cutoffs, so dropping or renaming them breaks it.
 
 ## v3 — enrichment on top of v1 (GET `/reports/student_quiz_report/v3/...`)
 
