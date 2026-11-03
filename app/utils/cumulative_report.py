@@ -18,7 +18,6 @@ from markupsafe import Markup
 BIG_TEST_FORMATS = {"major_test", "full_syllabus_test", "mock_test", "part_test"}
 MAX_TESTS = 3
 MIN_TESTS = 2
-MAX_CHAPTER_ROWS = 8  # per subject table, including the "N other chapters" row
 SUBJECT_ORDER = ["Physics", "Chemistry", "Maths", "Mathematics", "Biology"]
 COUNT_FIELDS = ("num_correct", "num_wrong", "num_partially_correct", "num_skipped")
 
@@ -290,15 +289,7 @@ def _chapter_tables(tests, subjects, show_all) -> list:
             rows = [row for row in rows if row["priority"] == "High"]
         rows.sort(key=lambda c: (order.get(c["priority"], 3), -c["q"], c["name"]))
         total = {k: sum(row[k] for row in rows) for k in ("q", "r", "w", "s")}
-        shown = rows
-        if len(rows) > MAX_CHAPTER_ROWS:  # keep page 2 on one A4 sheet
-            rest = rows[MAX_CHAPTER_ROWS - 1 :]
-            other = {k: sum(row[k] for row in rest) for k in ("q", "r", "w", "s")}
-            other.update(name=f"{len(rest)} other chapters", priority=None, other=True)
-            shown = rows[: MAX_CHAPTER_ROWS - 1] + [other]
-        tables.append(
-            {"subject": subj["name"], "rows": rows, "shown": shown, "total": total}
-        )
+        tables.append({"subject": subj["name"], "rows": rows, "total": total})
     return tables
 
 

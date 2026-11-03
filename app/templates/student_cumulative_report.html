@@ -98,6 +98,7 @@ tr.total td:first-child{padding-left:6px;}
 .todo h2{font-size:18px;margin:0 0 6px;}
 .todo ol{margin:0;padding-left:20px;display:grid;gap:6px;}
 .todo li b{color:var(--ink);}
+.todo-note{margin:0 0 6px;font-size:13px;color:var(--muted);}
 
 .spacer{flex:1;}
 footer{margin-top:14px;padding-top:8px;border-top:1px solid var(--rule);font-size:10.5px;color:var(--muted);display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;}
@@ -167,6 +168,8 @@ footer p{margin:0;max-width:64ch;}
   .tblwrap th.n{width:15%;}
 }
 @media print{ .actions{display:none;} }
+/* page 2 grows onto a 3rd sheet when there are many chapters */
+@media print{html{-webkit-print-color-adjust:exact;print-color-adjust:exact}.sheet.p2{height:auto;min-height:0;break-inside:auto}.p2 .part,.p2 table{break-inside:auto}.p2 tr{break-inside:avoid}.p2 caption,.p2 thead{break-after:avoid}}
 </style>
 </head>
 <body>
@@ -266,12 +269,20 @@ footer p{margin:0;max-width:64ch;}
   </div>
 
   <div class="spacer"></div>
-  <footer><p>{{ r.student_name }} · {{ "NEET" if r.is_neet else "JEE" }} report</p><p>Page 1 of 2 · turn over for chapters →</p></footer>
+  <footer><p>{{ r.student_name }} · {{ "NEET" if r.is_neet else "JEE" }} report</p><p>Turn over for chapters →</p></footer>
 </div>
 
 <!-- ============ Page 2 ============ -->
 <div class="sheet p2">
   {{ page_header() }}
+
+  <div class="todo">
+    <h2>What to do next</h2>
+    <p class="todo-note">Based on your last {{ r.num_tests }} tests added together.</p>
+    <ol>
+      {% for item in r.todo %}<li>{{ item }}</li>{% endfor %}
+    </ol>
+  </div>
 
   <div class="part">
     <div class="part-tag">Part 3 of 3</div>
@@ -293,10 +304,10 @@ footer p{margin:0;max-width:64ch;}
           <th class="n">Questions</th><th class="n">Right</th><th class="n">Wrong</th><th class="n">Skipped</th>
         </tr></thead>
         <tbody>
-          {% for c in t.shown %}
+          {% for c in t.rows %}
           <tr>
-            <td class="ch"{% if c.other %} style="font-weight:400;color:var(--muted)"{% endif %}>{{ c.name }}</td>
-            {% if r.show_all_chapters %}<td class="pc {{ c.priority or '' }}">{{ "" if c.other else (c.priority or "—") }}</td>{% endif %}
+            <td class="ch">{{ c.name }}</td>
+            {% if r.show_all_chapters %}<td class="pc {{ c.priority or '' }}">{{ c.priority or "—" }}</td>{% endif %}
             <td>{{ c.q }}</td><td>{{ c.r }}</td><td>{{ c.w }}</td><td>{{ c.s }}</td>
           </tr>
           {% else %}
@@ -314,15 +325,8 @@ footer p{margin:0;max-width:64ch;}
     {% endfor %}
   </div>
 
-  <div class="todo">
-    <h2>What to do next</h2>
-    <ol>
-      {% for item in r.todo %}<li>{{ item }}</li>{% endfor %}
-    </ol>
-  </div>
-
   <div class="spacer"></div>
-  <footer><p>Source: Avanti Fellows test data · as of {{ r.as_of }}</p><p>Page 2 of 2</p></footer>
+  <footer><p>Source: Avanti Fellows test data · as of {{ r.as_of }}</p></footer>
 </div>
 </body>
 </html>
