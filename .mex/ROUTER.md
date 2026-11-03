@@ -18,7 +18,7 @@ edges:
     condition: when working on launch tokens, cookies, or report access control
   - target: patterns/INDEX.md
     condition: when starting a task — check the pattern index for a matching pattern file
-last_updated: 2026-07-09
+last_updated: 2026-11-03
 ---
 
 # Session Bootstrap
@@ -34,6 +34,7 @@ Then read this file fully before doing anything else in this session.
 - Launch-token auth flow (portal-verified, cookie handoff) across quiz reports and form responses, plus quiz-review handoff links
 - Live session / live quiz reports from Mongo aggregation + Firestore session lookup
 - Form responses with OpenRouter LLM theme summaries
+- Cumulative report (`/reports/cumulative_report/{user_id}`, launch-token route `/reports/cumulative_report`): a student's last 2-3 big tests from their v2 docs, 2-page print layout + PDF download
 - PDF generation via external HTML-to-PDF service; staging + prod deploys via GitHub Actions + SAM
 
 **Not yet built:**

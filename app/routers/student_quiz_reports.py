@@ -11,6 +11,7 @@ from db.bq_db import BigQueryDB
 from fastapi.security.api_key import APIKeyHeader
 from utils.pdf_converter import convert_template_to_pdf
 from utils.formatting import format_duration, current_year
+from utils.cumulative_report import build_cumulative_report, select_tests
 from utils.report_launch import (
     get_report_launch_token,
     redirect_with_launch_cookie,
@@ -327,6 +328,78 @@ class StudentQuizReportsRouter:
             if format == "pdf":
                 return convert_template_to_pdf(template_response, debug=debug)
 
+            return template_response
+
+        @api_router.get("/cumulative_report")
+        def cumulative_report_with_token(
+            request: Request,
+            launchToken: Optional[str] = None,
+            format: Optional[str] = None,
+            debug: bool = False,
+        ):
+            """Launch-token entry (Gurukul) for the cumulative report."""
+            if launchToken:
+                return redirect_with_launch_cookie(
+                    request=request,
+                    session_id="cumulative",
+                    launch_token=launchToken,
+                    cookie_prefix="cumulative_report_launch",
+                    clean_path="/reports/cumulative_report",
+                )
+            token = get_report_launch_token(
+                request=request,
+                session_id="cumulative",
+                launch_token=None,
+                cookie_prefix="cumulative_report_launch",
+            )
+            return cumulative_report(
+                request=request,
+                user_id=resolve_report_user_id(None, token),
+                format=format,
+                debug=debug,
+            )
+
+        @api_router.get("/cumulative_report/{user_id}")
+        def cumulative_report(
+            request: Request,
+            user_id: str,
+            format: Optional[str] = None,
+            debug: bool = False,
+        ):
+            """
+            One report across the student's last 2-3 big tests (AIAT/AIET,
+            major, full-syllabus...), built from their v2 docs.
+            ?format=pdf downloads it; fewer than 2 big tests -> error page.
+            """
+            user_id = unquote(user_id)
+            items = self.__reports_db.get_student_reports_v2(user_id)
+            report = build_cumulative_report(items)
+
+            if report is None:
+                count = len(select_tests(items))
+                error_data = {
+                    "error_message": (
+                        "You don't have a cumulative report yet. It needs at least "
+                        f"2 big tests (like AIAT), and you have taken {count}."
+                    ),
+                    "student_id": next(
+                        (i.get("student_id") for i in items if i.get("student_id")),
+                        None,
+                    ),
+                }
+                template_response = self._templates.TemplateResponse(
+                    "error.html", {"request": request, "error_data": error_data}
+                )
+            else:
+                template_response = self._templates.TemplateResponse(
+                    "student_cumulative_report.html",
+                    {"request": request, "r": report, "pdf": format == "pdf"},
+                )
+            if format == "pdf":
+                # The cumulative template carries its own full print CSS.
+                return convert_template_to_pdf(
+                    template_response, debug=debug, default_css=report is None
+                )
             return template_response
 
         @api_router.get("/student_quiz_report/{session_id}")
