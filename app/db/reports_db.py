@@ -52,15 +52,22 @@ class ReportsDB:
     def get_student_reports_v2(self, user_id):
         """
         Returns all student reports from the v2 table for a given user ID.
-        Uses the user_id_index GSI.
+        Uses the user_id_index GSI. Pages through results: docs carry
+        chapter data, so a student with many tests can pass the 1 MB page limit.
         """
         try:
             table = self.__db.Table("student_quiz_reports_v2")
-            response = table.query(
-                IndexName="user_id_index",
-                KeyConditionExpression=Key("user_id").eq(user_id),
-            )
-            return response["Items"]
+            kwargs = {
+                "IndexName": "user_id_index",
+                "KeyConditionExpression": Key("user_id").eq(user_id),
+            }
+            items = []
+            while True:
+                response = table.query(**kwargs)
+                items.extend(response["Items"])
+                if "LastEvaluatedKey" not in response:
+                    return items
+                kwargs["ExclusiveStartKey"] = response["LastEvaluatedKey"]
         except ClientError:
             return []
 

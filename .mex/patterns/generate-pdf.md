@@ -10,7 +10,7 @@ edges:
     condition: for the external HTML-to-PDF service's place in the flow
   - target: patterns/add-report-endpoint.md
     condition: when wiring PDF support into a new endpoint
-last_updated: 2026-07-09
+last_updated: 2026-11-03
 ---
 
 # Generate / Debug PDFs
@@ -31,6 +31,7 @@ last_updated: 2026-07-09
 - Only the style.css link is inlined — a `<link>` to any other stylesheet silently won't apply in the PDF (the link tag stays but the service can't fetch relative URLs).
 - Remote images (http/https/data:) are left as-is; local images must exist under `app/static/` to be base64-inlined.
 - The SAM parameter is named `HtmlToPdfUrl` but the runtime env var is `HTML_TO_PDF_SERVER_URL` — keep both in sync when changing the service URL.
+- With no `style.css` link the converter appends its own fallback CSS (centred text, Avenir), which wrecks a template that ships its own `<style>`. Pass `default_css=False` for such templates (the cumulative report does).
 - Failure returns an HTML "Error generating PDF" page with status 500, not an exception — check Lambda logs for the service's status/text.
 
 ## Verify
