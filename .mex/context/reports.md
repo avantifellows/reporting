@@ -41,7 +41,9 @@ last_updated: 2026-11-03
 3. v1 section query
 4. `error.html` with 404 message
 
-The student reports listing (`/reports/student_reports/{user_id}`) merges both tables — v1 items filtered to `overall` sections, skipping any session_id also present in v2. Each entry carries `test_name`, `test_session_id`, `percentile`, `rank`, `report_link`, `start_date`, plus `marks_scored` / `max_marks_possible` (flat on the v1 overall row, under `overall_performance` in v2; `None` on rows predating them). Gurukul's cutoffs screen reads the marks to place a score against the JEE cutoffs, so dropping or renaming them breaks it.
+The student reports listing (`/reports/student_reports/{user_id}`) merges both tables — v1 items filtered to `overall` sections, skipping any session_id also present in v2. Each entry carries `test_name`, `test_session_id`, `percentile`, `rank`, `report_link`, `start_date`, plus `marks_scored` / `max_marks_possible` and `test_format` / `test_type` (v1 keeps all four flat on the overall row; v2 splits them between `overall_performance` and `report_header`; empty or `None` on rows predating them). Gurukul's cutoffs screen reads the marks to place a score against the JEE cutoffs and the format to ignore anything that is not a full-length paper, so dropping or renaming any of them breaks it.
+
+**`percentile` in the listing is not a percentile for v2 entries** — it is filled from `overall_performance.percentage`, the student's score as a percentage. v1 entries use the real `percentile` attribute. Anything that labels this field "percentile" in a UI shows v2 students the wrong number.
 
 ## v3 — enrichment on top of v1 (GET `/reports/student_quiz_report/v3/...`)
 

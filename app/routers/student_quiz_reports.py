@@ -298,6 +298,12 @@ class StudentQuizReportsRouter:
                     # overall section row. None when the row predates them.
                     "marks_scored": doc.get("marks_scored"),
                     "max_marks_possible": doc.get("max_marks_possible"),
+                    # What kind of paper the marks came from. A cutoff is only
+                    # meaningful against a full-length paper, so a client
+                    # comparing scores has to be able to tell a part test from
+                    # a major one. Empty on rows that never carried it.
+                    "test_format": doc.get("test_format", ""),
+                    "test_type": doc.get("test_type", ""),
                 }
                 student_reports.append(result)
 
@@ -316,10 +322,12 @@ class StudentQuizReportsRouter:
                         session_id=doc["session_id"], user_id=user_id
                     ),
                     "start_date": header.get("test_date", ""),
-                    # Same two fields as v1 above, nested under
-                    # overall_performance in the v2 shape.
+                    # Same four fields as v1 above; v2 splits them between
+                    # overall_performance and report_header.
                     "marks_scored": overall.get("marks_scored"),
                     "max_marks_possible": overall.get("max_marks_possible"),
+                    "test_format": header.get("test_format", ""),
+                    "test_type": header.get("test_type", ""),
                 }
                 student_reports.append(result)
 
