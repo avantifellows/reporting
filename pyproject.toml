@@ -82,4 +82,5 @@ packages = ["app"]
 [tool.uv]
 dev-dependencies = [
     "pre-commit>=4.2.0",
+    "pytest>=9.2.0",
 ]
