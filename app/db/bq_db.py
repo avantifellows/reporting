@@ -6,7 +6,7 @@ class BigQueryDB:
         self.__client = client
 
     def get_student_qualification_data(self, user_id, test_id):
-        query_string = f"""
+        query_string = """
         SELECT
             qualification_status,
             marks_to_qualify,
@@ -15,14 +15,20 @@ class BigQueryDB:
         FROM
             avantifellows.prod_af_db.student_profile_al
         WHERE
-            user_id = '{user_id}'
-            AND test_id = '{test_id}'
+            user_id = @user_id
+            AND test_id = @test_id
             AND section = 'overall'
         LIMIT 1
         """
 
         try:
-            query_job = self.__client.query(query_string)
+            job_config = bigquery.QueryJobConfig(
+                query_parameters=[
+                    bigquery.ScalarQueryParameter("user_id", "STRING", str(user_id)),
+                    bigquery.ScalarQueryParameter("test_id", "STRING", str(test_id)),
+                ]
+            )
+            query_job = self.__client.query(query_string, job_config=job_config)
             results = list(query_job.result())
 
             if results:

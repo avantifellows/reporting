@@ -1,4 +1,6 @@
 import json
+import logging
+import os
 from collections import OrderedDict
 from typing import Union, Optional
 from urllib.parse import unquote, quote
@@ -44,11 +46,15 @@ CHAPTER_WISE_ROW_NAMES = {
     "chapter_code": "Chapter Code",
 }
 
+logger = logging.getLogger(__name__)
+
 QUIZ_REVIEW_URL = (
     "https://quiz.avantifellows.org/quiz/{quiz_id}"
     "?apiKey={api_key}&launchToken={launch_token}"
 )
-QUIZ_AF_API_KEY = "6qOO8UdF1EGxLgzwIbQN"
+# The Quiz API key comes from the environment (QUIZ_AF_API_KEY), never source
+# control. If unset, quiz review links are omitted from reports instead of the
+# whole report failing.
 
 # https://reports.avantifellows.org/reports/student_quiz_report/Homework_Quiz_2022-08-03_62ea813210de4e9677c8ce2d/1403899102
 STUDENT_QUIZ_REPORT_URL = "https://reports.avantifellows.org/reports/student_quiz_report/{session_id}/{user_id}"
@@ -229,12 +235,16 @@ class StudentQuizReportsRouter:
             launch_token = getattr(request.state, "report_launch_token", None)
             if not launch_token:
                 return None
+            quiz_api_key = os.environ.get("QUIZ_AF_API_KEY")
+            if not quiz_api_key:
+                logger.warning("QUIZ_AF_API_KEY is not set; omitting quiz review link")
+                return None
 
             # Direct report -> quiz review handoff reuses the verified report token.
             # Quiz resolves canonical identity from the token and strips it from the URL after boot.
             return QUIZ_REVIEW_URL.format(
                 quiz_id=quote(str(quiz_id), safe=""),
-                api_key=quote(QUIZ_AF_API_KEY, safe=""),
+                api_key=quote(quiz_api_key, safe=""),
                 launch_token=quote(launch_token, safe=""),
             )
 
