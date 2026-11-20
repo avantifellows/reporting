@@ -293,6 +293,22 @@ class StudentQuizReportsRouter:
                         session_id=doc["session_id"], user_id=user_id
                     ),
                     "start_date": doc["start_date"],
+                    # Marks, for clients that compare a score against something
+                    # (Gurukul's cutoffs screen). v1 keeps them flat on the
+                    # overall section row. None when the row predates them.
+                    "marks_scored": doc.get("marks_scored"),
+                    "max_marks_possible": doc.get("max_marks_possible"),
+                    # What kind of paper the marks came from. A cutoff is only
+                    # meaningful against a full-length paper, so a client
+                    # comparing scores has to be able to tell a part test from
+                    # a major one. Empty on rows that never carried it.
+                    "test_format": doc.get("test_format", ""),
+                    "test_type": doc.get("test_type", ""),
+                    # Which exam the paper belongs to. Marks alone cannot say:
+                    # a NEET nursing paper and a JEE Mains paper are both out
+                    # of 300, so without this a client has no way to keep one
+                    # exam's score away from another's cutoffs.
+                    "stream": doc.get("stream", ""),
                 }
                 student_reports.append(result)
 
@@ -311,6 +327,14 @@ class StudentQuizReportsRouter:
                         session_id=doc["session_id"], user_id=user_id
                     ),
                     "start_date": header.get("test_date", ""),
+                    # Same four fields as v1 above; v2 splits them between
+                    # overall_performance and report_header.
+                    "marks_scored": overall.get("marks_scored"),
+                    "max_marks_possible": overall.get("max_marks_possible"),
+                    "test_format": header.get("test_format", ""),
+                    "test_type": header.get("test_type", ""),
+                    "stream": header.get("stream", ""),
+                    "course": header.get("course", ""),
                 }
                 student_reports.append(result)
 
