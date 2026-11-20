@@ -304,6 +304,11 @@ class StudentQuizReportsRouter:
                     # a major one. Empty on rows that never carried it.
                     "test_format": doc.get("test_format", ""),
                     "test_type": doc.get("test_type", ""),
+                    # Which exam the paper belongs to. Marks alone cannot say:
+                    # a NEET nursing paper and a JEE Mains paper are both out
+                    # of 300, so without this a client has no way to keep one
+                    # exam's score away from another's cutoffs.
+                    "stream": doc.get("stream", ""),
                 }
                 student_reports.append(result)
 
@@ -328,6 +333,8 @@ class StudentQuizReportsRouter:
                     "max_marks_possible": overall.get("max_marks_possible"),
                     "test_format": header.get("test_format", ""),
                     "test_type": header.get("test_type", ""),
+                    "stream": header.get("stream", ""),
+                    "course": header.get("course", ""),
                 }
                 student_reports.append(result)
 
