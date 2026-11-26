@@ -15,7 +15,16 @@ from datetime import date
 
 from markupsafe import Markup
 
-BIG_TEST_FORMATS = {"major_test", "full_syllabus_test", "mock_test", "part_test"}
+BIG_TEST_FORMATS = {
+    "major_test",
+    "full_syllabus_test",
+    "mock_test",
+    "part_test",
+    "previous_year_test",
+}
+# Previous-year papers count only for JEE/NEET. The CUET, NDA and CLAT practice PYQs
+# (also previous_year_test) must not decide the stream of a JEE/NEET student who tried one.
+PYQ_BIG_STREAMS = {"engineering", "medical"}
 MAX_TESTS = 3
 MIN_TESTS = 2
 SUBJECT_ORDER = ["Physics", "Chemistry", "Maths", "Mathematics", "Biology"]
@@ -67,9 +76,10 @@ def _grade_from_name(name: str):
 def select_tests(items: list) -> list:
     """The student's last MAX_TESTS big tests, oldest first.
 
-    Big = major/full-syllabus/mock/part test, submitted, not a Baseline or a
-    JEE Advanced paper, written for the student's grade (when the name says),
-    and in the stream of the student's latest big test. A test name taken twice
+    Big = major/full-syllabus/mock/part test or a JEE/NEET previous-year
+    paper, submitted, not a Baseline or a JEE Advanced paper, written for the
+    student's grade (when the name says), and in the stream of the student's
+    latest big test. A test name taken twice
     keeps only the later sitting.
     """
     candidates = []
@@ -79,6 +89,11 @@ def select_tests(items: list) -> list:
         name = header.get("test_name") or ""
         lname = name.lower()
         if header.get("test_format") not in BIG_TEST_FORMATS:
+            continue
+        if (
+            header.get("test_format") == "previous_year_test"
+            and header.get("stream") not in PYQ_BIG_STREAMS
+        ):
             continue
         if "baseline" in lname or "advance" in lname:
             continue
